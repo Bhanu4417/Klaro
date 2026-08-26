@@ -1,0 +1,248 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@font-face {
+  font-family: 'satoshi';
+  src: url('./satoshi/Satoshi-Regular.otf') format('opentype');
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'satoshi';
+  src: url('./satoshi/Satoshi-Medium.otf') format('opentype');
+  font-weight: 500;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'satoshi';
+  src: url('./satoshi/Satoshi-Bold.otf') format('opentype');
+  font-weight: 600;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'satoshi';
+  src: url('./satoshi/Satoshi-Bold.otf') format('opentype');
+  font-weight: 700;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'satoshi';
+  src: url('./satoshi/Satoshi-Black.otf') format('opentype');
+  font-weight: 900;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'satoshi Fallback';
+  src: local('Inter'), local('-apple-system'), local('BlinkMacSystemFont'), local('Segoe UI'), local('sans-serif');
+  ascent-override: 90%;
+  descent-override: 22%;
+  line-gap-override: 0%;
+}
+
+@font-face {
+  font-family: 'saans Fallback';
+  src: local('Inter'), local('-apple-system'), local('BlinkMacSystemFont'), local('Segoe UI'), local('sans-serif');
+  ascent-override: 90%;
+  descent-override: 22%;
+  line-gap-override: 0%;
+}
+
+:root {
+  --background: #E6E4E5;
+  --foreground: rgb(18, 18, 18);
+}
+
+@layer base {
+  * {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+  }
+
+  body {
+    background-color: #E6E4E5;
+    color: rgb(18, 18, 18);
+    font-family: var(--font-satoshi), 'satoshi', 'satoshi Fallback', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    font-feature-settings: "cv02", "cv03", "cv04", "cv11";
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    min-height: 100vh;
+    overflow-x: hidden;
+  }
+
+  ::selection {
+    background-color: #94EC40;
+    color: #121212;
+  }
+}
+
+/* Background surface */
+.bg-warm-paper-texture {
+  background-color: #E6E4E5;
+}
+
+/* Low-key ambient motion for the India map's grey dot field. */
+@keyframes india-dot-breathe {
+  0%, 100% {
+    opacity: 0.16;
+  }
+  44% {
+    opacity: 0.28;
+  }
+  58% {
+    opacity: 0.2;
+  }
+}
+
+@keyframes india-flow-one {
+  0%, 100% {
+    transform: translate3d(-8%, -5%, 0) scale(0.9);
+  }
+  50% {
+    transform: translate3d(12%, 8%, 0) scale(1.08);
+  }
+}
+
+@keyframes india-flow-two {
+  0%, 100% {
+    transform: translate3d(10%, 8%, 0) scale(1.05);
+  }
+  50% {
+    transform: translate3d(-12%, -3%, 0) scale(0.88);
+  }
+}
+
+@keyframes india-flow-three {
+  0%, 100% {
+    transform: translate3d(-5%, 12%, 0) scale(0.85);
+  }
+  50% {
+    transform: translate3d(8%, -10%, 0) scale(1.12);
+  }
+}
+
+.india-dot-field {
+  opacity: 0.2;
+  animation: india-dot-breathe 5.8s ease-in-out infinite;
+}
+
+.india-dot-glow {
+  overflow: hidden;
+  opacity: 0.7;
+}
+
+.india-map-svg {
+  image-rendering: pixelated;
+}
+
+.india-copy-panel {
+  background: rgba(32, 32, 35, 0.94);
+  box-shadow: 0 10px 28px rgba(0, 0, 0, 0.16);
+}
+
+.india-flow-glow {
+  position: absolute;
+  width: 42%;
+  height: 38%;
+  border-radius: 999px;
+  background: radial-gradient(circle, rgba(148, 235, 65, 0.16), transparent 68%);
+  filter: blur(34px);
+  will-change: transform;
+}
+
+.india-flow-glow-one {
+  top: 12%;
+  left: 16%;
+  animation: india-flow-one 13s ease-in-out infinite;
+}
+
+.india-flow-glow-two {
+  right: 8%;
+  bottom: 18%;
+  opacity: 0.7;
+  animation: india-flow-two 16s ease-in-out infinite;
+}
+
+.india-flow-glow-three {
+  top: 44%;
+  left: 42%;
+  width: 32%;
+  height: 30%;
+  opacity: 0.55;
+  animation: india-flow-three 11s ease-in-out infinite;
+}
+
+.india-profile-pin {
+  position: absolute;
+  z-index: 0;
+  top: calc(100% - 5px);
+  left: 50%;
+  width: 14px;
+  height: 23px;
+  transform: translateX(-50%);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.india-profile-pin__stem {
+  width: 2px;
+  height: 12px;
+  border-radius: 999px;
+  background: linear-gradient(to bottom, rgba(148, 235, 65, 0.85), rgba(148, 235, 65, 0.28));
+  box-shadow: 0 0 8px rgba(148, 235, 65, 0.28);
+}
+
+.india-profile-pin__tip {
+  position: relative;
+  width: 9px;
+  height: 9px;
+  margin-top: -1px;
+  border-radius: 50% 50% 50% 0;
+  background: #94eb41;
+  transform: rotate(-45deg);
+  box-shadow: 0 2px 8px rgba(148, 235, 65, 0.35);
+}
+
+.india-profile-pin__dot {
+  position: absolute;
+  width: 3px;
+  height: 3px;
+  top: 3px;
+  left: 3px;
+  border-radius: 50%;
+  background: #1c2a16;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .india-dot-field,
+  .india-dot-glow,
+  .india-flow-glow {
+    animation: none;
+  }
+}
+
+/* Focus ring accessibility with #94EC40 */
+.focus-ring {
+  @apply focus:outline-none focus-visible:ring-2 focus-visible:ring-[#94EC40] focus-visible:ring-offset-2 focus-visible:ring-offset-[#E6E4E5];
+}
+
+/* Smooth input styling */
+input:-webkit-autofill,
+input:-webkit-autofill:hover, 
+input:-webkit-autofill:focus {
+  -webkit-box-shadow: 0 0 0px 1000px #E6E4E5 inset !important;
+  -webkit-text-fill-color: rgb(18, 18, 18) !important;
+  transition: background-color 5000s ease-in-out 0s;
+}
