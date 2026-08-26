@@ -729,7 +729,7 @@ export default function DashboardPage() {
         className={cn(
           "flex-1 max-w-7xl w-full mx-auto px-3 sm:px-6 lg:px-8",
           mobileTab === "home" || mobileTab === "reports"
-            ? "py-2 pb-20 sm:py-6 sm:pb-6 overflow-hidden sm:overflow-visible"
+            ? "py-2 pb-2 sm:py-6 sm:pb-6 overflow-hidden sm:overflow-visible"
             : "py-3 pb-28 sm:py-6 sm:pb-6"
         )}
       >
@@ -1037,11 +1037,11 @@ export default function DashboardPage() {
                     </div>
                   )}
 
-                  {/* TAB 3: REPORTS (User's Submitted Violation Reports - Fixed Header, Scrollable List) */}
+                  {/* TAB 3: REPORTS (User's Submitted Violation Reports - Pinned Header, Dedicated Scroll Area) */}
                   {mobileTab === "reports" && (
-                    <div className="flex flex-col h-[calc(100dvh-5.5rem)] max-h-[calc(100dvh-5.5rem)] space-y-3 pt-1 text-left pb-14 overflow-hidden">
+                    <div className="flex flex-col h-[calc(100dvh-5.5rem)] max-h-[calc(100dvh-5.5rem)] space-y-3 pt-0.5 text-left overflow-hidden">
                       
-                      {/* Fixed Reports Header Box (Never scrolls) */}
+                      {/* Pinned Reports Header Box (Stays in its place, never scrolls or covers cards) */}
                       <div className="shrink-0 p-4 rounded-2xl bg-[#FCFCFB] border border-[#D5D2D4] shadow-sm space-y-3">
                         <div className="flex items-center justify-between">
                           <div className="flex items-center gap-2">
@@ -1077,8 +1077,8 @@ export default function DashboardPage() {
                         </div>
                       </div>
 
-                      {/* Scrollable Reports List Only */}
-                      <div className="flex-1 overflow-y-auto space-y-3 pr-0.5 no-scrollbar pb-6">
+                      {/* Scrollable Reports List Only (Starts below header, scrolls smoothly with pb-36) */}
+                      <div className="flex-1 overflow-y-auto space-y-3 pr-0.5 no-scrollbar pb-36">
                         {MY_SUBMITTED_REPORTS.map((rep) => (
                           <div
                             key={rep.id}
