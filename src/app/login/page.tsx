@@ -44,38 +44,36 @@ export default function LoginPage() {
   const [authEmail, setAuthEmail] = useState("");
   const [resetEmail, setResetEmail] = useState("");
 
-  // Sync with live Clerk session & Supabase profile on load
+  // Sync with live Clerk session & direct straight to dashboard
   useEffect(() => {
     async function syncSession() {
       if (!isUserLoaded) return;
 
       if (isSignedIn && user) {
         setIsLoading(true);
-        setLoadingMessage("Fetching your profile...");
+        setLoadingMessage("Directing to dashboard...");
         try {
           const profile = await getUserProfile();
           if (profile && profile.username) {
             setCurrentUser(profile);
-            router.push("/dashboard");
-            return;
           } else {
-            // New user or incomplete onboarding -> direct to ProfileOnboarding
+            // Auto-create default profile in background
             const email = user.emailAddresses[0]?.emailAddress || "";
-            setAuthEmail(email);
-            setCurrentUser((prev) => ({
-              ...prev,
-              id: user.id,
-              email,
-              displayName: user.fullName || user.firstName || email.split("@")[0],
-              avatarUrl: user.imageUrl || "🥑",
-            }));
-            setView("onboarding");
+            const displayName = user.fullName || user.firstName || email.split("@")[0] || "User";
+            const username = (user.username || email.split("@")[0] || `user_${user.id.slice(-6)}`).toLowerCase().replace(/[^a-z0-9_]/g, "");
+            const avatarUrl = user.imageUrl || "🥑";
+
+            saveUserProfile({
+              username,
+              displayName,
+              avatarUrl,
+              dietaryPreferences: ["Clean Label"],
+            }).catch(() => {});
           }
         } catch (err) {
           console.error("Profile sync error:", err);
-          setView("onboarding");
         } finally {
-          setIsLoading(false);
+          router.replace("/dashboard");
         }
       }
     }
@@ -195,14 +193,7 @@ export default function LoginPage() {
 
       if (result.status === "complete") {
         await clerk.setActive({ session: result.createdSessionId });
-        const profile = await getUserProfile();
-        if (profile && profile.username) {
-          setCurrentUser(profile);
-          router.push("/dashboard");
-        } else {
-          setAuthEmail(data.email);
-          setView("onboarding");
-        }
+        router.push("/dashboard");
       } else {
         setAuthError({ message: "Additional verification required. Please check your account settings." });
       }
@@ -255,7 +246,7 @@ export default function LoginPage() {
 
       if (completeSignUp.status === "complete") {
         await clerk.setActive({ session: completeSignUp.createdSessionId });
-        setView("onboarding");
+        router.push("/dashboard");
       } else {
         setAuthError({ message: "Verification incomplete. Please enter the correct code." });
       }
