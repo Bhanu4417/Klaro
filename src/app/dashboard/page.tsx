@@ -263,7 +263,13 @@ const MY_SUBMITTED_REPORTS = [
 ];
 
 // Custom SVG icons requested by user
-const TrendingCustomIcon = ({ className = "w-5 h-5" }: { className?: string }) => (
+const TrendingFlameCustomIcon = ({ className = "w-4 h-4" }: { className?: string }) => (
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="24" height="24" className={className} fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
+    <path d="M13.8561 22C26.0783 19 19.2338 7 10.9227 2C9.9453 5.5 8.47838 6.5 5.54497 10C1.66121 14.6339 3.5895 20 8.96719 22C8.1524 21 6.04958 18.9008 7.5 16C8 15 9 14 8.5 12C9.47778 12.5 11.5 13 12 15.5C12.8148 14.5 13.6604 12.4 12.8783 10C19 14.5 16.5 19 13.8561 22Z" />
+  </svg>
+);
+
+const TrendingCustomIcon = ({ className = "w-4 h-4" }: { className?: string }) => (
   <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="24" height="24" className={className} fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
     <path d="M3 17L7 13C7.88256 12.1174 8.32385 11.6762 8.86543 11.6274C8.95496 11.6193 9.04504 11.6193 9.13457 11.6274C9.67615 11.6762 10.1174 12.1174 11 13C11.8826 13.8826 12.3238 14.3238 12.8654 14.3726C12.955 14.3807 13.045 14.3807 13.1346 14.3726C13.6762 14.3238 14.1174 13.8826 15 13L20 8" />
     <path d="M16 7.27657C16 7.27657 20.101 6.65426 20.7234 7.27661C21.3458 7.89896 20.7234 12 20.7234 12" />
@@ -764,18 +770,15 @@ export default function DashboardPage() {
                         </h1>
                       </div>
 
-                      {/* Photo Upload Action Box - Triggers Scan Picker */}
+                      {/* Photo Upload Action Box */}
                       <div
                         onClick={openPickerChoice}
                         role="button"
                         tabIndex={0}
                         onKeyDown={(e) => e.key === "Enter" && openPickerChoice()}
-                        className="p-2.5 sm:p-3 rounded-[24px] bg-[#FCFCFB]/75 backdrop-blur-2xl border border-white/80 transition-all cursor-pointer text-center active:scale-[0.99] shrink-0 hover:border-[#B8F27D]/40"
-                        style={{
-                          boxShadow: "0 14px 40px -4px rgba(0, 0, 0, 0.12), 0 2px 8px 0 rgba(0, 0, 0, 0.04), inset 0 1px 1px 0 rgba(255, 255, 255, 0.95), inset 0 -1px 2px 0 rgba(0, 0, 0, 0.04)",
-                        }}
+                        className="p-2.5 sm:p-3 rounded-2xl bg-[#FCFCFB] border border-[#D5D2D4] shadow-sm transition-all cursor-pointer text-center active:scale-[0.99] shrink-0 hover:border-zinc-400"
                       >
-                        <div className="border-2 border-dashed border-zinc-300/80 rounded-2xl p-3.5 sm:p-4 flex flex-col items-center justify-center gap-2 bg-white/40 hover:bg-white/60 transition-all">
+                        <div className="border-2 border-dashed border-zinc-300/80 rounded-xl p-3.5 sm:p-4 flex flex-col items-center justify-center gap-2 bg-[#ECEAEB]/30 hover:bg-[#ECEAEB]/50 transition-all">
                           <div className="w-10 h-10 rounded-full bg-[#94EB41] shadow-[0_4px_14px_rgba(148,235,65,0.35),inset_0_1px_1px_rgba(255,255,255,0.7)] flex items-center justify-center text-[rgb(18,18,18)] border border-[#80D42F]">
                             <AddPhotoCustomIcon className="w-5 h-5 stroke-[1.8]" />
                           </div>
@@ -786,12 +789,12 @@ export default function DashboardPage() {
                         </div>
                       </div>
 
-                      {/* Trending Now Section with Custom Icon & Dynamic Dark Blurry Edge Vignettes */}
+                      {/* Trending Now Section with Flame Icon */}
                       <div className="space-y-2 pt-1 shrink-0">
                         <div className="flex items-center justify-between">
                           <div className="flex items-center gap-2">
-                            <div className="text-[#346415] bg-[#EAFBD9] p-1.5 rounded-xl border border-[#B8F27D]/70 flex items-center justify-center shadow-sm">
-                              <TrendingCustomIcon className="w-4 h-4" />
+                            <div className="text-zinc-900 bg-[#ECEAEB] p-1.5 rounded-xl border border-[#D5D2D4] flex items-center justify-center shadow-xs">
+                              <TrendingFlameCustomIcon className="w-4 h-4 text-amber-600" />
                             </div>
                             <h2
                               className="text-[17px] font-[900] text-zinc-950 tracking-[-0.02em]"
@@ -833,7 +836,7 @@ export default function DashboardPage() {
                             {posts.map((post) => (
                               <div
                                 key={`trending-${post.id}`}
-                                className="w-[265px] shrink-0 snap-start p-3 rounded-2xl bg-[#E4E2E3] text-[rgb(18,18,18)] font-mono space-y-2 border-[1.5px] border-[#C8C5C9] shadow-[0_4px_16px_rgba(0,0,0,0.04),inset_0_1px_1px_rgba(255,255,255,0.9)] ring-1 ring-black/[0.04] text-left"
+                                className="w-[265px] shrink-0 snap-start p-3.5 rounded-[20px] bg-[#E4E2E3] text-[rgb(18,18,18)] font-mono space-y-2 border-[1.5px] border-[#C8C5C9] shadow-[0_4px_16px_rgba(0,0,0,0.04),inset_0_1.5px_1.5px_rgba(255,255,255,0.9)] ring-1 ring-black/[0.04] text-left"
                               >
                                 {/* Header with Commodity and Brand */}
                                 <div className="flex items-center justify-between border-b border-[#D2CFD3] pb-1.5 text-[10px]">
@@ -859,7 +862,7 @@ export default function DashboardPage() {
                                 <div className="pt-1.5 border-t border-[#D2CFD3] space-y-0.5 text-[10px] leading-tight">
                                   <span className="text-rose-700 font-bold block truncate">Flag: {post.evidence.flagReason}</span>
                                   {post.evidence.requiredValue && (
-                                    <span className="text-zinc-600 font-semibold block truncate">Req: {post.evidence.requiredValue}</span>
+                                    <span className="text-zinc-700 font-medium block truncate">Req: {post.evidence.requiredValue}</span>
                                   )}
                                 </div>
                               </div>
@@ -871,11 +874,10 @@ export default function DashboardPage() {
                     </div>
                   )}
 
-                  {/* TAB 2: FEED (Community Posts Stream) */}
+                  {/* TAB 2: FEED (Community Violation Stream) */}
                   {mobileTab === "feed" && (
-                    <div className="space-y-3 pt-1">
-                      
-                      {/* Mobile Feed Top Search & Filter Bar (Smooth Collapsible on Scroll) */}
+                    <div className="space-y-4 pt-1 text-left pb-28">
+                      {/* Sticky Search & Filter Header Box */}
                       <div
                         className={cn(
                           "sticky top-1 z-30 rounded-2xl bg-[#FCFCFB]/95 backdrop-blur-md border border-[#D5D2D4] shadow-sm transition-all duration-300 ease-out text-left",
@@ -891,13 +893,13 @@ export default function DashboardPage() {
                             onChange={(e) => setSearchQuery(e.target.value)}
                             placeholder="Search violations, brands..."
                             className={cn(
-                              "w-full pl-9 pr-3 rounded-xl bg-[#ECEAEB] border border-[#D5D2D4] text-xs text-zinc-800 placeholder-zinc-400 focus:outline-none focus:bg-white focus:border-[#80D42F] focus:ring-1 focus:ring-[#94EB41]/40 transition-all duration-200",
+                              "w-full pl-9 pr-3 rounded-xl bg-[#ECEAEB] border border-[#D5D2D4] text-xs text-zinc-800 placeholder-zinc-400 focus:outline-none focus:bg-white focus:border-zinc-400 transition-all duration-200",
                               isSearchCollapsed ? "py-1.5" : "py-2"
                             )}
                           />
                         </div>
 
-                        {/* Filter Pills - Theme-aligned with Klaro signature palette */}
+                        {/* Filter Pills - Clean and sleek */}
                         <div
                           className={cn(
                             "overflow-hidden transition-all duration-300 ease-out",
@@ -913,9 +915,9 @@ export default function DashboardPage() {
                                 type="button"
                                 onClick={() => setActiveFilter(filter)}
                                 className={cn(
-                                  "px-2.5 py-1 rounded-xl font-bold transition-all whitespace-nowrap text-[11px] active:scale-95",
+                                  "px-3 py-1 rounded-xl font-bold transition-all whitespace-nowrap text-[11px] active:scale-95",
                                   activeFilter === filter
-                                    ? "bg-[#94EB41] text-[rgb(18,18,18)] border border-[#80D42F] shadow-[0_2px_8px_rgba(148,235,65,0.35),inset_0_1px_1px_rgba(255,255,255,0.7)]"
+                                    ? "bg-[#94EB41] text-[rgb(18,18,18)] border border-[#80D42F] shadow-xs"
                                     : "bg-[#ECEAEB] text-zinc-600 hover:text-zinc-900 border border-[#D5D2D4]"
                                 )}
                               >
@@ -930,7 +932,7 @@ export default function DashboardPage() {
                       {filteredPosts.map((post) => (
                         <article
                           key={`feed-${post.id}`}
-                          className="rounded-2xl bg-[#FCFCFB] border border-[#D5D2D4] shadow-[0_2px_12px_rgba(0,0,0,0.03)] overflow-hidden p-4 space-y-3 text-left"
+                          className="rounded-[22px] bg-[#FCFCFB] border-[1.5px] border-[#D5D2D4] shadow-[0_4px_20px_rgba(0,0,0,0.03),inset_0_1.5px_1.5px_rgba(255,255,255,0.95)] overflow-hidden p-4 space-y-3 text-left"
                         >
                           {/* Meta Header */}
                           <div className="flex items-center justify-between">
@@ -956,7 +958,7 @@ export default function DashboardPage() {
                           </div>
 
                           {/* Evidence Box */}
-                          <div className="p-4 rounded-2xl bg-[#E4E2E3] text-[rgb(18,18,18)] font-mono text-xs space-y-3 border-[1.5px] border-[#C8C5C9] shadow-[0_4px_16px_rgba(0,0,0,0.04),inset_0_1px_1px_rgba(255,255,255,0.9)] ring-1 ring-black/[0.04]">
+                          <div className="p-4 rounded-[20px] bg-[#E4E2E3] text-[rgb(18,18,18)] font-mono text-xs space-y-3 border-[1.5px] border-[#C8C5C9] shadow-[0_4px_16px_rgba(0,0,0,0.04),inset_0_1.5px_1.5px_rgba(255,255,255,0.9)] ring-1 ring-black/[0.04]">
                             {/* Top Row: Commodity & Brand Pill */}
                             <div className="flex items-center justify-between border-b border-[#D5D2D6] pb-2.5">
                               <span className="text-[13px] font-mono font-medium text-zinc-900 truncate pr-2">
@@ -1004,7 +1006,7 @@ export default function DashboardPage() {
 
                           {/* Bottom Engagement */}
                           <div className="pt-2 flex items-center justify-between border-t border-[#ECEAEB]">
-                            <div className="flex items-center gap-1.5 bg-[#ECEAEB] rounded-xl px-2 py-1">
+                            <div className="flex items-center gap-1.5 bg-[#ECEAEB] border border-[#D5D2D4] shadow-[inset_0_1px_1px_rgba(255,255,255,0.85)] rounded-[14px] px-2 py-1">
                               <button
                                 type="button"
                                 onClick={() => handleVote(post.id, "up")}
@@ -1025,7 +1027,7 @@ export default function DashboardPage() {
                             <button
                               type="button"
                               onClick={() => handleOpenShare(post.title, post.id)}
-                              className="p-2 rounded-xl bg-[#ECEAEB] hover:bg-[#E0DEE0] active:scale-95 transition-all text-zinc-600 flex items-center gap-1.5 font-bold text-xs"
+                              className="p-2 rounded-[14px] bg-[#ECEAEB] hover:bg-[#E0DEE0] active:scale-95 transition-all text-zinc-600 border border-[#D5D2D4] shadow-[inset_0_1px_1px_rgba(255,255,255,0.85)] flex items-center gap-1.5 font-bold text-xs"
                             >
                               <ShareCustomIcon className="w-4 h-4" />
                               <span>Share</span>
@@ -1041,10 +1043,10 @@ export default function DashboardPage() {
                     <div className="flex flex-col h-[calc(100dvh-5.5rem)] max-h-[calc(100dvh-5.5rem)] space-y-3 pt-0.5 text-left overflow-hidden">
                       
                       {/* Pinned Reports Header Box (Stays in its place, never scrolls or covers cards) */}
-                      <div className="shrink-0 p-4 rounded-2xl bg-[#FCFCFB] border border-[#D5D2D4] shadow-sm space-y-3">
+                      <div className="shrink-0 p-4 rounded-[22px] bg-[#FCFCFB] border-[1.5px] border-[#D5D2D4] shadow-[0_4px_20px_rgba(0,0,0,0.03),inset_0_1.5px_1.5px_rgba(255,255,255,0.95)] space-y-3">
                         <div className="flex items-center justify-between">
                           <div className="flex items-center gap-2">
-                            <div className="text-zinc-900 bg-[#ECEAEB] p-2 rounded-xl border border-[#D5D2D4] flex items-center justify-center">
+                            <div className="text-zinc-900 bg-[#ECEAEB] p-2 rounded-[14px] border border-[#D5D2D4] shadow-[inset_0_1px_1px_rgba(255,255,255,0.85)] flex items-center justify-center">
                               <ReportsNavIcon className="w-5 h-5" />
                             </div>
                             <div>
@@ -1061,15 +1063,15 @@ export default function DashboardPage() {
 
                         {/* Quick Summary Counter Bar */}
                         <div className="grid grid-cols-3 gap-2 pt-2 border-t border-[#ECEAEB] text-center">
-                          <div className="p-2 rounded-xl bg-[#ECEAEB]">
+                          <div className="p-2 rounded-[14px] bg-[#ECEAEB] border border-[#D5D2D4] shadow-[inset_0_1px_1px_rgba(255,255,255,0.85)]">
                             <span className="text-[9.5px] font-mono uppercase text-zinc-500 block">Total Filed</span>
                             <span className="text-sm font-bold text-zinc-900 font-mono">4</span>
                           </div>
-                          <div className="p-2 rounded-xl bg-[#ECEAEB]">
+                          <div className="p-2 rounded-[14px] bg-[#ECEAEB] border border-[#D5D2D4] shadow-[inset_0_1px_1px_rgba(255,255,255,0.85)]">
                             <span className="text-[9.5px] font-mono uppercase text-zinc-500 block">Notices Issued</span>
                             <span className="text-sm font-bold text-amber-700 font-mono">1</span>
                           </div>
-                          <div className="p-2 rounded-xl bg-[#ECEAEB]">
+                          <div className="p-2 rounded-[14px] bg-[#ECEAEB] border border-[#D5D2D4] shadow-[inset_0_1px_1px_rgba(255,255,255,0.85)]">
                             <span className="text-[9.5px] font-mono uppercase text-zinc-500 block">Compounded</span>
                             <span className="text-sm font-bold text-[#346415] font-mono">2</span>
                           </div>
@@ -1081,7 +1083,7 @@ export default function DashboardPage() {
                         {MY_SUBMITTED_REPORTS.map((rep) => (
                           <div
                             key={rep.id}
-                            className="p-4 rounded-2xl bg-[#FCFCFB] border border-[#D5D2D4] shadow-sm space-y-2.5"
+                            className="p-4 rounded-[20px] bg-[#FCFCFB] border-[1.5px] border-[#D5D2D4] shadow-[0_4px_16px_rgba(0,0,0,0.03),inset_0_1.5px_1.5px_rgba(255,255,255,0.95)] space-y-2.5"
                           >
                             <div className="flex items-center justify-between gap-2">
                               <span className="px-2 py-0.5 rounded-md text-[10px] font-mono font-bold bg-rose-100 text-rose-800 border border-rose-200">
@@ -1118,7 +1120,7 @@ export default function DashboardPage() {
                     <div className="space-y-4 pt-1 text-left pb-6">
                       
                       {/* User Profile Card */}
-                      <div className="p-5 rounded-2xl bg-[#FCFCFB] border border-[#D5D2D4] shadow-sm space-y-4">
+                      <div className="p-5 rounded-[22px] bg-[#FCFCFB] border-[1.5px] border-[#D5D2D4] shadow-[0_4px_20px_rgba(0,0,0,0.03),inset_0_1.5px_1.5px_rgba(255,255,255,0.95)] space-y-4">
                         <div className="flex items-center gap-3.5">
                           <div className="w-14 h-14 rounded-2xl overflow-hidden border-2 border-zinc-300 shrink-0 shadow-sm flex items-center justify-center text-2xl bg-white">
                             {avatar?.startsWith("http") || avatar?.startsWith("data:") ? (
@@ -1146,25 +1148,25 @@ export default function DashboardPage() {
 
                         {/* 4 Stats Grid: Karma, Reports, Upvoted, Downvoted */}
                         <div className="grid grid-cols-4 gap-2 pt-3 border-t border-[#ECEAEB] text-center">
-                          <div className="p-2.5 rounded-xl bg-[#ECEAEB]">
+                          <div className="p-2.5 rounded-[14px] bg-[#ECEAEB] border border-[#D5D2D4] shadow-[inset_0_1px_1px_rgba(255,255,255,0.85)]">
                             <span className="text-[9px] font-mono uppercase text-zinc-500 block">Karma</span>
                             <span className="text-base font-extrabold text-[#346415] font-mono">501</span>
                           </div>
-                          <div className="p-2.5 rounded-xl bg-[#ECEAEB]">
+                          <div className="p-2.5 rounded-[14px] bg-[#ECEAEB] border border-[#D5D2D4] shadow-[inset_0_1px_1px_rgba(255,255,255,0.85)]">
                             <span className="text-[9px] font-mono uppercase text-zinc-500 block">Reports</span>
                             <span className="text-base font-extrabold text-zinc-900 font-mono">4</span>
                           </div>
-                          <div className="p-2.5 rounded-xl bg-[#ECEAEB]">
+                          <div className="p-2.5 rounded-[14px] bg-[#ECEAEB] border border-[#D5D2D4] shadow-[inset_0_1px_1px_rgba(255,255,255,0.85)]">
                             <span className="text-[9px] font-mono uppercase text-zinc-500 block">Upvoted</span>
                             <span className="text-base font-extrabold text-zinc-900 font-mono">89</span>
                           </div>
-                          <div className="p-2.5 rounded-xl bg-[#ECEAEB]">
+                          <div className="p-2.5 rounded-[14px] bg-[#ECEAEB] border border-[#D5D2D4] shadow-[inset_0_1px_1px_rgba(255,255,255,0.85)]">
                             <span className="text-[9px] font-mono uppercase text-zinc-500 block">Downvoted</span>
                             <span className="text-base font-extrabold text-rose-700 font-mono">6</span>
                           </div>
                         </div>
 
-                        <div className="p-3 rounded-xl bg-[#E4E2E3] border border-[#C8C5C9] text-xs space-y-1">
+                        <div className="p-3 rounded-[16px] bg-[#E4E2E3] border border-[#C8C5C9] text-xs space-y-1 shadow-[inset_0_1px_1px_rgba(255,255,255,0.85)]">
                           <span className="text-[10px] font-bold text-zinc-600 uppercase font-mono tracking-wider block">HOW KARMA WORKS</span>
                           <p className="text-[11px] text-zinc-700 font-normal leading-relaxed">
                             You earn +1 Karma every time another citizen or officer upvotes a violation report you submitted.
@@ -1176,7 +1178,7 @@ export default function DashboardPage() {
                           type="button"
                           onClick={handleSignOut}
                           disabled={isSigningOut}
-                          className="w-full py-2.5 rounded-xl bg-[#ECEAEB] hover:bg-rose-50 hover:text-rose-700 border border-[#D5D2D4] text-xs font-bold text-zinc-700 transition-colors flex items-center justify-center gap-2"
+                          className="w-full py-2.5 rounded-[16px] bg-[#ECEAEB] hover:bg-rose-50 hover:text-rose-700 border-[1.5px] border-[#D5D2D4] shadow-[0_2px_8px_rgba(0,0,0,0.03),inset_0_1px_1px_rgba(255,255,255,0.85)] text-xs font-bold text-zinc-700 transition-colors flex items-center justify-center gap-2"
                         >
                           <LogOut className="w-3.5 h-3.5" />
                           <span>Sign Out</span>

@@ -154,29 +154,13 @@ export function ScanFlow({ isOpen, imageUrl, imageName, onClose, onPost, onSave 
                   initial={{ y: 12 }}
                   animate={{ y: 0 }}
                   transition={{ type: "spring", stiffness: 300, damping: 24 }}
-                  className="w-full bg-[#FCFCFB] border border-[#D5D2D4] shadow-[0_24px_60px_rgba(0,0,0,0.22)] relative overflow-hidden"
+                  className="w-full bg-[#FCFCFB] border border-[#D5D2D4] shadow-[0_24px_60px_rgba(0,0,0,0.22)] relative overflow-hidden rounded-2xl"
                   style={{
                     clipPath:
                       "polygon(0 0, 100% 0, 100% calc(100% - 10px), 96% 100%, 92% calc(100% - 10px), 88% 100%, 84% calc(100% - 10px), 80% 100%, 76% calc(100% - 10px), 72% 100%, 68% calc(100% - 10px), 64% 100%, 60% calc(100% - 10px), 56% 100%, 52% calc(100% - 10px), 48% 100%, 44% calc(100% - 10px), 40% 100%, 36% calc(100% - 10px), 32% 100%, 28% calc(100% - 10px), 24% 100%, 20% calc(100% - 10px), 16% 100%, 12% calc(100% - 10px), 8% 100%, 4% calc(100% - 10px), 0 100%)",
                   }}
                 >
-                  <DetachedPaperContent imageUrl={imageUrl} />
-                </motion.div>
-                <motion.div initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.18 }} className="flex gap-3 w-full">
-                  <button
-                    onClick={handlePost}
-                    className="flex-1 py-3 rounded-2xl bg-[#94EC40] text-[rgb(18,18,18)] font-bold text-[13px] shadow-[0_8px_20px_rgba(148,236,64,0.35)] flex items-center justify-center gap-2 hover:bg-[#80D42F] transition-colors border border-[#80D42F]"
-                  >
-                    <Share2 className="w-4 h-4" />
-                    Post to feed
-                  </button>
-                  <button
-                    onClick={handleSave}
-                    className="flex-1 py-3 rounded-2xl bg-white text-zinc-800 font-bold text-[13px] border border-[#D5D2D4] shadow-sm flex items-center justify-center gap-2 hover:bg-zinc-50 transition-colors"
-                  >
-                    <Bookmark className="w-4 h-4" />
-                    Save report
-                  </button>
+                  <DetachedPaperContent imageUrl={imageUrl} onPost={handlePost} onSave={handleSave} />
                 </motion.div>
               </motion.div>
             ) : (
@@ -362,18 +346,57 @@ function PaperContent({ imageUrl }: { imageUrl: string | null }) {
   );
 }
 
-function DetachedPaperContent({ imageUrl }: { imageUrl: string | null }) {
-  return (
-    <div className="p-6 sm:p-7 font-mono text-left">
-      <PaperContent imageUrl={imageUrl} />
-      <div className="pt-4 mt-4 border-t border-dashed border-zinc-300 text-center space-y-3">
-        <div className="inline-block px-3 py-1 rounded border-2 border-dashed border-[#417F14] text-[#346415] font-bold text-xs bg-[#F5FDF0]">★ 98% OCR CONFIDENCE • AUDITABLE EVIDENCE ★</div>
-        
-        {/* Authentic Crisp Barcode */}
-        <BarcodeGraphic code="KLR-2026-08-9412 • 8 901234 567890" />
+const PostToFeedCustomIcon = ({ className = "w-4 h-4" }: { className?: string }) => (
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="24" height="24" className={className} fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
+    <path d="M14 21.5H9.99995C6.71247 21.5 5.06873 21.5 3.96238 20.592C3.75984 20.4258 3.57413 20.2401 3.40791 20.0376C2.49995 18.9312 2.49995 17.2875 2.49995 14C2.49995 10.7125 2.49995 9.06878 3.40791 7.96243C3.57413 7.75989 3.75984 7.57418 3.96238 7.40796C5.06873 6.5 6.71247 6.5 9.99995 6.5H14C17.2874 6.5 18.9312 6.5 20.0375 7.40796C20.2401 7.57418 20.4258 7.75989 20.592 7.96243C21.5 9.06878 21.5 10.7125 21.5 14C21.5 17.2875 21.5 18.9312 20.592 20.0376C20.4258 20.2401 20.2401 20.4258 20.0375 20.592C18.9312 21.5 17.2874 21.5 14 21.5Z" />
+    <path d="M2.49995 14.5V10.5C2.49995 6.72876 2.49995 4.84315 3.67153 3.67157C4.8431 2.5 6.72872 2.5 10.5 2.5H13.5C17.2712 2.5 19.1568 2.5 20.3284 3.67157C21.5 4.84315 21.5 6.72876 21.5 10.5V14.5" />
+    <path d="M15 13.5C15 13.5 12.7905 10.5 11.9999 10.5C11.2094 10.5 8.99995 13.5 8.99995 13.5M11.9999 11L12 17.5" />
+  </svg>
+);
 
-        {/* Updated Legal Privacy Line */}
-        <p className="text-[10px] text-zinc-600 font-medium leading-relaxed max-w-[340px] mx-auto">
+const SaveReportCustomIcon = ({ className = "w-4 h-4" }: { className?: string }) => (
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="24" height="24" className={className} fill="none" stroke="currentColor" strokeWidth="1.5">
+    <path d="M4 17.9808V9.70753C4 6.07416 4 4.25748 5.17157 3.12874C6.34315 2 8.22876 2 12 2C15.7712 2 17.6569 2 18.8284 3.12874C20 4.25748 20 6.07416 20 9.70753V17.9808C20 20.2867 20 21.4396 19.2272 21.8523C17.7305 22.6514 14.9232 19.9852 13.59 19.1824C12.8168 18.7168 12.4302 18.484 12 18.484C11.5698 18.484 11.1832 18.7168 10.41 19.1824C9.0768 19.9852 6.26947 22.6514 4.77285 21.8523C4 21.4396 4 20.2867 4 17.9808Z" strokeLinecap="round" strokeLinejoin="round" />
+    <path d="M4 7H20" />
+  </svg>
+);
+
+function DetachedPaperContent({
+  imageUrl,
+  onPost,
+  onSave,
+}: {
+  imageUrl: string | null;
+  onPost: () => void;
+  onSave: () => void;
+}) {
+  return (
+    <div className="p-5 sm:p-6 font-mono text-left">
+      <PaperContent imageUrl={imageUrl} />
+      
+      {/* Footer Section with Smaller Post & Save Buttons in One Horizontal Line */}
+      <div className="pt-3.5 mt-3.5 border-t border-dashed border-zinc-300 space-y-2.5">
+        <div className="flex items-center gap-2.5 pt-0.5">
+          <button
+            type="button"
+            onClick={onPost}
+            className="flex-1 py-2 px-3 rounded-xl bg-[#94EC40] text-[rgb(18,18,18)] font-bold text-xs shadow-[0_2px_8px_rgba(148,236,64,0.35),inset_0_1px_1px_rgba(255,255,255,0.7)] flex items-center justify-center gap-1.5 hover:bg-[#80D42F] active:scale-95 transition-all border border-[#80D42F]"
+          >
+            <PostToFeedCustomIcon className="w-4 h-4 stroke-[1.8]" />
+            <span>Post to feed</span>
+          </button>
+          <button
+            type="button"
+            onClick={onSave}
+            className="flex-1 py-2 px-3 rounded-xl bg-[#ECEAEB] text-zinc-800 font-bold text-xs border border-[#D5D2D4] shadow-xs flex items-center justify-center gap-1.5 hover:bg-[#E2DFE1] active:scale-95 transition-all"
+          >
+            <SaveReportCustomIcon className="w-4 h-4 stroke-[1.8]" />
+            <span>Save report</span>
+          </button>
+        </div>
+
+        {/* Legal Privacy Note */}
+        <p className="text-[10px] text-zinc-500 font-medium text-center leading-snug">
           This script is saved automatically and would be given to officer if needed
         </p>
       </div>
