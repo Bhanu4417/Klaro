@@ -683,7 +683,7 @@ export default function DashboardPage() {
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
               placeholder="Search violations, brands, rules (e.g. MRP, Rule 6)..."
-              className="w-full pl-9 pr-4 py-2 rounded-xl bg-[#ECEAEB] border border-[#D5D2D4] text-xs sm:text-sm text-zinc-800 placeholder-zinc-400 focus:outline-none focus:bg-white focus:border-zinc-400 transition-all font-medium"
+              className="w-full pl-9 pr-4 py-2.5 rounded-[18px] bg-[#ECEAEB] border-[1.5px] border-[#D5D2D4] shadow-[inset_0_1.5px_2px_rgba(0,0,0,0.03),inset_0_1px_1px_rgba(255,255,255,0.85)] text-xs sm:text-sm text-zinc-800 placeholder-zinc-400 focus:outline-none focus:bg-white focus:border-zinc-400 transition-all font-medium"
             />
           </div>
 
@@ -1457,7 +1457,7 @@ export default function DashboardPage() {
           <aside className="hidden lg:block lg:col-span-4 space-y-4 text-left sticky top-[4.5rem] self-start transition-none">
             
             {/* User Identity Card */}
-            <div className="p-5 rounded-2xl bg-[#FCFCFB] border border-[#D5D2D4] shadow-[0_4px_16px_rgba(0,0,0,0.03)] space-y-4">
+            <div className="p-5 rounded-[22px] bg-[#FCFCFB] border-[1.5px] border-[#D5D2D4] shadow-[0_4px_20px_rgba(0,0,0,0.03),inset_0_1.5px_1.5px_rgba(255,255,255,0.95)] space-y-4">
               <div className="flex items-center gap-3">
                 <div className="w-14 h-14 rounded-2xl overflow-hidden border-2 border-zinc-300 shrink-0 shadow-sm flex items-center justify-center text-2xl bg-white">
                   {avatar?.startsWith("http") || avatar?.startsWith("data:") ? (
@@ -1485,25 +1485,25 @@ export default function DashboardPage() {
 
               {/* 4 Stats Grid: Karma, Reports, Upvoted, Downvoted */}
               <div className="grid grid-cols-4 gap-2 pt-2 border-t border-[#ECEAEB] text-center">
-                <div className="p-2 rounded-xl bg-[#ECEAEB]">
+                <div className="p-2 rounded-[14px] bg-[#ECEAEB] border border-[#D5D2D4] shadow-[inset_0_1px_1px_rgba(255,255,255,0.85)]">
                   <span className="text-[9px] font-mono uppercase text-zinc-500 block">Karma</span>
                   <span className="text-sm font-bold text-[#346415] font-mono">501</span>
                 </div>
-                <div className="p-2 rounded-xl bg-[#ECEAEB]">
+                <div className="p-2 rounded-[14px] bg-[#ECEAEB] border border-[#D5D2D4] shadow-[inset_0_1px_1px_rgba(255,255,255,0.85)]">
                   <span className="text-[9px] font-mono uppercase text-zinc-500 block">Reports</span>
                   <span className="text-sm font-bold text-zinc-900 font-mono">4</span>
                 </div>
-                <div className="p-2 rounded-xl bg-[#ECEAEB]">
+                <div className="p-2 rounded-[14px] bg-[#ECEAEB] border border-[#D5D2D4] shadow-[inset_0_1px_1px_rgba(255,255,255,0.85)]">
                   <span className="text-[9px] font-mono uppercase text-zinc-500 block">Upvoted</span>
                   <span className="text-sm font-bold text-zinc-900 font-mono">89</span>
                 </div>
-                <div className="p-2 rounded-xl bg-[#ECEAEB]">
+                <div className="p-2 rounded-[14px] bg-[#ECEAEB] border border-[#D5D2D4] shadow-[inset_0_1px_1px_rgba(255,255,255,0.85)]">
                   <span className="text-[9px] font-mono uppercase text-zinc-500 block">Downvoted</span>
                   <span className="text-sm font-bold text-rose-700 font-mono">6</span>
                 </div>
               </div>
 
-              <div className="p-3 rounded-xl bg-[#E4E2E3] border border-[#C8C5C9] text-xs space-y-1">
+              <div className="p-3 rounded-[16px] bg-[#E4E2E3] border border-[#C8C5C9] text-xs space-y-1 shadow-[inset_0_1px_1px_rgba(255,255,255,0.85)]">
                 <span className="text-[10px] font-bold text-zinc-600 uppercase font-mono tracking-wider block">HOW KARMA WORKS</span>
                 <p className="text-[11px] text-zinc-700 font-normal leading-relaxed">
                   You earn +1 Karma every time another citizen or officer upvotes a violation report you submitted.
@@ -1514,7 +1514,7 @@ export default function DashboardPage() {
                 type="button"
                 onClick={handleSignOut}
                 disabled={isSigningOut}
-                className="w-full py-2.5 rounded-xl bg-[#ECEAEB] hover:bg-rose-50 hover:text-rose-700 border border-[#D5D2D4] text-xs font-bold text-zinc-700 transition-colors flex items-center justify-center gap-2"
+                className="w-full py-2.5 rounded-[16px] bg-[#ECEAEB] hover:bg-rose-50 hover:text-rose-700 border-[1.5px] border-[#D5D2D4] shadow-[0_2px_8px_rgba(0,0,0,0.03),inset_0_1px_1px_rgba(255,255,255,0.85)] text-xs font-bold text-zinc-700 transition-colors flex items-center justify-center gap-2"
               >
                 <LogOut className="w-3.5 h-3.5" />
                 <span>Sign Out</span>
@@ -1522,7 +1522,7 @@ export default function DashboardPage() {
             </div>
 
             {/* My Recent Submitted Reports Preview */}
-            <div className="p-5 rounded-2xl bg-[#FCFCFB] border border-[#D5D2D4] shadow-[0_4px_16px_rgba(0,0,0,0.03)] space-y-3">
+            <div className="p-5 rounded-[22px] bg-[#FCFCFB] border-[1.5px] border-[#D5D2D4] shadow-[0_4px_20px_rgba(0,0,0,0.03),inset_0_1.5px_1.5px_rgba(255,255,255,0.95)] space-y-3">
               <div className="flex items-center gap-2">
                 <FileText className="w-4 h-4 text-zinc-800" />
                 <h4 className="text-xs font-bold font-mono uppercase tracking-wider text-zinc-900">
@@ -1532,7 +1532,7 @@ export default function DashboardPage() {
 
               <div className="space-y-2 text-xs">
                 {MY_SUBMITTED_REPORTS.map((rep) => (
-                  <div key={rep.id} className="p-2.5 rounded-xl bg-[#ECEAEB] flex items-center justify-between">
+                  <div key={rep.id} className="p-2.5 rounded-[14px] bg-[#ECEAEB] border border-[#D5D2D4] shadow-[inset_0_1px_1px_rgba(255,255,255,0.85)] flex items-center justify-between">
                     <div>
                       <span className="text-[10.5px] font-bold text-zinc-900 block font-mono">{rep.ruleCode}</span>
                       <span className="text-[11px] text-zinc-600 truncate max-w-[170px] block">{rep.title}</span>
@@ -1547,7 +1547,7 @@ export default function DashboardPage() {
 
             {/* Legal Metrology Act Reference (Distinct Light-Tinted Slate/Grey Card in Satoshi Font with Green Underline) */}
             <div
-              className="p-4 rounded-2xl bg-[#E0DFDC] text-[rgb(18,18,18)] space-y-2 border-[1.5px] border-[#CBC7C4] shadow-[0_4px_16px_rgba(0,0,0,0.04),inset_0_1px_1px_rgba(255,255,255,0.8)]"
+              className="p-4 rounded-[22px] bg-[#E0DFDC] text-[rgb(18,18,18)] space-y-2 border-[1.5px] border-[#CBC7C4] shadow-[0_4px_16px_rgba(0,0,0,0.04),inset_0_1.5px_1.5px_rgba(255,255,255,0.85)]"
               style={{ fontFamily: 'satoshi, "satoshi Fallback", sans-serif' }}
             >
               <div className="pb-1">

@@ -15,7 +15,7 @@ export const TactileCard: React.FC<TactileCardProps> = ({
   return (
     <div
       className={cn(
-        "relative w-full bg-[#E6E4E5] rounded-2xl sm:rounded-[24px] border border-[#D5D2D4] shadow-[0_2px_14px_rgba(0,0,0,0.03)] overflow-hidden transition-all duration-300",
+        "relative w-full bg-[#FCFCFB] rounded-[24px] sm:rounded-[28px] border-[1.5px] border-[#D5D2D4] shadow-[0_8px_30px_rgba(0,0,0,0.04),inset_0_1.5px_1.5px_rgba(255,255,255,0.95)] overflow-hidden transition-all duration-300",
         className
       )}
     >

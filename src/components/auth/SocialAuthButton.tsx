@@ -72,8 +72,8 @@ export const SocialAuthButton: React.FC<SocialAuthButtonProps> = ({
       onClick={onClick}
       disabled={disabled || isLoading}
       className={cn(
-        "relative w-full h-12 min-h-[48px] sm:min-h-[50px] rounded-xl sm:rounded-2xl bg-[#ECEAEB] border border-[#D5D2D4] text-[rgb(18,18,18)] text-sm sm:text-[15px] font-[600] tracking-tight",
-        "flex items-center justify-center gap-3 px-4 shadow-[0_1px_2px_rgba(0,0,0,0.02)] transition-all duration-150 select-none",
+        "relative w-full h-12 min-h-[48px] sm:min-h-[50px] rounded-[18px] bg-[#ECEAEB] border-[1.5px] border-[#D5D2D4] text-[rgb(18,18,18)] text-sm sm:text-[15px] font-[700] tracking-tight",
+        "flex items-center justify-center gap-3 px-4 shadow-[0_2px_8px_rgba(0,0,0,0.03),inset_0_1.5px_1px_rgba(255,255,255,0.85)] transition-all duration-150 select-none",
         "hover:bg-[#E2DFE1] hover:border-[#CAC7C9] active:scale-[0.985] active:bg-[#DDD9DB]",
         "focus:outline-none focus-visible:ring-2 focus-visible:ring-[#94EC40] focus-visible:ring-offset-2",
         "disabled:opacity-50 disabled:cursor-not-allowed",

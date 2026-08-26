@@ -42,23 +42,20 @@ export const WelcomeView: React.FC<WelcomeViewProps> = ({
 
       <Divider text="or" />
 
-      {/* Continue with Email button with #94EC40 green theme */}
-      <Button
-        variant="primary"
-        size="lg"
-        fullWidth
+      {/* Continue with Email button with glossy green capsule styling */}
+      <button
+        type="button"
         onClick={onSelectEmail}
-        leftIcon={
-          <svg className="w-4 h-4 fill-current text-[rgb(18,18,18)] shrink-0" viewBox="0 0 24 24">
-            <path d="M1.5 8.67v8.58a3 3 0 003 3h15a3 3 0 003-3V8.67l-8.928 5.493a3 3 0 01-3.144 0L1.5 8.67z" />
-            <path d="M22.5 6.908V6.75a3 3 0 00-3-3h-15a3 3 0 00-3 3v.158l9.714 5.978a1.5 1.5 0 001.572 0L22.5 6.908z" />
-          </svg>
-        }
         disabled={Boolean(isLoadingSocial)}
-        className="font-[600] tracking-tight"
+        className="w-full h-12 min-h-[48px] sm:min-h-[50px] px-5 rounded-[18px] bg-[#94EB41] hover:bg-[#88E430] active:bg-[#7ED428] text-[rgb(18,18,18)] font-[800] text-sm sm:text-[15px] tracking-tight border-2 border-[#62C414] shadow-[0_4px_14px_rgba(104,202,26,0.35),inset_0_1.5px_1.5px_rgba(255,255,255,0.85),inset_0_-1.5px_2px_rgba(0,0,0,0.08)] flex items-center justify-center gap-2.5 transition-all duration-150 active:scale-[0.985] select-none cursor-pointer focus:outline-none focus-visible:ring-2 focus-visible:ring-[#94EC40]"
+        style={{ fontFamily: 'satoshi, "satoshi Fallback", sans-serif', fontWeight: 800 }}
       >
-        Continue with Email
-      </Button>
+        <svg className="w-4 h-4 fill-current text-[rgb(18,18,18)] shrink-0" viewBox="0 0 24 24">
+          <path d="M1.5 8.67v8.58a3 3 0 003 3h15a3 3 0 003-3V8.67l-8.928 5.493a3 3 0 01-3.144 0L1.5 8.67z" />
+          <path d="M22.5 6.908V6.75a3 3 0 00-3-3h-15a3 3 0 00-3 3v.158l9.714 5.978a1.5 1.5 0 001.572 0L22.5 6.908z" />
+        </svg>
+        <span>Continue with Email</span>
+      </button>
 
       {/* Sign In Switcher */}
       <div className="pt-1.5 space-y-3">

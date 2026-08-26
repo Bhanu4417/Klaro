@@ -42,9 +42,9 @@ export const Button = forwardRef<HTMLButtonElement, ButtonProps>(
 
     const variantStyles = {
       primary:
-        "bg-[#94EC40] text-[rgb(18,18,18)] hover:bg-[#85DE32] active:bg-[#7ED428] shadow-[0_1px_3px_rgba(148,236,64,0.3)] border border-[#83D634]/50 focus-visible:ring-[#94EC40]",
+        "bg-[#94EB41] text-[rgb(18,18,18)] hover:bg-[#88E430] active:bg-[#7ED428] border-2 border-[#62C414] shadow-[0_4px_14px_rgba(104,202,26,0.35),inset_0_1.5px_1.5px_rgba(255,255,255,0.85),inset_0_-1.5px_2px_rgba(0,0,0,0.08)] focus-visible:ring-[#94EC40] font-bold rounded-[18px]",
       green:
-        "bg-[#94EC40] text-[rgb(18,18,18)] hover:bg-[#85DE32] active:bg-[#7ED428] shadow-[0_1px_3px_rgba(148,236,64,0.3)] border border-[#83D634]/50 focus-visible:ring-[#94EC40]",
+        "bg-[#94EB41] text-[rgb(18,18,18)] hover:bg-[#88E430] active:bg-[#7ED428] border-2 border-[#62C414] shadow-[0_4px_14px_rgba(104,202,26,0.35),inset_0_1.5px_1.5px_rgba(255,255,255,0.85),inset_0_-1.5px_2px_rgba(0,0,0,0.08)] focus-visible:ring-[#94EC40] font-bold rounded-[18px]",
       secondary:
         "bg-[#F4F4F5] text-[rgb(18,18,18)] hover:bg-[#EBEBEF] active:bg-[#E4E4E8] border border-zinc-200/60 shadow-[0_1px_2px_rgba(0,0,0,0.02)] focus-visible:ring-[#94EC40]",
       outline:

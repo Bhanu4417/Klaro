@@ -67,8 +67,8 @@ export const Input = forwardRef<HTMLInputElement, InputProps>(
             onChange={onChange}
             disabled={disabled}
             className={cn(
-              "w-full h-12 min-h-[48px] sm:min-h-[50px] rounded-xl sm:rounded-2xl bg-[#ECEAEB] text-[rgb(18,18,18)] placeholder:text-zinc-400 text-sm sm:text-[15px] transition-all duration-150 border",
-              "shadow-[inset_0_1px_2px_rgba(0,0,0,0.02)] focus:outline-none focus:ring-2 focus:ring-[#94EC40]/25 focus:border-[#94EC40]",
+              "w-full h-12 min-h-[48px] sm:min-h-[50px] rounded-[18px] bg-[#ECEAEB] text-[rgb(18,18,18)] placeholder:text-zinc-400 text-sm sm:text-[15px] font-medium transition-all duration-150 border-[1.5px]",
+              "shadow-[inset_0_1.5px_2px_rgba(0,0,0,0.03),inset_0_1px_1px_rgba(255,255,255,0.85)] focus:outline-none focus:ring-2 focus:ring-[#94EC40]/25 focus:border-[#94EC40] focus:bg-white",
               leftIcon ? "pl-10" : "pl-4",
               isPassword || (allowClear && hasValue) ? "pr-10" : "pr-4",
               error
