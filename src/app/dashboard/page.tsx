@@ -333,6 +333,14 @@ const SparkleAddPhotoCustomIcon = ({ className = "w-5 h-5" }: { className?: stri
   </svg>
 );
 
+const ReportNavbarCustomIcon = ({ className = "w-4 h-4" }: { className?: string }) => (
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="24" height="24" className={className} fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round">
+    <path d="M19 11V10C19 6.22876 19 4.34315 17.8284 3.17157C16.6569 2 14.7712 2 11 2C7.22876 2 5.34315 2 4.17157 3.17157C3 4.34315 3 6.22876 3 10V14C3 17.7712 3 19.6569 4.17157 20.8284C5.34315 22 7.22876 22 11 22" strokeLinejoin="round" />
+    <path d="M21 22L19.2857 20.2857M19.8571 17.4286C19.8571 19.3221 18.3221 20.8571 16.4286 20.8571C14.535 20.8571 13 19.3221 13 17.4286C13 15.535 14.535 14 16.4286 14C18.3221 14 19.8571 15.535 19.8571 17.4286Z" />
+    <path d="M7 7H15M7 11H11" strokeLinejoin="round" />
+  </svg>
+);
+
 export default function DashboardPage() {
   const { isLoaded, isSignedIn, user } = useUser();
   const { signOut } = useClerk();
@@ -654,9 +662,9 @@ export default function DashboardPage() {
       <header className="hidden md:block sticky top-0 z-40 bg-[#FCFCFB]/95 backdrop-blur-md border-b border-[#D5D2D4] px-4 sm:px-6 lg:px-8 py-3 shadow-[0_2px_12px_rgba(0,0,0,0.03)]">
         <div className="max-w-7xl mx-auto flex items-center justify-between gap-4">
           
-          {/* Logo & Platform Tag */}
+          {/* Klaro Logo */}
           <div className="flex items-center gap-3 shrink-0">
-            <Link href="/" className="flex items-center gap-2 group">
+            <Link href="/dashboard" className="flex items-center gap-2">
               <Logo size="sm" showText={false} />
               <span
                 className="text-xl font-[800] text-[rgb(18,18,18)] tracking-[-0.03em]"
@@ -665,9 +673,6 @@ export default function DashboardPage() {
                 klaro
               </span>
             </Link>
-            <span className="hidden sm:inline-block px-2.5 py-0.5 rounded-full text-[11px] font-mono font-bold bg-[#EAFBD9] text-[#346415] border border-[#B8F27D]">
-              COMMUNITY FEED
-            </span>
           </div>
 
           {/* Search Bar */}
@@ -682,43 +687,16 @@ export default function DashboardPage() {
             />
           </div>
 
-          {/* Action CTAs & Profile */}
-          <div className="flex items-center gap-3 shrink-0">
-            <Link href="/" className="hidden md:inline-flex">
-              <button
-                type="button"
-                className="px-3.5 py-1.5 rounded-xl text-xs font-bold text-zinc-700 bg-[#ECEAEB] hover:bg-white border border-[#D5D2D4] transition-all"
-              >
-                Public Site
-              </button>
-            </Link>
-
-            <div className="flex items-center gap-2.5 pl-2 border-l border-[#D5D2D4]">
-              <div className="w-8 h-8 rounded-full overflow-hidden border border-zinc-300 shrink-0 flex items-center justify-center text-sm bg-white">
-                {avatar?.startsWith("http") || avatar?.startsWith("data:") ? (
-                  <img src={avatar} alt="Avatar" className="w-full h-full object-cover" />
-                ) : (
-                  <span>{avatar || "🥑"}</span>
-                )}
-              </div>
-              <div className="hidden lg:flex flex-col text-left text-xs">
-                <span className="font-bold text-zinc-900 leading-tight">
-                  {profile?.displayName || user?.fullName || "Officer"}
-                </span>
-                <span className="text-[10px] text-zinc-500 font-mono">
-                  {profile?.username || "@officer"}
-                </span>
-              </div>
-              <button
-                type="button"
-                onClick={handleSignOut}
-                disabled={isSigningOut}
-                className="p-1.5 rounded-xl text-zinc-500 hover:text-rose-600 hover:bg-rose-50 transition-colors"
-                title="Sign out"
-              >
-                <LogOut className="w-4 h-4" />
-              </button>
-            </div>
+          {/* Report CTA Button */}
+          <div className="flex items-center gap-2.5 shrink-0">
+            <button
+              type="button"
+              onClick={openPickerChoice}
+              className="px-3.5 py-1.5 rounded-xl bg-[#94EB41] hover:bg-[#80D42F] text-[rgb(18,18,18)] font-bold text-xs shadow-[0_2px_8px_rgba(148,235,65,0.35),inset_0_1px_1px_rgba(255,255,255,0.7)] border border-[#80D42F] flex items-center gap-1.5 active:scale-95 transition-all"
+            >
+              <ReportNavbarCustomIcon className="w-4 h-4 stroke-[1.8]" />
+              <span>Report</span>
+            </button>
           </div>
 
         </div>
@@ -978,28 +956,49 @@ export default function DashboardPage() {
                           </div>
 
                           {/* Evidence Box */}
-                          <div className="p-3.5 rounded-2xl bg-[#E4E2E3] text-[rgb(18,18,18)] font-mono text-xs space-y-2.5 border-[1.5px] border-[#C8C5C9] shadow-[0_4px_16px_rgba(0,0,0,0.04),inset_0_1px_1px_rgba(255,255,255,0.9)] ring-1 ring-black/[0.04]">
-                            <div className="flex items-center justify-between border-b border-[#D2CFD3] pb-1.5 text-[10px]">
-                              <span className="truncate pr-2 text-zinc-700 font-bold">{post.commodity}</span>
-                              <span className="text-[#346415] shrink-0 font-extrabold bg-[#EAFBD9] px-2 py-0.5 rounded-md border border-[#B8F27D]">BRAND: {post.brand}</span>
+                          <div className="p-4 rounded-2xl bg-[#E4E2E3] text-[rgb(18,18,18)] font-mono text-xs space-y-3 border-[1.5px] border-[#C8C5C9] shadow-[0_4px_16px_rgba(0,0,0,0.04),inset_0_1px_1px_rgba(255,255,255,0.9)] ring-1 ring-black/[0.04]">
+                            {/* Top Row: Commodity & Brand Pill */}
+                            <div className="flex items-center justify-between border-b border-[#D5D2D6] pb-2.5">
+                              <span className="text-[13px] font-mono font-medium text-zinc-900 truncate pr-2">
+                                {post.commodity}
+                              </span>
+                              <span className="px-2.5 py-0.5 rounded-lg bg-[#EAFBD9] text-[#346415] text-[11px] font-mono font-bold border border-[#B8F27D] shrink-0">
+                                BRAND: {post.brand}
+                              </span>
                             </div>
 
-                            <div className="grid grid-cols-1 gap-2 text-[11px]">
+                            {/* Middle Row: OCR Region & OCR Extracted String */}
+                            <div className="grid grid-cols-2 gap-4 text-[11px] border-b border-[#D5D2D6] pb-3">
                               <div>
-                                <span className="text-[9.5px] text-zinc-500 font-bold uppercase tracking-wider block">OCR Region</span>
-                                <span className="text-zinc-900 font-bold block leading-snug">{post.evidence.labelRegion}</span>
+                                <span className="text-[10px] font-mono font-bold uppercase tracking-wider text-zinc-500 block mb-1">
+                                  OCR REGION
+                                </span>
+                                <span className="text-xs font-mono font-bold text-zinc-950 block leading-snug">
+                                  {post.evidence.labelRegion}
+                                </span>
                               </div>
                               <div>
-                                <span className="text-[9.5px] text-zinc-500 font-bold uppercase tracking-wider block">OCR Extracted String</span>
-                                <span className="text-[#92400E] font-bold block leading-snug">{post.evidence.ocrSnippet}</span>
+                                <span className="text-[10px] font-mono font-bold uppercase tracking-wider text-zinc-500 block mb-1">
+                                  OCR EXTRACTED STRING
+                                </span>
+                                <span className="text-xs font-mono font-bold text-[#A8500D] block leading-snug">
+                                  {post.evidence.ocrSnippet}
+                                </span>
                               </div>
                             </div>
 
-                            <div className="pt-2 border-t border-[#D2CFD3] text-[10.5px] leading-relaxed">
-                              <span className="text-rose-700 font-bold block">Flag: {post.evidence.flagReason}</span>
-                              {post.evidence.requiredValue && (
-                                <span className="text-zinc-600 font-semibold block mt-0.5">Req: {post.evidence.requiredValue}</span>
-                              )}
+                            {/* Bottom Row: Flag Reason & Required Value */}
+                            <div className="grid grid-cols-2 gap-4 text-[11px] pt-0.5">
+                              <div>
+                                <span className="text-xs font-mono font-medium text-rose-700 leading-snug block">
+                                  Flag: {post.evidence.flagReason}
+                                </span>
+                              </div>
+                              <div>
+                                <span className="text-xs font-mono font-medium text-zinc-700 leading-snug block">
+                                  {post.evidence.requiredValue ? `Req: ${post.evidence.requiredValue}` : ""}
+                                </span>
+                              </div>
                             </div>
                           </div>
 
@@ -1328,28 +1327,49 @@ export default function DashboardPage() {
                         </p>
 
                         {/* Evidence Box */}
-                        <div className="p-4 rounded-2xl bg-[#E4E2E3] text-[rgb(18,18,18)] font-mono text-xs space-y-2.5 border-[1.5px] border-[#C8C5C9] shadow-[0_4px_16px_rgba(0,0,0,0.04),inset_0_1px_1px_rgba(255,255,255,0.9)] ring-1 ring-black/[0.04]">
-                          <div className="flex items-center justify-between border-b border-[#D2CFD3] pb-2 text-[10px] tracking-wide">
-                            <span className="truncate pr-2 text-zinc-700 font-bold">{post.commodity}</span>
-                            <span className="text-[#346415] shrink-0 font-extrabold bg-[#EAFBD9] px-2 py-0.5 rounded-md border border-[#B8F27D]">BRAND: {post.brand}</span>
+                        <div className="p-4 rounded-2xl bg-[#E4E2E3] text-[rgb(18,18,18)] font-mono text-xs space-y-3 border-[1.5px] border-[#C8C5C9] shadow-[0_4px_16px_rgba(0,0,0,0.04),inset_0_1px_1px_rgba(255,255,255,0.9)] ring-1 ring-black/[0.04]">
+                          {/* Top Row: Commodity & Brand Pill */}
+                          <div className="flex items-center justify-between border-b border-[#D5D2D6] pb-2.5">
+                            <span className="text-[13px] font-mono font-medium text-zinc-900 truncate pr-2">
+                              {post.commodity}
+                            </span>
+                            <span className="px-2.5 py-0.5 rounded-lg bg-[#EAFBD9] text-[#346415] text-[11px] font-mono font-bold border border-[#B8F27D] shrink-0">
+                              BRAND: {post.brand}
+                            </span>
                           </div>
 
-                          <div className="grid grid-cols-2 gap-3 text-[11px]">
+                          {/* Middle Row: OCR Region & OCR Extracted String */}
+                          <div className="grid grid-cols-2 gap-4 text-[11px] border-b border-[#D5D2D6] pb-3">
                             <div>
-                              <span className="text-[9.5px] text-zinc-500 font-bold uppercase tracking-wider block mb-0.5">OCR Region</span>
-                              <span className="text-zinc-900 font-bold block leading-snug">{post.evidence.labelRegion}</span>
+                              <span className="text-[10px] font-mono font-bold uppercase tracking-wider text-zinc-500 block mb-1">
+                                OCR REGION
+                              </span>
+                              <span className="text-xs font-mono font-bold text-zinc-950 block leading-snug">
+                                {post.evidence.labelRegion}
+                              </span>
                             </div>
                             <div>
-                              <span className="text-[9.5px] text-zinc-500 font-bold uppercase tracking-wider block mb-0.5">OCR Extracted String</span>
-                              <span className="text-[#92400E] font-bold block leading-snug">{post.evidence.ocrSnippet}</span>
+                              <span className="text-[10px] font-mono font-bold uppercase tracking-wider text-zinc-500 block mb-1">
+                                OCR EXTRACTED STRING
+                              </span>
+                              <span className="text-xs font-mono font-bold text-[#A8500D] block leading-snug">
+                                {post.evidence.ocrSnippet}
+                              </span>
                             </div>
                           </div>
 
-                          <div className="pt-2 border-t border-[#D2CFD3] flex items-center justify-between text-[10.5px] leading-relaxed">
-                            <span className="text-rose-700 font-bold">Flag: {post.evidence.flagReason}</span>
-                            {post.evidence.requiredValue && (
-                              <span className="text-zinc-600 font-semibold">Req: {post.evidence.requiredValue}</span>
-                            )}
+                          {/* Bottom Row: Flag Reason & Required Value */}
+                          <div className="grid grid-cols-2 gap-4 text-[11px] pt-0.5">
+                            <div>
+                              <span className="text-xs font-mono font-medium text-rose-700 leading-snug block">
+                                Flag: {post.evidence.flagReason}
+                              </span>
+                            </div>
+                            <div>
+                              <span className="text-xs font-mono font-medium text-zinc-700 leading-snug block">
+                                {post.evidence.requiredValue ? `Req: ${post.evidence.requiredValue}` : ""}
+                              </span>
+                            </div>
                           </div>
                         </div>
 
@@ -1433,8 +1453,8 @@ export default function DashboardPage() {
 
           </div>
 
-          {/* RIGHT SIDEBAR: Community Member Profile & Karma Stats (Desktop Only) */}
-          <aside className="hidden lg:block lg:col-span-4 space-y-5 text-left">
+          {/* RIGHT SIDEBAR: Community Member Profile & Karma Stats (Smooth Sticky Desktop Sidebar) */}
+          <aside className="hidden lg:block lg:col-span-4 space-y-4 text-left sticky top-[4.5rem] self-start transition-none">
             
             {/* User Identity Card */}
             <div className="p-5 rounded-2xl bg-[#FCFCFB] border border-[#D5D2D4] shadow-[0_4px_16px_rgba(0,0,0,0.03)] space-y-4">
@@ -1525,12 +1545,23 @@ export default function DashboardPage() {
               </div>
             </div>
 
-            {/* Legal Act Reference */}
-            <div className="p-4 rounded-2xl bg-[#2E2E32] text-white border border-[#B8F27D]/25 shadow-[0_2px_12px_rgba(0,0,0,0.08)] space-y-2 text-xs">
-              <span className="text-[10px] font-mono uppercase text-[#A8E665] font-bold block tracking-widest">
-                LEGAL METROLOGY ACT, 2009
-              </span>
-              <p className="text-[11px] text-zinc-300 leading-relaxed font-normal">
+            {/* Legal Metrology Act Reference (Distinct Light-Tinted Slate/Grey Card in Satoshi Font with Green Underline) */}
+            <div
+              className="p-4 rounded-2xl bg-[#E0DFDC] text-[rgb(18,18,18)] space-y-2 border-[1.5px] border-[#CBC7C4] shadow-[0_4px_16px_rgba(0,0,0,0.04),inset_0_1px_1px_rgba(255,255,255,0.8)]"
+              style={{ fontFamily: 'satoshi, "satoshi Fallback", sans-serif' }}
+            >
+              <div className="pb-1">
+                <span
+                  className="font-[900] text-zinc-950 tracking-tight text-xs uppercase inline-block pb-0.5 border-b-2 border-[#80D42F]"
+                  style={{ fontFamily: 'satoshi, "satoshi Fallback", sans-serif', fontWeight: 900 }}
+                >
+                  Legal Metrology Act, 2009
+                </span>
+              </div>
+              <p
+                className="text-[12px] text-zinc-700 font-medium leading-relaxed"
+                style={{ fontFamily: 'satoshi, "satoshi Fallback", sans-serif' }}
+              >
                 Inspection evidence logged through Klaro generates digital certificates compliant with the Indian Evidence Act for statutory penalty proceedings.
               </p>
             </div>

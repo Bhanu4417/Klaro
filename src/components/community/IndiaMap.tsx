@@ -180,15 +180,12 @@ export const IndiaMap: React.FC<{ className?: string }> = ({ className }) => {
                   </div>
                 </div>
 
-                {/* B. Profile Avatar Frame (Directly Underneath Pointer Tail) */}
+                {/* B. Profile Avatar Frame (Account Setup Preset Emoji on Dark Frame) */}
                 <div className="relative z-10 -mt-0.5 flex flex-col items-center">
-                  <div className="w-11 h-11 sm:w-12 sm:h-12 rounded-[15px] p-0.5 bg-zinc-950 border-2 border-zinc-700 shadow-[0_10px_24px_rgba(0,0,0,0.8),0_2px_6px_rgba(0,0,0,0.6)] overflow-hidden">
-                    <img
-                      src={`https://api.dicebear.com/9.x/lorelei/svg?seed=${activeStep.avatarSeed}&size=256&backgroundColor=27272a`}
-                      alt={activeStep.name}
-                      className="w-full h-full rounded-[12px] object-cover pointer-events-none select-none"
-                      style={{ imageRendering: "auto" }}
-                    />
+                  <div className="w-11 h-11 sm:w-12 sm:h-12 rounded-[16px] bg-zinc-900 border-2 border-zinc-700 shadow-[0_10px_24px_rgba(0,0,0,0.8),0_2px_6px_rgba(0,0,0,0.6)] flex items-center justify-center select-none">
+                    <span className="text-xl sm:text-2xl leading-none">
+                      {["🥑", "🥗", "☕", "🥐", "🫐", "🌱"][stepIndex % 6]}
+                    </span>
                   </div>
 
                   {/* Downward Stem Pointer to Beacon */}
