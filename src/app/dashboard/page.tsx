@@ -866,13 +866,13 @@ export default function DashboardPage() {
                             onChange={(e) => setSearchQuery(e.target.value)}
                             placeholder="Search violations, brands..."
                             className={cn(
-                              "w-full pl-9 pr-3 rounded-xl bg-[#ECEAEB] border border-[#D5D2D4] text-xs text-zinc-800 placeholder-zinc-400 focus:outline-none focus:bg-white transition-all duration-200",
+                              "w-full pl-9 pr-3 rounded-xl bg-[#ECEAEB] border border-[#D5D2D4] text-xs text-zinc-800 placeholder-zinc-400 focus:outline-none focus:bg-white focus:border-[#80D42F] focus:ring-1 focus:ring-[#94EB41]/40 transition-all duration-200",
                               isSearchCollapsed ? "py-1.5" : "py-2"
                             )}
                           />
                         </div>
 
-                        {/* Filter Pills - Smoothly collapses on scroll down, expands on scroll up */}
+                        {/* Filter Pills - Theme-aligned with Klaro signature palette */}
                         <div
                           className={cn(
                             "overflow-hidden transition-all duration-300 ease-out",
@@ -888,10 +888,10 @@ export default function DashboardPage() {
                                 type="button"
                                 onClick={() => setActiveFilter(filter)}
                                 className={cn(
-                                  "px-2.5 py-1 rounded-xl font-bold transition-all whitespace-nowrap text-[11px]",
+                                  "px-2.5 py-1 rounded-xl font-bold transition-all whitespace-nowrap text-[11px] active:scale-95",
                                   activeFilter === filter
-                                    ? "bg-[#0B0B0D] text-white shadow-sm"
-                                    : "bg-[#ECEAEB] text-zinc-600 border border-[#D5D2D4]"
+                                    ? "bg-[#94EB41] text-[rgb(18,18,18)] border border-[#80D42F] shadow-[0_2px_8px_rgba(148,235,65,0.35),inset_0_1px_1px_rgba(255,255,255,0.7)]"
+                                    : "bg-[#ECEAEB] text-zinc-600 hover:text-zinc-900 border border-[#D5D2D4]"
                                 )}
                               >
                                 {filter}
@@ -1164,9 +1164,9 @@ export default function DashboardPage() {
                       type="button"
                       onClick={() => setActiveFilter(filter)}
                       className={cn(
-                        "px-3 py-1.5 rounded-xl font-bold transition-all whitespace-nowrap",
+                        "px-3 py-1.5 rounded-xl font-bold transition-all whitespace-nowrap active:scale-95",
                         activeFilter === filter
-                          ? "bg-[#0B0B0D] text-white shadow-sm"
+                          ? "bg-[#94EB41] text-[rgb(18,18,18)] border border-[#80D42F] shadow-[0_2px_8px_rgba(148,235,65,0.35),inset_0_1px_1px_rgba(255,255,255,0.7)]"
                           : "bg-[#ECEAEB] text-zinc-600 hover:text-zinc-900 border border-[#D5D2D4]"
                       )}
                     >
