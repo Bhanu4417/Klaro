@@ -694,8 +694,12 @@ export default function DashboardPage() {
             </Link>
 
             <div className="flex items-center gap-2.5 pl-2 border-l border-[#D5D2D4]">
-              <div className="w-8 h-8 rounded-full overflow-hidden bg-zinc-900 border border-zinc-300 shrink-0">
-                <img src={avatar} alt="Avatar" className="w-full h-full object-cover" />
+              <div className="w-8 h-8 rounded-full overflow-hidden border border-zinc-300 shrink-0 flex items-center justify-center text-sm bg-white">
+                {avatar?.startsWith("http") || avatar?.startsWith("data:") ? (
+                  <img src={avatar} alt="Avatar" className="w-full h-full object-cover" />
+                ) : (
+                  <span>{avatar || "🥑"}</span>
+                )}
               </div>
               <div className="hidden lg:flex flex-col text-left text-xs">
                 <span className="font-bold text-zinc-900 leading-tight">
@@ -1117,8 +1121,12 @@ export default function DashboardPage() {
                       {/* User Profile Card */}
                       <div className="p-5 rounded-2xl bg-[#FCFCFB] border border-[#D5D2D4] shadow-sm space-y-4">
                         <div className="flex items-center gap-3.5">
-                          <div className="w-14 h-14 rounded-2xl overflow-hidden bg-zinc-900 border-2 border-zinc-300 shrink-0 shadow-sm">
-                            <img src={avatar} alt="Profile" className="w-full h-full object-cover" />
+                          <div className="w-14 h-14 rounded-2xl overflow-hidden border-2 border-zinc-300 shrink-0 shadow-sm flex items-center justify-center text-2xl bg-white">
+                            {avatar?.startsWith("http") || avatar?.startsWith("data:") ? (
+                              <img src={avatar} alt="Profile" className="w-full h-full object-cover" />
+                            ) : (
+                              <span>{avatar || "🥑"}</span>
+                            )}
                           </div>
                           <div>
                             <h3
@@ -1190,8 +1198,12 @@ export default function DashboardPage() {
               {/* Desktop Create Scan / Filter Header Bar */}
               <div className="p-4 rounded-2xl bg-[#FCFCFB] border border-[#D5D2D4] shadow-[0_4px_16px_rgba(0,0,0,0.02)] space-y-3">
                 <div className="flex items-center gap-3">
-                  <div className="w-9 h-9 rounded-full overflow-hidden bg-zinc-900 shrink-0 border border-zinc-200">
-                    <img src={avatar} alt="User" className="w-full h-full object-cover" />
+                  <div className="w-9 h-9 rounded-full overflow-hidden shrink-0 border border-zinc-200 flex items-center justify-center text-sm bg-white">
+                    {avatar?.startsWith("http") || avatar?.startsWith("data:") ? (
+                      <img src={avatar} alt="User" className="w-full h-full object-cover" />
+                    ) : (
+                      <span>{avatar || "🥑"}</span>
+                    )}
                   </div>
                   <div
                     onClick={openPickerChoice}
@@ -1427,8 +1439,12 @@ export default function DashboardPage() {
             {/* User Identity Card */}
             <div className="p-5 rounded-2xl bg-[#FCFCFB] border border-[#D5D2D4] shadow-[0_4px_16px_rgba(0,0,0,0.03)] space-y-4">
               <div className="flex items-center gap-3">
-                <div className="w-14 h-14 rounded-2xl overflow-hidden bg-zinc-900 border-2 border-zinc-300 shrink-0 shadow-sm">
-                  <img src={avatar} alt="Profile" className="w-full h-full object-cover" />
+                <div className="w-14 h-14 rounded-2xl overflow-hidden border-2 border-zinc-300 shrink-0 shadow-sm flex items-center justify-center text-2xl bg-white">
+                  {avatar?.startsWith("http") || avatar?.startsWith("data:") ? (
+                    <img src={avatar} alt="Profile" className="w-full h-full object-cover" />
+                  ) : (
+                    <span>{avatar || "🥑"}</span>
+                  )}
                 </div>
                 <div>
                   <h3
@@ -1627,8 +1643,12 @@ export default function DashboardPage() {
               transition={{ type: "spring", stiffness: 450, damping: 35 }}
             />
           )}
-          <div className="relative z-10 w-6 h-6 rounded-full overflow-hidden bg-zinc-900 border border-zinc-300">
-            <img src={avatar} alt="Profile" className="w-full h-full object-cover" />
+          <div className="relative z-10 w-6 h-6 rounded-full overflow-hidden border border-zinc-300 flex items-center justify-center text-[13px] bg-white">
+            {avatar?.startsWith("http") || avatar?.startsWith("data:") ? (
+              <img src={avatar} alt="Profile" className="w-full h-full object-cover" />
+            ) : (
+              <span>{avatar || "🥑"}</span>
+            )}
           </div>
         </button>
       </nav>
