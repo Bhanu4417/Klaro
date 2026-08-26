@@ -149,20 +149,40 @@ export const ReceiptDemo: React.FC = () => {
                     ★ 96% CLEAN SCORE VERIFIED ★
                   </div>
 
-                  {/* Simulated Barcode */}
-                  <div className="flex flex-col items-center gap-1">
-                    <div className="h-9 w-44 bg-zinc-900 flex items-center justify-around px-2 py-1">
-                      <div className="w-1 h-7 bg-white" />
-                      <div className="w-0.5 h-7 bg-zinc-900" />
-                      <div className="w-1.5 h-7 bg-white" />
-                      <div className="w-0.5 h-7 bg-white" />
-                      <div className="w-2 h-7 bg-white" />
-                      <div className="w-1 h-7 bg-white" />
-                      <div className="w-0.5 h-7 bg-white" />
-                      <div className="w-1.5 h-7 bg-white" />
-                      <div className="w-1 h-7 bg-white" />
+                  {/* Clean Authentic Barcode */}
+                  <div className="flex flex-col items-center gap-1.5">
+                    <div className="flex items-center justify-center gap-[1.5px] h-8 px-3 py-1 bg-white border border-zinc-200 rounded-md">
+                      <div className="w-[1.5px] h-7 bg-zinc-950" />
+                      <div className="w-[1px] h-7 bg-transparent" />
+                      <div className="w-[1.5px] h-7 bg-zinc-950" />
+                      <div className="w-[2.5px] h-6 bg-zinc-950" />
+                      <div className="w-[1px] h-6 bg-transparent" />
+                      <div className="w-[1.5px] h-6 bg-zinc-950" />
+                      <div className="w-[3px] h-6 bg-zinc-950" />
+                      <div className="w-[1px] h-6 bg-transparent" />
+                      <div className="w-[2px] h-6 bg-zinc-950" />
+                      <div className="w-[1px] h-6 bg-zinc-950" />
+                      <div className="w-[1.5px] h-6 bg-transparent" />
+                      <div className="w-[3px] h-6 bg-zinc-950" />
+                      <div className="w-[1px] h-6 bg-transparent" />
+                      <div className="w-[2px] h-6 bg-zinc-950" />
+                      <div className="w-[1.5px] h-6 bg-zinc-950" />
+                      <div className="w-[1px] h-7 bg-transparent" />
+                      <div className="w-[1.5px] h-7 bg-zinc-950" />
+                      <div className="w-[1px] h-7 bg-transparent" />
+                      <div className="w-[1.5px] h-7 bg-zinc-950" />
+                      <div className="w-[1px] h-7 bg-transparent" />
+                      <div className="w-[2px] h-6 bg-zinc-950" />
+                      <div className="w-[1.5px] h-6 bg-transparent" />
+                      <div className="w-[3px] h-6 bg-zinc-950" />
+                      <div className="w-[1px] h-6 bg-zinc-950" />
+                      <div className="w-[1.5px] h-6 bg-transparent" />
+                      <div className="w-[2.5px] h-6 bg-zinc-950" />
+                      <div className="w-[1.5px] h-7 bg-zinc-950" />
+                      <div className="w-[1px] h-7 bg-transparent" />
+                      <div className="w-[1.5px] h-7 bg-zinc-950" />
                     </div>
-                    <span className="text-[9px] text-zinc-400 tracking-widest">7 394376 616035</span>
+                    <span className="text-[9px] text-zinc-500 tracking-[0.2em] font-mono font-medium">7 394376 616035</span>
                   </div>
                 </div>
               </motion.div>

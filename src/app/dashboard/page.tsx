@@ -10,6 +10,7 @@ import { UserProfile } from "../../types/auth";
 import { Logo } from "../../components/ui/Logo";
 import { Button } from "../../components/ui/Button";
 import { ShareModal } from "../../components/ShareModal";
+import { ScanFlow } from "../../components/scan/ScanFlow";
 import {
   LogOut,
   User,
@@ -23,6 +24,7 @@ import {
   AlertTriangle,
   CheckCircle2,
   XCircle,
+  X,
   FileText,
   Filter,
   Flame,
@@ -33,6 +35,7 @@ import {
   Bookmark,
   Scale,
   Camera,
+  ImageIcon,
   Layers,
   ChevronDown,
   Building2,
@@ -313,6 +316,23 @@ const ShareCustomIcon = ({ className = "w-4 h-4" }: { className?: string }) => (
   </svg>
 );
 
+const InspectionCameraCustomIcon = ({ className = "w-5 h-5" }: { className?: string }) => (
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="24" height="24" className={className} fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
+    <path d="M22 7.49945V15.4994C22 18.3279 22 19.7421 21.1213 20.6208C20.2426 21.4994 18.8284 21.4994 16 21.4994H8C5.17157 21.4994 3.75736 21.4994 2.87868 20.6208C2 19.7421 2 18.3279 2 15.4994V12.9994C2 10.171 2 8.7568 2.87868 7.87812C3.75736 6.99944 5.17157 6.99944 8 6.99944H8.39922C9.02578 6.99944 9.33906 6.99944 9.62612 6.91124C9.81759 6.85241 9.99914 6.76516 10.1647 6.65239C10.4129 6.48333 10.6086 6.2387 11 5.74944C11.3914 5.26018 11.5871 5.01555 11.8353 4.84648C12.0009 4.73372 12.1824 4.64646 12.3739 4.58763C12.5504 4.53339 12.7369 4.5086 13 4.50056" />
+    <path d="M16 5.00056H21M18.5 7.50056V2.50056" />
+    <path d="M5 10.0006H7" />
+    <path d="M18.5309 14.0006C18.5309 16.2097 16.74 18.0006 14.5309 18.0006C12.3217 18.0006 10.5309 16.2097 10.5309 14.0006C10.5309 11.7914 12.3217 10.0006 14.5309 10.0006C16.74 10.0006 18.5309 11.7914 18.5309 14.0006Z" />
+  </svg>
+);
+
+const SparkleAddPhotoCustomIcon = ({ className = "w-5 h-5" }: { className?: string }) => (
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="24" height="24" className={className} fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
+    <path d="M3.5 15.502L7.46967 11.5323C7.80923 11.1927 8.26978 11.002 8.75 11.002C9.23022 11.002 9.69077 11.1927 10.0303 11.5323L12.5858 14.0877C13.2525 14.7544 13.5858 15.0877 14 15.0877C14.4142 15.0877 14.7475 14.7544 15.4142 14.0877L15.9697 13.5323C16.3092 13.1927 16.7698 13.002 17.25 13.002C17.7302 13.002 18.1908 13.1927 18.5303 13.5323L20.5 15.502" />
+    <path d="M21 10.5V12C21 16.2426 21 18.364 19.682 19.682C18.364 21 16.2426 21 12 21C7.75736 21 5.63604 21 4.31802 19.682C3 18.364 3 16.2426 3 12C3 7.75736 3 5.63604 4.31802 4.31802C5.63604 3 7.75736 3 12 3H13.5" />
+    <path d="M19.5 2.9375V4.5M19.5 4.5V6.0625M19.5 4.5H18.25M19.5 4.5H20.75M22 4.5L20.9156 4.13852C20.4179 3.97263 20.0274 3.58211 19.8615 3.08443L19.5 2L19.1385 3.08443C18.9726 3.58211 18.5821 3.97263 18.0844 4.13852L17 4.5L18.0844 4.86148C18.5821 5.02737 18.9726 5.41789 19.1385 5.91557L19.5 7L19.8615 5.91557C20.0274 5.41789 20.4179 5.02737 20.9156 4.86148L22 4.5Z" />
+  </svg>
+);
+
 export default function DashboardPage() {
   const { isLoaded, isSignedIn, user } = useUser();
   const { signOut } = useClerk();
@@ -388,6 +408,63 @@ export default function DashboardPage() {
   const [shareModalOpen, setShareModalOpen] = useState(false);
   const [sharingPost, setSharingPost] = useState<{ title: string; url: string } | null>(null);
 
+  // ---- SCAN FLOW STATE (chinn music 🎶) ----
+  const [showScanFlow, setShowScanFlow] = useState(false);
+  const [scanImageUrl, setScanImageUrl] = useState<string | null>(null);
+  const [scanImageName, setScanImageName] = useState<string>("");
+  const [showPickerChoice, setShowPickerChoice] = useState(false);
+  const galleryInputRef = useRef<HTMLInputElement>(null);
+  const cameraInputRef = useRef<HTMLInputElement>(null);
+
+  const openPickerChoice = () => setShowPickerChoice(true);
+  const handleScanFile = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    const url = URL.createObjectURL(file);
+    setScanImageUrl(url);
+    setScanImageName(file.name);
+    setShowPickerChoice(false);
+    setShowScanFlow(true);
+    e.target.value = "";
+  };
+  const handleScanPost = ({ imageUrl, title }: { imageUrl: string; title: string }) => {
+    const newPost: FeedPost = {
+      id: `post-${Date.now()}`,
+      author: {
+        name: profile?.displayName || user?.fullName || "You",
+        badge: "Community Inspector",
+        avatar: avatar || "https://api.dicebear.com/9.x/lorelei/svg?seed=You&backgroundColor=27272a",
+        zone: "Your Zone",
+      },
+      timeAgo: "Just now",
+      title,
+      commodity: "Packaged Commodity (Scanned)",
+      brand: "Detected via Klaro OCR",
+      ruleCode: "Rule 6(1)(d)",
+      ruleLabel: "Retail Price & USP Non-Compliance",
+      severity: "high",
+      description: "Auto-generated from your photo. Klaro detected a potential USP omission — review and submit as inspection dossier.",
+      evidence: {
+        labelRegion: "Auto-detected PDP • Confidence 98%",
+        ocrSnippet: "MRP Rs 120.00 (PKD 07/2026)",
+        flagReason: "Missing ₹ per g/kg specification and tax inclusion text.",
+        requiredValue: "₹0.24 per g (Mandatory since 2022 Amendment)",
+      },
+      upvotes: 1,
+      commentsCount: 0,
+      userVote: null,
+      status: "Under Review",
+      comments: [],
+    };
+    setPosts((prev) => [newPost, ...prev]);
+    setMobileTab("feed");
+    // also reset scan
+    setScanImageUrl(null);
+  };
+  const handleScanSave = () => {
+    setScanImageUrl(null);
+  };
+
   const handleOpenShare = (title: string, postId: string) => {
     const origin = typeof window !== "undefined" ? window.location.origin : "https://klaro.app";
     setSharingPost({
@@ -397,14 +474,8 @@ export default function DashboardPage() {
     setShareModalOpen(true);
   };
 
-  // Feed Collapsible Sticky Search Bar State (RAF + Delta Hysteresis to eliminate flicker)
+  // Feed Collapsible Sticky Search Bar State (Rock-solid hysteresis threshold)
   const [isSearchCollapsed, setIsSearchCollapsed] = useState(false);
-  const scrollTracker = useRef({
-    lastY: 0,
-    downDelta: 0,
-    upDelta: 0,
-    isCollapsed: false,
-  });
 
   useEffect(() => {
     let ticking = false;
@@ -413,46 +484,14 @@ export default function DashboardPage() {
       if (!ticking) {
         window.requestAnimationFrame(() => {
           const currentY = window.scrollY || document.documentElement.scrollTop;
-          const delta = currentY - scrollTracker.current.lastY;
 
-          // Always expand when user is at the top
-          if (currentY <= 20) {
-            if (scrollTracker.current.isCollapsed) {
-              scrollTracker.current.isCollapsed = false;
-              setIsSearchCollapsed(false);
-            }
-            scrollTracker.current.downDelta = 0;
-            scrollTracker.current.upDelta = 0;
-          } else if (delta > 0) {
-            // Scrolling down
-            scrollTracker.current.upDelta = 0;
-            scrollTracker.current.downDelta += delta;
-
-            // Only collapse if user has scrolled down > 25px continuously
-            if (
-              currentY > 50 &&
-              scrollTracker.current.downDelta > 25 &&
-              !scrollTracker.current.isCollapsed
-            ) {
-              scrollTracker.current.isCollapsed = true;
-              setIsSearchCollapsed(true);
-            }
-          } else if (delta < 0) {
-            // Scrolling up
-            scrollTracker.current.downDelta = 0;
-            scrollTracker.current.upDelta += Math.abs(delta);
-
-            // Only expand if user has scrolled up > 30px continuously
-            if (
-              scrollTracker.current.upDelta > 30 &&
-              scrollTracker.current.isCollapsed
-            ) {
-              scrollTracker.current.isCollapsed = false;
-              setIsSearchCollapsed(false);
-            }
+          // Deterministic threshold hysteresis: Collapses once past 55px, expands when back near top (< 25px)
+          if (currentY > 55) {
+            setIsSearchCollapsed(true);
+          } else if (currentY < 25) {
+            setIsSearchCollapsed(false);
           }
 
-          scrollTracker.current.lastY = currentY;
           ticking = false;
         });
         ticking = true;
@@ -714,7 +753,7 @@ export default function DashboardPage() {
                 >
                   {/* TAB 1: HOME */}
                   {mobileTab === "home" && (
-                    <div className="flex flex-col justify-between h-[calc(100dvh-5.5rem)] max-h-[calc(100dvh-5.5rem)] space-y-3 pt-1 pb-2 px-1 text-left overflow-hidden">
+                    <div className="flex flex-col justify-between h-[calc(100dvh-5.5rem)] max-h-[calc(100dvh-5.5rem)] gap-2.5 pt-0.5 pb-16 px-1 text-left overflow-hidden">
                       
                       {/* Top Bar: Klaro Icon on Left + "klaro" text to the right */}
                       <div className="flex items-center justify-between shrink-0">
@@ -730,57 +769,61 @@ export default function DashboardPage() {
                       </div>
 
                       {/* Bold 2-Line Headline with green hand icon in front of So */}
-                      <div className="pt-2">
+                      <div className="pt-0.5">
                         <h1
-                          className="text-[34px] sm:text-[38px] font-[900] text-[rgb(18,18,18)] tracking-[-0.04em] leading-[1.05]"
+                          className="text-[30px] sm:text-[36px] font-[900] text-[rgb(18,18,18)] tracking-[-0.04em] leading-[1.08]"
                           style={{ fontFamily: 'satoshi, "satoshi Fallback", sans-serif', fontWeight: 900 }}
                         >
                           <span className="flex items-center gap-2">
-                            <WaveHandIcon className="w-8 h-8 text-[#94EB41] shrink-0" />
+                            <WaveHandIcon className="w-7 h-7 text-[#94EB41] shrink-0" />
                             <span>So what You</span>
                           </span>
                           <span>reporting today</span>
                         </h1>
                       </div>
 
-                      {/* Photo Upload Action Box - Plastic Liquid Glass Aesthetic matching Navbar */}
+                      {/* Photo Upload Action Box - Triggers Scan Picker */}
                       <div
-                        className="p-3.5 rounded-[26px] bg-[#FCFCFB]/75 backdrop-blur-2xl border border-white/80 transition-all cursor-pointer text-center active:scale-[0.99]"
+                        onClick={openPickerChoice}
+                        role="button"
+                        tabIndex={0}
+                        onKeyDown={(e) => e.key === "Enter" && openPickerChoice()}
+                        className="p-2.5 sm:p-3 rounded-[24px] bg-[#FCFCFB]/75 backdrop-blur-2xl border border-white/80 transition-all cursor-pointer text-center active:scale-[0.99] shrink-0 hover:border-[#B8F27D]/40"
                         style={{
                           boxShadow: "0 14px 40px -4px rgba(0, 0, 0, 0.12), 0 2px 8px 0 rgba(0, 0, 0, 0.04), inset 0 1px 1px 0 rgba(255, 255, 255, 0.95), inset 0 -1px 2px 0 rgba(0, 0, 0, 0.04)",
                         }}
                       >
-                        <div className="border-2 border-dashed border-zinc-300/80 rounded-2xl p-5 flex flex-col items-center justify-center gap-3 bg-white/40 hover:bg-white/60 transition-all">
-                          <div className="w-12 h-12 rounded-full bg-[#94EB41] shadow-[0_4px_14px_rgba(148,235,65,0.35),inset_0_1px_1px_rgba(255,255,255,0.7)] flex items-center justify-center text-[rgb(18,18,18)] border border-[#80D42F]">
-                            <AddPhotoCustomIcon className="w-6 h-6 stroke-[1.8]" />
+                        <div className="border-2 border-dashed border-zinc-300/80 rounded-2xl p-3.5 sm:p-4 flex flex-col items-center justify-center gap-2 bg-white/40 hover:bg-white/60 transition-all">
+                          <div className="w-10 h-10 rounded-full bg-[#94EB41] shadow-[0_4px_14px_rgba(148,235,65,0.35),inset_0_1px_1px_rgba(255,255,255,0.7)] flex items-center justify-center text-[rgb(18,18,18)] border border-[#80D42F]">
+                            <AddPhotoCustomIcon className="w-5 h-5 stroke-[1.8]" />
                           </div>
                           <div className="space-y-0.5">
-                            <span className="text-sm font-[800] text-zinc-900 block">Upload or Capture Product Label</span>
-                            <span className="text-[11px] text-zinc-500 font-medium block">Tap to upload packaged commodity photo for instant OCR audit</span>
+                            <span className="text-xs sm:text-sm font-[800] text-zinc-900 block">Upload or Capture Product Label</span>
+                            <span className="text-[10.5px] text-zinc-500 font-medium block">Tap to upload packaged commodity photo for instant OCR audit</span>
                           </div>
                         </div>
                       </div>
 
                       {/* Trending Now Section with Custom Icon & Dynamic Dark Blurry Edge Vignettes */}
-                      <div className="space-y-4 pt-4">
+                      <div className="space-y-2 pt-1 shrink-0">
                         <div className="flex items-center justify-between">
-                          <div className="flex items-center gap-2.5">
-                            <div className="text-[#346415] bg-[#EAFBD9] p-2 rounded-xl border border-[#B8F27D]/70 flex items-center justify-center shadow-sm">
-                              <TrendingCustomIcon className="w-5 h-5" />
+                          <div className="flex items-center gap-2">
+                            <div className="text-[#346415] bg-[#EAFBD9] p-1.5 rounded-xl border border-[#B8F27D]/70 flex items-center justify-center shadow-sm">
+                              <TrendingCustomIcon className="w-4 h-4" />
                             </div>
                             <h2
-                              className="text-[19px] font-[900] text-zinc-950 tracking-[-0.02em]"
+                              className="text-[17px] font-[900] text-zinc-950 tracking-[-0.02em]"
                               style={{ fontFamily: 'satoshi, "satoshi Fallback", sans-serif', fontWeight: 900 }}
                             >
                               Trending now
                             </h2>
                           </div>
-                          <span className="text-[11px] font-mono text-zinc-400 font-bold uppercase tracking-wider">Swipe →</span>
+                          <span className="text-[10.5px] font-mono text-zinc-400 font-bold uppercase tracking-wider">Swipe →</span>
                         </div>
 
                         {/* Relative Container with Dynamic Blurry Dark Gradient Masks at Outer Edges */}
                         <div className="relative -mx-2 px-2 overflow-hidden">
-                          {/* Left Dark Blurry Vignette Fade (appears when swiped to right) */}
+                          {/* Left Dark Blurry Vignette Fade */}
                           <div
                             className={cn(
                               "absolute left-0 top-0 bottom-0 w-4 bg-gradient-to-r from-[#E6E4E5] to-transparent pointer-events-none z-10 transition-opacity duration-300 backdrop-blur-[1px]",
@@ -788,7 +831,7 @@ export default function DashboardPage() {
                             )}
                           />
 
-                          {/* Right Dark Blurry Vignette Fade (appears when more content on right) */}
+                          {/* Right Dark Blurry Vignette Fade */}
                           <div
                             className={cn(
                               "absolute right-0 top-0 bottom-0 w-4 bg-gradient-to-l from-[#E6E4E5] to-transparent pointer-events-none z-10 transition-opacity duration-300 backdrop-blur-[1px]",
@@ -803,38 +846,38 @@ export default function DashboardPage() {
                             onTouchStart={(e) => e.stopPropagation()}
                             onTouchMove={(e) => e.stopPropagation()}
                             onTouchEnd={(e) => e.stopPropagation()}
-                            className="flex gap-3.5 overflow-x-auto snap-x snap-mandatory no-scrollbar pb-2 pt-0.5 px-2"
+                            className="flex gap-3 overflow-x-auto snap-x snap-mandatory no-scrollbar pb-1 pt-0.5 px-2"
                           >
                             {posts.map((post) => (
                               <div
                                 key={`trending-${post.id}`}
-                                className="w-[285px] shrink-0 snap-start p-4 rounded-2xl bg-[#E4E2E3] text-[rgb(18,18,18)] font-mono space-y-3 border-[1.5px] border-[#C8C5C9] shadow-[0_4px_16px_rgba(0,0,0,0.04),inset_0_1px_1px_rgba(255,255,255,0.9)] ring-1 ring-black/[0.04] text-left"
+                                className="w-[265px] shrink-0 snap-start p-3 rounded-2xl bg-[#E4E2E3] text-[rgb(18,18,18)] font-mono space-y-2 border-[1.5px] border-[#C8C5C9] shadow-[0_4px_16px_rgba(0,0,0,0.04),inset_0_1px_1px_rgba(255,255,255,0.9)] ring-1 ring-black/[0.04] text-left"
                               >
                                 {/* Header with Commodity and Brand */}
-                                <div className="flex items-center justify-between border-b border-[#D2CFD3] pb-2 text-[10.5px]">
-                                  <span className="truncate pr-1.5 text-zinc-900 font-bold text-xs max-w-[145px]">{post.commodity}</span>
-                                  <span className="text-[#346415] shrink-0 font-extrabold bg-[#EAFBD9] px-2 py-0.5 rounded-md border border-[#B8F27D] text-[9.5px] truncate max-w-[125px]">
+                                <div className="flex items-center justify-between border-b border-[#D2CFD3] pb-1.5 text-[10px]">
+                                  <span className="truncate pr-1 text-zinc-900 font-bold text-xs max-w-[135px]">{post.commodity}</span>
+                                  <span className="text-[#346415] shrink-0 font-extrabold bg-[#EAFBD9] px-2 py-0.5 rounded-md border border-[#B8F27D] text-[9px] truncate max-w-[115px]">
                                     BRAND: {post.brand}
                                   </span>
                                 </div>
 
                                 {/* OCR Region */}
                                 <div>
-                                  <span className="text-[9px] text-zinc-500 font-bold uppercase tracking-wider block">OCR REGION</span>
-                                  <span className="text-zinc-900 font-bold block text-[11px] leading-tight mt-0.5">{post.evidence.labelRegion}</span>
+                                  <span className="text-[8.5px] text-zinc-500 font-bold uppercase tracking-wider block">OCR REGION</span>
+                                  <span className="text-zinc-900 font-bold block text-[10.5px] leading-tight mt-0.5">{post.evidence.labelRegion}</span>
                                 </div>
 
                                 {/* OCR Extracted String */}
                                 <div>
-                                  <span className="text-[9px] text-zinc-500 font-bold uppercase tracking-wider block">OCR EXTRACTED STRING</span>
-                                  <span className="text-[#92400E] font-extrabold block text-[11.5px] leading-tight mt-0.5">{post.evidence.ocrSnippet}</span>
+                                  <span className="text-[8.5px] text-zinc-500 font-bold uppercase tracking-wider block">OCR EXTRACTED STRING</span>
+                                  <span className="text-[#92400E] font-extrabold block text-[11px] leading-tight mt-0.5">{post.evidence.ocrSnippet}</span>
                                 </div>
 
                                 {/* Flag & Req */}
-                                <div className="pt-2 border-t border-[#D2CFD3] space-y-0.5 text-[10.5px] leading-tight">
-                                  <span className="text-rose-700 font-bold block">Flag: {post.evidence.flagReason}</span>
+                                <div className="pt-1.5 border-t border-[#D2CFD3] space-y-0.5 text-[10px] leading-tight">
+                                  <span className="text-rose-700 font-bold block truncate">Flag: {post.evidence.flagReason}</span>
                                   {post.evidence.requiredValue && (
-                                    <span className="text-zinc-600 font-semibold block">Req: {post.evidence.requiredValue}</span>
+                                    <span className="text-zinc-600 font-semibold block truncate">Req: {post.evidence.requiredValue}</span>
                                   )}
                                 </div>
                               </div>
@@ -1150,9 +1193,13 @@ export default function DashboardPage() {
                   <div className="w-9 h-9 rounded-full overflow-hidden bg-zinc-900 shrink-0 border border-zinc-200">
                     <img src={avatar} alt="User" className="w-full h-full object-cover" />
                   </div>
-                  <div className="flex-1 p-2 px-3.5 rounded-xl bg-[#ECEAEB] border border-[#D5D2D4] text-xs sm:text-sm text-zinc-500 flex items-center justify-between cursor-pointer hover:bg-[#E6E4E5] transition-colors">
-                    <span className="truncate">Log new field inspection or upload commodity photo...</span>
-                    <Camera className="w-4 h-4 text-zinc-400 shrink-0 ml-2" />
+                  <div
+                    onClick={openPickerChoice}
+                    role="button"
+                    className="flex-1 p-2 px-3.5 rounded-xl bg-[#ECEAEB] border border-[#D5D2D4] text-xs sm:text-sm text-zinc-500 flex items-center justify-between cursor-pointer hover:bg-[#E6E4E5] hover:border-[#B8F27D]/40 transition-colors"
+                  >
+                    <span className="truncate">Upload packaged commodity photo for OCR inspection...</span>
+                    <InspectionCameraCustomIcon className="w-4 h-4 text-zinc-500 shrink-0 ml-2" />
                   </div>
                 </div>
 
@@ -1531,12 +1578,12 @@ export default function DashboardPage() {
           </span>
         </button>
 
-        {/* 3. Center Green Plus Button (Stationary Action) */}
+        {/* 3. Center Green Plus Button — opens picker */}
         <button
           type="button"
-          onClick={() => setMobileTab("home")}
+          onClick={openPickerChoice}
           className="relative w-10 h-10 -my-2 rounded-full bg-[#94EB41] text-[rgb(18,18,18)] shadow-[0_4px_14px_rgba(148,235,65,0.35),inset_0_1px_1px_rgba(255,255,255,0.7)] flex items-center justify-center hover:bg-[#80D42F] active:scale-90 transition-all cursor-pointer border border-[#80D42F] shrink-0"
-          title="New Scan / Post"
+          title="New Scan — take or pick photo"
         >
           <Plus className="w-5 h-5 stroke-[2.8]" />
         </button>
@@ -1594,6 +1641,88 @@ export default function DashboardPage() {
         onClose={() => setShareModalOpen(false)}
         postTitle={sharingPost?.title}
         shareUrl={sharingPost?.url}
+      />
+
+      {/* ========================================================
+          5. SCAN FLOW — Hidden Inputs + Choice Modal + Thermal Printer
+         ======================================================== */}
+      <input ref={galleryInputRef} type="file" accept="image/*" className="hidden" onChange={handleScanFile} />
+      <input ref={cameraInputRef} type="file" accept="image/*" capture="environment" className="hidden" onChange={handleScanFile} />
+
+      <AnimatePresence>
+        {showPickerChoice && (
+          <div className="fixed inset-0 z-[75] flex items-center justify-center p-4">
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              className="fixed inset-0 bg-black/40 backdrop-blur-sm"
+              onClick={() => setShowPickerChoice(false)}
+            />
+            <motion.div
+              initial={{ opacity: 0, scale: 0.9, y: 12 }}
+              animate={{ opacity: 1, scale: 1, y: 0 }}
+              exit={{ opacity: 0, scale: 0.92, y: 8 }}
+              transition={{ type: "spring", stiffness: 450, damping: 28 }}
+              className="relative w-full max-w-[340px] p-5 rounded-[26px] bg-[#FCFCFB] border border-white/80 shadow-[0_24px_60px_rgba(0,0,0,0.22),inset_0_1px_1px_rgba(255,255,255,0.95)] z-[76] space-y-4 mx-auto"
+            >
+              <div className="flex items-center justify-between">
+                <div className="flex items-center gap-2">
+                  <div className="w-7 h-7 rounded-lg bg-[#94EB41] text-[rgb(18,18,18)] flex items-center justify-center border border-[#80D42F] shadow-xs">
+                    <InspectionCameraCustomIcon className="w-4 h-4 stroke-[2]" />
+                  </div>
+                  <h4
+                    className="text-sm font-[900] text-zinc-950 tracking-tight"
+                    style={{ fontFamily: 'satoshi, "satoshi Fallback", sans-serif', fontWeight: 900 }}
+                  >
+                    Add Product Photo
+                  </h4>
+                </div>
+                <button
+                  type="button"
+                  onClick={() => setShowPickerChoice(false)}
+                  className="p-1 rounded-full hover:bg-black/5 text-zinc-400 hover:text-zinc-900 transition-colors"
+                  title="Close"
+                >
+                  <X className="w-4 h-4" />
+                </button>
+              </div>
+
+              <div className="grid grid-cols-2 gap-3 pt-0.5">
+                <button
+                  type="button"
+                  onClick={() => cameraInputRef.current?.click()}
+                  className="p-4 rounded-2xl bg-[#EAFBD9] border border-[#B8F27D] hover:bg-[#dcf8c4] flex flex-col items-center gap-2 transition-all active:scale-95 shadow-sm text-center"
+                >
+                  <InspectionCameraCustomIcon className="w-6 h-6 text-[#346415]" />
+                  <span className="text-xs font-bold text-zinc-900">Take photo</span>
+                  <span className="text-[10px] font-medium text-zinc-500 font-mono">Camera</span>
+                </button>
+                <button
+                  type="button"
+                  onClick={() => galleryInputRef.current?.click()}
+                  className="p-4 rounded-2xl bg-white border border-[#D5D2D4] hover:bg-zinc-50 flex flex-col items-center gap-2 transition-all active:scale-95 shadow-sm text-center"
+                >
+                  <SparkleAddPhotoCustomIcon className="w-6 h-6 text-zinc-800" />
+                  <span className="text-xs font-bold text-zinc-900">Choose photo</span>
+                  <span className="text-[10px] font-medium text-zinc-500 font-mono">Gallery</span>
+                </button>
+              </div>
+            </motion.div>
+          </div>
+        )}
+      </AnimatePresence>
+
+      <ScanFlow
+        isOpen={showScanFlow}
+        imageUrl={scanImageUrl}
+        imageName={scanImageName}
+        onClose={() => {
+          setShowScanFlow(false);
+          if (scanImageUrl) URL.revokeObjectURL(scanImageUrl);
+        }}
+        onPost={handleScanPost}
+        onSave={handleScanSave}
       />
 
     </div>

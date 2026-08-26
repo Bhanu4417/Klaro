@@ -5,6 +5,7 @@ import Link from "next/link";
 import { motion } from "framer-motion";
 import { ArrowRight, ShieldCheck, FileCheck, Scale } from "lucide-react";
 import { Button } from "../ui/Button";
+import { HomeScanTrigger } from "./HomeScanTrigger";
 
 export const Hero: React.FC = () => {
   return (
@@ -69,6 +70,16 @@ export const Hero: React.FC = () => {
             >
               See how it works
             </a>
+          </motion.div>
+
+          {/* Chinn music scan trigger — any photo */}
+          <motion.div
+            initial={{ opacity: 0, y: 8 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.5, delay: 0.35 }}
+            className="pt-1"
+          >
+            <HomeScanTrigger />
           </motion.div>
 
           {/* Standards & Authority Trust Row */}
