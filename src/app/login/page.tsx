@@ -153,16 +153,16 @@ export default function LoginPage() {
     const strategy = provider === "google" ? "oauth_google" : "oauth_github";
 
     try {
-      // Use signUp authenticateWithRedirect which automatically handles both new signups and existing logins
-      await clerk.client.signUp.authenticateWithRedirect({
+      // First attempt signIn OAuth redirect (seamless for existing users)
+      await clerk.client.signIn.authenticateWithRedirect({
         strategy,
         redirectUrl: "/sso-callback",
         redirectUrlComplete: "/dashboard",
       });
     } catch (err: any) {
-      console.error("OAuth signUp error, trying signIn fallback:", err);
+      console.error("OAuth signIn error, trying signUp fallback:", err);
       try {
-        await clerk.client.signIn.authenticateWithRedirect({
+        await clerk.client.signUp.authenticateWithRedirect({
           strategy,
           redirectUrl: "/sso-callback",
           redirectUrlComplete: "/dashboard",
