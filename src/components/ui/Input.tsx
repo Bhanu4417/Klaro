@@ -66,14 +66,20 @@ export const Input = forwardRef<HTMLInputElement, InputProps>(
             value={value}
             onChange={onChange}
             disabled={disabled}
+            spellCheck={false}
+            autoCorrect="off"
+            autoCapitalize="off"
+            data-gramm="false"
+            data-gramm_editor="false"
+            data-enable-grammarly="false"
             className={cn(
-              "w-full h-12 min-h-[48px] sm:min-h-[50px] rounded-[18px] bg-[#ECEAEB] text-[rgb(18,18,18)] placeholder:text-zinc-400 text-sm sm:text-[15px] font-medium transition-all duration-150 border-[1.5px]",
-              "shadow-[inset_0_1.5px_2px_rgba(0,0,0,0.03),inset_0_1px_1px_rgba(255,255,255,0.85)] focus:outline-none focus:ring-2 focus:ring-[#94EC40]/25 focus:border-[#94EC40] focus:bg-white",
+              "w-full h-12 min-h-[48px] sm:min-h-[50px] rounded-[18px] bg-[#ECEAEB] text-[rgb(18,18,18)] placeholder:text-zinc-400 text-sm sm:text-[15px] font-medium transition-colors duration-150 border-[1.5px] outline-none ring-0 ring-offset-0",
+              "shadow-[inset_0_1.5px_2px_rgba(0,0,0,0.03),inset_0_1px_1px_rgba(255,255,255,0.85)] focus:outline-none focus-visible:outline-none focus:ring-2 focus:ring-[#94EC40]/30 focus:border-[#94EC40] focus:bg-white focus-visible:ring-2 focus-visible:ring-[#94EC40]/30 focus-visible:border-[#94EC40] focus-visible:bg-white focus:ring-offset-0 focus-visible:ring-offset-0",
               leftIcon ? "pl-10" : "pl-4",
               isPassword || (allowClear && hasValue) ? "pr-10" : "pr-4",
               error
-                ? "border-red-400 bg-red-50/20 text-red-950 focus:border-red-500 focus:ring-red-500/20"
-                : "border-[#D5D2D4] hover:border-[#CAC7C9]",
+                ? "border-red-400 bg-red-50/20 text-red-950 focus:border-red-500 focus:ring-red-500/20 focus-visible:border-red-500 focus-visible:ring-red-500/20"
+                : "border-[#D5D2D4] hover:border-[#CAC7C9] focus:hover:border-[#94EC40] focus-visible:hover:border-[#94EC40]",
               disabled && "bg-[#DFDCDE] text-zinc-400 cursor-not-allowed border-[#D5D2D4]",
               className
             )}

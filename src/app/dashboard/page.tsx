@@ -322,6 +322,14 @@ const ShareCustomIcon = ({ className = "w-4 h-4" }: { className?: string }) => (
   </svg>
 );
 
+const WatchdogHeartHandsIcon = ({ className = "w-3 h-3" }: { className?: string }) => (
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="24" height="24" className={className} fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round">
+    <path d="M8.39559 2.55196C9.8705 1.63811 11.1578 2.00638 11.9311 2.59299C12.2482 2.83351 12.4067 2.95378 12.5 2.95378C12.5933 2.95378 12.7518 2.83351 13.0689 2.59299C13.8422 2.00638 15.1295 1.63811 16.6044 2.55196C18.5401 3.75128 18.9781 7.7079 14.5133 11.046C13.6629 11.6818 13.2377 11.9996 12.5 11.9996C11.7623 11.9996 11.3371 11.6818 10.4867 11.046C6.02195 7.7079 6.45994 3.75128 8.39559 2.55196Z"></path>
+    <path d="M4 14H6.39482C6.68897 14 6.97908 14.0663 7.24217 14.1936L9.28415 15.1816C9.54724 15.3089 9.83735 15.3751 10.1315 15.3751H11.1741C12.1825 15.3751 13 16.1662 13 17.142C13 17.1814 12.973 17.2161 12.9338 17.2269L10.3929 17.9295C9.93707 18.0555 9.449 18.0116 9.025 17.8064L6.84211 16.7503" strokeLinejoin="round"></path>
+    <path d="M13 16.5L17.5928 15.0889C18.407 14.8352 19.2871 15.136 19.7971 15.8423C20.1659 16.3529 20.0157 17.0842 19.4785 17.3942L11.9629 21.7305C11.4849 22.0063 10.9209 22.0736 10.3952 21.9176L4 20.0199" strokeLinejoin="round"></path>
+  </svg>
+);
+
 const InspectionCameraCustomIcon = ({ className = "w-5 h-5" }: { className?: string }) => (
   <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="24" height="24" className={className} fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
     <path d="M22 7.49945V15.4994C22 18.3279 22 19.7421 21.1213 20.6208C20.2426 21.4994 18.8284 21.4994 16 21.4994H8C5.17157 21.4994 3.75736 21.4994 2.87868 20.6208C2 19.7421 2 18.3279 2 15.4994V12.9994C2 10.171 2 8.7568 2.87868 7.87812C3.75736 6.99944 5.17157 6.99944 8 6.99944H8.39922C9.02578 6.99944 9.33906 6.99944 9.62612 6.91124C9.81759 6.85241 9.99914 6.76516 10.1647 6.65239C10.4129 6.48333 10.6086 6.2387 11 5.74944C11.3914 5.26018 11.5871 5.01555 11.8353 4.84648C12.0009 4.73372 12.1824 4.64646 12.3739 4.58763C12.5504 4.53339 12.7369 4.5086 13 4.50056" />
@@ -664,47 +672,94 @@ export default function DashboardPage() {
   return (
     <div className="min-h-screen w-full bg-[#E6E4E5] text-[rgb(18,18,18)] antialiased font-sans flex flex-col selection:bg-[#94EC40] selection:text-[rgb(18,18,18)]">
       
-      {/* 1. TOP DASHBOARD NAVBAR */}
-      <header className="hidden md:block sticky top-0 z-40 bg-[#FCFCFB]/95 backdrop-blur-md border-b border-[#D5D2D4] px-4 sm:px-6 lg:px-8 py-3 shadow-[0_2px_12px_rgba(0,0,0,0.03)]">
-        <div className="max-w-7xl mx-auto flex items-center justify-between gap-4">
-          
-          {/* Klaro Logo */}
-          <div className="flex items-center gap-3 shrink-0">
-            <Link href="/dashboard" className="flex items-center gap-2">
-              <Logo size="sm" showText={false} />
-              <span
-                className="text-xl font-[800] text-[rgb(18,18,18)] tracking-[-0.03em]"
-                style={{ fontFamily: 'satoshi, "satoshi Fallback", sans-serif', fontWeight: 800 }}
-              >
-                klaro
-              </span>
-            </Link>
-          </div>
-
-          {/* Search Bar */}
-          <div className="flex-1 max-w-xl relative">
-            <Search className="w-4 h-4 text-zinc-400 absolute left-3.5 top-1/2 -translate-y-1/2" />
-            <input
-              type="text"
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
-              placeholder="Search violations, brands, rules (e.g. MRP, Rule 6)..."
-              className="w-full pl-9 pr-4 py-2.5 rounded-[18px] bg-[#ECEAEB] border-[1.5px] border-[#D5D2D4] shadow-[inset_0_1.5px_2px_rgba(0,0,0,0.03),inset_0_1px_1px_rgba(255,255,255,0.85)] text-xs sm:text-sm text-zinc-800 placeholder-zinc-400 focus:outline-none focus:bg-white focus:border-zinc-400 transition-all font-medium"
-            />
-          </div>
-
-          {/* Report CTA Button */}
-          <div className="flex items-center gap-2.5 shrink-0">
-            <button
-              type="button"
-              onClick={openPickerChoice}
-              className="px-3.5 py-1.5 rounded-xl bg-[#94EB41] hover:bg-[#80D42F] text-[rgb(18,18,18)] font-bold text-xs shadow-[0_2px_8px_rgba(148,235,65,0.35),inset_0_1px_1px_rgba(255,255,255,0.7)] border border-[#80D42F] flex items-center gap-1.5 active:scale-95 transition-all"
+      {/* 1. TOP DASHBOARD SUSPENDED NOTCH NAVBAR */}
+      <header className="hidden md:block sticky top-0 z-40 w-full pointer-events-none">
+        <div className="max-w-7xl mx-auto px-3 sm:px-6 lg:px-8">
+          <div className="relative pointer-events-auto filter drop-shadow-[0_4px_16px_rgba(0,0,0,0.04)]">
+            {/* Left Squircle Edge Cap (Inverted Top + Rounded Bottom) */}
+            <svg
+              width="39"
+              height="54"
+              viewBox="0 0 39 54"
+              fill="none"
+              xmlns="http://www.w3.org/2000/svg"
+              className="absolute top-0 -left-[38px] pointer-events-none z-10 overflow-visible"
             >
-              <ReportNavbarCustomIcon className="w-4 h-4 stroke-[1.8]" />
-              <span>Report</span>
-            </button>
-          </div>
+              <path
+                d="M 0 0 A 24 24 0 0 1 24 24 L 24 40 A 14 14 0 0 0 38 54 H 39 V 0 Z"
+                fill="#FCFCFB"
+              />
+              <path
+                d="M 0 0 A 24 24 0 0 1 24 24 L 24 39.25 A 14 14 0 0 0 38 53.25 H 39"
+                stroke="#D5D2D4"
+                strokeWidth="1.5"
+                fill="none"
+              />
+            </svg>
 
+            {/* Right Squircle Edge Cap (Inverted Top + Rounded Bottom) */}
+            <svg
+              width="39"
+              height="54"
+              viewBox="-1 0 39 54"
+              fill="none"
+              xmlns="http://www.w3.org/2000/svg"
+              className="absolute top-0 -right-[38px] pointer-events-none z-10 overflow-visible"
+            >
+              <path
+                d="M 0 54 A 14 14 0 0 0 14 40 L 14 24 A 24 24 0 0 1 38 0 H -1 V 54 Z"
+                fill="#FCFCFB"
+              />
+              <path
+                d="M -1 53.25 H 0 A 14 14 0 0 0 14 39.25 L 14 24 A 24 24 0 0 1 38 0"
+                stroke="#D5D2D4"
+                strokeWidth="1.5"
+                fill="none"
+              />
+            </svg>
+
+            {/* Navbar Central Bar (Square Rectangle, corners handled by caps) */}
+            <div className="h-[54px] bg-[#FCFCFB] border-b-[1.5px] border-[#D5D2D4] px-4 sm:px-6 flex items-center justify-between gap-4">
+              
+              {/* Klaro Logo */}
+              <div className="flex items-center gap-3 shrink-0">
+                <Link href="/dashboard" className="flex items-center gap-2">
+                  <Logo size="sm" showText={false} />
+                  <span
+                    className="text-xl font-[800] text-[rgb(18,18,18)] tracking-[-0.03em]"
+                    style={{ fontFamily: 'satoshi, "satoshi Fallback", sans-serif', fontWeight: 800 }}
+                  >
+                    klaro
+                  </span>
+                </Link>
+              </div>
+
+              {/* Search Bar */}
+              <div className="flex-1 max-w-xl relative">
+                <Search className="w-4 h-4 text-zinc-400 absolute left-3.5 top-1/2 -translate-y-1/2" />
+                <input
+                  type="text"
+                  value={searchQuery}
+                  onChange={(e) => setSearchQuery(e.target.value)}
+                  placeholder="Search violations, brands, rules (e.g. MRP, Rule 6)..."
+                  className="w-full pl-9 pr-4 py-2 rounded-xl bg-[#ECEAEB] border-[1.5px] border-[#D5D2D4] shadow-[inset_0_1.5px_2px_rgba(0,0,0,0.03),inset_0_1px_1px_rgba(255,255,255,0.85)] text-xs sm:text-sm text-zinc-800 placeholder-zinc-400 outline-none ring-0 ring-offset-0 focus:outline-none focus-visible:outline-none focus:ring-2 focus:ring-[#94EC40]/30 focus:border-[#94EC40] focus-visible:ring-2 focus-visible:ring-[#94EC40]/30 focus-visible:border-[#94EC40] focus:bg-white focus-visible:bg-white transition-colors font-medium"
+                />
+              </div>
+
+              {/* Report CTA Button */}
+              <div className="flex items-center gap-2.5 shrink-0">
+                <button
+                  type="button"
+                  onClick={openPickerChoice}
+                  className="px-3.5 py-1.5 rounded-xl bg-[#94EB41] hover:bg-[#80D42F] text-[rgb(18,18,18)] font-bold text-xs shadow-[0_2px_8px_rgba(148,235,65,0.35),inset_0_1px_1px_rgba(255,255,255,0.7)] border border-[#80D42F] flex items-center gap-1.5 active:scale-95 transition-all"
+                >
+                  <ReportNavbarCustomIcon className="w-4 h-4 stroke-[1.8]" />
+                  <span>Report</span>
+                </button>
+              </div>
+
+            </div>
+          </div>
         </div>
       </header>
 
@@ -893,7 +948,7 @@ export default function DashboardPage() {
                             onChange={(e) => setSearchQuery(e.target.value)}
                             placeholder="Search violations, brands..."
                             className={cn(
-                              "w-full pl-9 pr-3 rounded-xl bg-[#ECEAEB] border border-[#D5D2D4] text-xs text-zinc-800 placeholder-zinc-400 focus:outline-none focus:bg-white focus:border-zinc-400 transition-all duration-200",
+                              "w-full pl-9 pr-3 rounded-xl bg-[#ECEAEB] border border-[#D5D2D4] text-xs text-zinc-800 placeholder-zinc-400 outline-none ring-0 ring-offset-0 focus:outline-none focus-visible:outline-none focus:ring-2 focus:ring-[#94EC40]/30 focus:border-[#94EC40] focus-visible:ring-2 focus-visible:ring-[#94EC40]/30 focus-visible:border-[#94EC40] focus:bg-white focus-visible:bg-white transition-colors duration-200",
                               isSearchCollapsed ? "py-1.5" : "py-2"
                             )}
                           />
@@ -1139,8 +1194,8 @@ export default function DashboardPage() {
                             <p className="text-xs text-zinc-500 font-mono">
                               {profile?.username || "@community_user"}
                             </p>
-                            <span className="inline-flex items-center gap-1 text-[10px] font-bold text-[#346415] bg-[#EAFBD9] px-2.5 py-0.5 rounded-full mt-1.5 border border-[#B8F27D]">
-                              <ShieldCheck className="w-3 h-3" />
+                            <span className="inline-flex items-center gap-1 text-[10px] font-bold text-red-700 bg-red-100 px-2.5 py-0.5 rounded-full mt-1.5 border border-red-200">
+                              <WatchdogHeartHandsIcon className="w-3.5 h-3.5 text-red-600" />
                               Community Watchdog
                             </span>
                           </div>
@@ -1431,7 +1486,7 @@ export default function DashboardPage() {
                                 onChange={(e) => setCommentInputs((prev) => ({ ...prev, [post.id]: e.target.value }))}
                                 onKeyDown={(e) => { if (e.key === "Enter") handleAddComment(post.id); }}
                                 placeholder="Add an officer note..."
-                                className="flex-1 px-3.5 py-2 rounded-xl bg-white border border-[#D5D2D4] text-xs text-zinc-800 placeholder-zinc-400 focus:outline-none"
+                                className="flex-1 px-3.5 py-2 rounded-xl bg-white border border-[#D5D2D4] text-xs text-zinc-800 placeholder-zinc-400 outline-none ring-0 ring-offset-0 focus:outline-none focus-visible:outline-none focus:ring-2 focus:ring-[#94EC40]/30 focus:border-[#94EC40] focus-visible:ring-2 focus-visible:ring-[#94EC40]/30 focus-visible:border-[#94EC40] transition-colors"
                               />
                               <button
                                 type="button"
@@ -1455,8 +1510,8 @@ export default function DashboardPage() {
 
           </div>
 
-          {/* RIGHT SIDEBAR: Community Member Profile & Karma Stats (Smooth Sticky Desktop Sidebar) */}
-          <aside className="hidden lg:block lg:col-span-4 space-y-4 text-left sticky top-[4.5rem] self-start transition-none">
+          {/* RIGHT SIDEBAR: Fixed — does not move at all when scrolling feed */}
+          <aside className="hidden lg:block lg:col-span-4 space-y-4 text-left sticky top-[72px] self-start max-h-[calc(100vh-80px)] overflow-y-auto no-scrollbar overscroll-contain scrollbar-none">
             
             {/* User Identity Card */}
             <div className="p-5 rounded-[22px] bg-[#FCFCFB] border-[1.5px] border-[#D5D2D4] shadow-[0_4px_20px_rgba(0,0,0,0.03),inset_0_1.5px_1.5px_rgba(255,255,255,0.95)] space-y-4">
@@ -1478,8 +1533,8 @@ export default function DashboardPage() {
                   <p className="text-xs text-zinc-500 font-mono">
                     {profile?.username || "@community_user"}
                   </p>
-                  <span className="inline-flex items-center gap-1 text-[10px] font-bold text-[#346415] bg-[#EAFBD9] px-2.5 py-0.5 rounded-full mt-1 border border-[#B8F27D]">
-                    <ShieldCheck className="w-3 h-3" />
+                  <span className="inline-flex items-center gap-1 text-[10px] font-bold text-red-700 bg-red-100 px-2.5 py-0.5 rounded-full mt-1 border border-red-200">
+                    <WatchdogHeartHandsIcon className="w-3.5 h-3.5 text-red-600" />
                     Community Watchdog
                   </span>
                 </div>

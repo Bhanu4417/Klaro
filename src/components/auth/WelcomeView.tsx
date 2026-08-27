@@ -47,7 +47,7 @@ export const WelcomeView: React.FC<WelcomeViewProps> = ({
         type="button"
         onClick={onSelectEmail}
         disabled={Boolean(isLoadingSocial)}
-        className="w-full h-12 min-h-[48px] sm:min-h-[50px] px-5 rounded-[18px] bg-[#94EB41] hover:bg-[#88E430] active:bg-[#7ED428] text-[rgb(18,18,18)] font-[800] text-sm sm:text-[15px] tracking-tight border-2 border-[#62C414] shadow-[0_4px_14px_rgba(104,202,26,0.35),inset_0_1.5px_1.5px_rgba(255,255,255,0.85),inset_0_-1.5px_2px_rgba(0,0,0,0.08)] flex items-center justify-center gap-2.5 transition-all duration-150 active:scale-[0.985] select-none cursor-pointer focus:outline-none focus-visible:ring-2 focus-visible:ring-[#94EC40]"
+        className="w-full h-12 min-h-[48px] sm:min-h-[50px] px-5 rounded-[18px] bg-[#94EB41] hover:bg-[#88E430] active:bg-[#7ED428] text-[rgb(18,18,18)] font-[800] text-sm sm:text-[15px] tracking-tight border-2 border-[#62C414] shadow-[0_4px_14px_rgba(104,202,26,0.35),inset_0_1.5px_1.5px_rgba(255,255,255,0.85),inset_0_-1.5px_2px_rgba(0,0,0,0.08)] flex items-center justify-center gap-2.5 transition-colors duration-150 active:scale-[0.985] select-none cursor-pointer outline-none ring-0 ring-offset-0 focus:outline-none focus-visible:outline-none focus:ring-2 focus:ring-[#94EC40]/30 focus:border-[#62C414] focus-visible:ring-2 focus-visible:ring-[#94EC40]/30 focus-visible:border-[#62C414] focus:ring-offset-0 focus-visible:ring-offset-0"
         style={{ fontFamily: 'satoshi, "satoshi Fallback", sans-serif', fontWeight: 800 }}
       >
         <svg className="w-4 h-4 fill-current text-[rgb(18,18,18)] shrink-0" viewBox="0 0 24 24">
@@ -74,7 +74,7 @@ export const WelcomeView: React.FC<WelcomeViewProps> = ({
         <button
           type="button"
           onClick={onOfficerLogin}
-          className="w-full py-2.5 px-4 rounded-xl bg-[#ECEAEB] hover:bg-white border border-[#D5D2D4] hover:border-zinc-400 text-xs font-[700] text-zinc-800 transition-all flex items-center justify-center gap-2 shadow-sm group"
+          className="w-full py-2.5 px-4 rounded-xl bg-[#ECEAEB] hover:bg-white border border-[#D5D2D4] hover:border-zinc-400 text-xs font-[700] text-zinc-800 transition-colors flex items-center justify-center gap-2 shadow-sm group outline-none ring-0 ring-offset-0 focus:outline-none focus-visible:outline-none focus:ring-2 focus:ring-[#94EC40]/30 focus:border-[#94EC40] focus-visible:ring-2 focus-visible:ring-[#94EC40]/30 focus-visible:border-[#94EC40] focus:ring-offset-0 focus-visible:ring-offset-0"
         >
           <svg
             xmlns="http://www.w3.org/2000/svg"

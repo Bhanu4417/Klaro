@@ -597,47 +597,94 @@ export default function AdminDashboardPage() {
   return (
     <div className="min-h-screen w-full bg-[#E6E4E5] text-[rgb(18,18,18)] antialiased font-sans flex flex-col selection:bg-[#94EC40] selection:text-[rgb(18,18,18)]">
       
-      {/* 1. TOP DASHBOARD NAVBAR (Exact match to User dashboard) */}
-      <header className="hidden md:block sticky top-0 z-40 bg-[#FCFCFB]/95 backdrop-blur-md border-b border-[#D5D2D4] px-4 sm:px-6 lg:px-8 py-3 shadow-[0_2px_12px_rgba(0,0,0,0.03)]">
-        <div className="max-w-7xl mx-auto flex items-center justify-between gap-4">
-          
-          {/* Klaro Logo */}
-          <div className="flex items-center gap-3 shrink-0">
-            <Link href="/admin" className="flex items-center gap-2">
-              <Logo size="sm" showText={false} />
-              <span
-                className="text-xl font-[800] text-[rgb(18,18,18)] tracking-[-0.03em]"
-                style={{ fontFamily: 'satoshi, "satoshi Fallback", sans-serif', fontWeight: 800 }}
-              >
-                klaro
-              </span>
-            </Link>
-          </div>
-
-          {/* Search Bar */}
-          <div className="flex-1 max-w-xl relative">
-            <Search className="w-4 h-4 text-zinc-400 absolute left-3.5 top-1/2 -translate-y-1/2" />
-            <input
-              type="text"
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
-              placeholder="Search violations, brands, rules (e.g. MRP, Rule 6)..."
-              className="w-full pl-9 pr-4 py-2 rounded-xl bg-[#ECEAEB] border border-[#D5D2D4] text-xs sm:text-sm text-zinc-800 placeholder-zinc-400 focus:outline-none focus:bg-white focus:border-zinc-400 transition-all font-medium"
-            />
-          </div>
-
-          {/* Report CTA Button */}
-          <div className="flex items-center gap-2.5 shrink-0">
-            <button
-              type="button"
-              onClick={openPickerChoice}
-              className="px-3.5 py-1.5 rounded-xl bg-[#94EB41] hover:bg-[#80D42F] text-[rgb(18,18,18)] font-bold text-xs shadow-[0_2px_8px_rgba(148,235,65,0.35),inset_0_1px_1px_rgba(255,255,255,0.7)] border border-[#80D42F] flex items-center gap-1.5 active:scale-95 transition-all"
+      {/* 1. TOP DASHBOARD SUSPENDED NOTCH NAVBAR */}
+      <header className="hidden md:block sticky top-0 z-40 w-full pointer-events-none">
+        <div className="max-w-7xl mx-auto px-3 sm:px-6 lg:px-8">
+          <div className="relative pointer-events-auto filter drop-shadow-[0_4px_16px_rgba(0,0,0,0.04)]">
+            {/* Left Squircle Edge Cap (Inverted Top + Rounded Bottom) */}
+            <svg
+              width="39"
+              height="54"
+              viewBox="0 0 39 54"
+              fill="none"
+              xmlns="http://www.w3.org/2000/svg"
+              className="absolute top-0 -left-[38px] pointer-events-none z-10 overflow-visible"
             >
-              <ReportNavbarCustomIcon className="w-4 h-4 stroke-[1.8]" />
-              <span>Report</span>
-            </button>
-          </div>
+              <path
+                d="M 0 0 A 24 24 0 0 1 24 24 L 24 40 A 14 14 0 0 0 38 54 H 39 V 0 Z"
+                fill="#FCFCFB"
+              />
+              <path
+                d="M 0 0 A 24 24 0 0 1 24 24 L 24 39.25 A 14 14 0 0 0 38 53.25 H 39"
+                stroke="#D5D2D4"
+                strokeWidth="1.5"
+                fill="none"
+              />
+            </svg>
 
+            {/* Right Squircle Edge Cap (Inverted Top + Rounded Bottom) */}
+            <svg
+              width="39"
+              height="54"
+              viewBox="-1 0 39 54"
+              fill="none"
+              xmlns="http://www.w3.org/2000/svg"
+              className="absolute top-0 -right-[38px] pointer-events-none z-10 overflow-visible"
+            >
+              <path
+                d="M 0 54 A 14 14 0 0 0 14 40 L 14 24 A 24 24 0 0 1 38 0 H -1 V 54 Z"
+                fill="#FCFCFB"
+              />
+              <path
+                d="M -1 53.25 H 0 A 14 14 0 0 0 14 39.25 L 14 24 A 24 24 0 0 1 38 0"
+                stroke="#D5D2D4"
+                strokeWidth="1.5"
+                fill="none"
+              />
+            </svg>
+
+            {/* Navbar Central Bar (Square Rectangle, corners handled by caps) */}
+            <div className="h-[54px] bg-[#FCFCFB] border-b-[1.5px] border-[#D5D2D4] px-4 sm:px-6 flex items-center justify-between gap-4">
+              
+              {/* Klaro Logo */}
+              <div className="flex items-center gap-3 shrink-0">
+                <Link href="/admin" className="flex items-center gap-2">
+                  <Logo size="sm" showText={false} />
+                  <span
+                    className="text-xl font-[800] text-[rgb(18,18,18)] tracking-[-0.03em]"
+                    style={{ fontFamily: 'satoshi, "satoshi Fallback", sans-serif', fontWeight: 800 }}
+                  >
+                    klaro
+                  </span>
+                </Link>
+              </div>
+
+              {/* Search Bar */}
+              <div className="flex-1 max-w-xl relative">
+                <Search className="w-4 h-4 text-zinc-400 absolute left-3.5 top-1/2 -translate-y-1/2" />
+                <input
+                  type="text"
+                  value={searchQuery}
+                  onChange={(e) => setSearchQuery(e.target.value)}
+                  placeholder="Search violations, brands, rules (e.g. MRP, Rule 6)..."
+                  className="w-full pl-9 pr-4 py-2 rounded-xl bg-[#ECEAEB] border-[1.5px] border-[#D5D2D4] shadow-[inset_0_1.5px_2px_rgba(0,0,0,0.03),inset_0_1px_1px_rgba(255,255,255,0.85)] text-xs sm:text-sm text-zinc-800 placeholder-zinc-400 outline-none ring-0 ring-offset-0 focus:outline-none focus-visible:outline-none focus:ring-2 focus:ring-[#94EC40]/30 focus:border-[#94EC40] focus-visible:ring-2 focus-visible:ring-[#94EC40]/30 focus-visible:border-[#94EC40] focus:bg-white focus-visible:bg-white transition-colors font-medium"
+                />
+              </div>
+
+              {/* Report CTA Button */}
+              <div className="flex items-center gap-2.5 shrink-0">
+                <button
+                  type="button"
+                  onClick={openPickerChoice}
+                  className="px-3.5 py-1.5 rounded-xl bg-[#94EB41] hover:bg-[#80D42F] text-[rgb(18,18,18)] font-bold text-xs shadow-[0_2px_8px_rgba(148,235,65,0.35),inset_0_1px_1px_rgba(255,255,255,0.7)] border border-[#80D42F] flex items-center gap-1.5 active:scale-95 transition-all"
+                >
+                  <ReportNavbarCustomIcon className="w-4 h-4 stroke-[1.8]" />
+                  <span>Report</span>
+                </button>
+              </div>
+
+            </div>
+          </div>
         </div>
       </header>
 
@@ -753,7 +800,7 @@ export default function AdminDashboardPage() {
                             value={searchQuery}
                             onChange={(e) => setSearchQuery(e.target.value)}
                             placeholder="Search violations, brands, rules (e.g. MRP, Rule 6)..."
-                            className="w-full pl-9 pr-4 py-2.5 rounded-xl bg-[#FCFCFB] border border-[#D5D2D4] text-xs text-zinc-800 placeholder-zinc-400 focus:outline-none focus:bg-white focus:border-zinc-400 shadow-xs transition-all font-medium"
+                            className="w-full pl-9 pr-4 py-2.5 rounded-xl bg-[#FCFCFB] border border-[#D5D2D4] text-xs text-zinc-800 placeholder-zinc-400 outline-none ring-0 ring-offset-0 focus:outline-none focus-visible:outline-none focus:ring-2 focus:ring-[#94EC40]/30 focus:border-[#94EC40] focus-visible:ring-2 focus-visible:ring-[#94EC40]/30 focus-visible:border-[#94EC40] focus:bg-white focus-visible:bg-white shadow-xs transition-colors font-medium"
                           />
                         </div>
 
