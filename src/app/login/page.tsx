@@ -18,14 +18,28 @@ import { AuthErrorState } from "../../components/auth/AuthErrorState";
 import { AuthLoadingState } from "../../components/auth/AuthLoadingState";
 import { getUserProfile, saveUserProfile } from "../../actions/profile";
 
+// Helper to synchronize login cookie & localStorage
+function setLoginStorage(active: boolean) {
+  if (typeof window === "undefined") return;
+  if (active) {
+    localStorage.setItem("klaro_logged_in", "true");
+    document.cookie = "klaro_logged_in=true; path=/; max-age=31536000; SameSite=Lax";
+  } else {
+    localStorage.removeItem("klaro_logged_in");
+    localStorage.removeItem("klaro_admin_auth");
+    document.cookie = "klaro_logged_in=; path=/; max-age=0; SameSite=Lax";
+  }
+}
+
 export default function LoginPage() {
   const { isLoaded: isUserLoaded, isSignedIn, user } = useUser();
   const clerk = useClerk();
   const router = useRouter();
 
   const [view, setView] = useState<AuthView>("welcome");
-  const [isLoading, setIsLoading] = useState(false);
-  const [loadingMessage, setLoadingMessage] = useState("Connecting to Klaro...");
+  // Default to true during SSR and initial hydration to prevent welcome screen flash & hydration mismatch
+  const [isLoading, setIsLoading] = useState<boolean>(true);
+  const [loadingMessage, setLoadingMessage] = useState<string>("Connecting to Klaro...");
   const [socialLoading, setSocialLoading] = useState<SocialProvider | null>(null);
   const [authError, setAuthError] = useState<AuthError | null>(null);
   const [isFramed, setIsFramed] = useState(false);
@@ -44,12 +58,33 @@ export default function LoginPage() {
   const [authEmail, setAuthEmail] = useState("");
   const [resetEmail, setResetEmail] = useState("");
 
+  // Instant client session check & redirect
+  useEffect(() => {
+    if (typeof window !== "undefined") {
+      const isAlreadyLoggedIn = localStorage.getItem("klaro_logged_in") === "true";
+      const hasAdminAuth = !!localStorage.getItem("klaro_admin_auth");
+
+      if (hasAdminAuth) {
+        setLoadingMessage("Directing to administrator portal...");
+        router.replace("/admin");
+        return;
+      }
+
+      if (isAlreadyLoggedIn) {
+        setLoadingMessage("Directing to dashboard...");
+        router.replace("/dashboard");
+        return;
+      }
+    }
+  }, [router]);
+
   // Sync with live Clerk session & direct straight to dashboard
   useEffect(() => {
     async function syncSession() {
       if (!isUserLoaded) return;
 
       if (isSignedIn && user) {
+        setLoginStorage(true);
         setIsLoading(true);
         setLoadingMessage("Directing to dashboard...");
         try {
@@ -74,6 +109,19 @@ export default function LoginPage() {
           console.error("Profile sync error:", err);
         } finally {
           router.replace("/dashboard");
+        }
+      } else if (isUserLoaded && !isSignedIn) {
+        // If Clerk has resolved and user is not signed in and has no admin auth, show login view
+        if (typeof window !== "undefined") {
+          const hasAdmin = !!localStorage.getItem("klaro_admin_auth");
+          const hasLocalLogin = localStorage.getItem("klaro_logged_in") === "true";
+          if (!hasAdmin && !hasLocalLogin) {
+            setIsLoading(false);
+          } else if (!hasAdmin && hasLocalLogin) {
+            // Local flag was present but Clerk confirmed user is not signed in
+            setLoginStorage(false);
+            setIsLoading(false);
+          }
         }
       }
     }
@@ -130,6 +178,7 @@ export default function LoginPage() {
             })
           );
         }
+        setLoginStorage(true);
         router.push("/admin");
       } else {
         setAuthError({ message: "Invalid officer credentials. Access denied." });
@@ -192,6 +241,7 @@ export default function LoginPage() {
       });
 
       if (result.status === "complete") {
+        setLoginStorage(true);
         await clerk.setActive({ session: result.createdSessionId });
         router.push("/dashboard");
       } else {
@@ -245,6 +295,7 @@ export default function LoginPage() {
       const completeSignUp = await clerk.client.signUp.attemptEmailAddressVerification({ code });
 
       if (completeSignUp.status === "complete") {
+        setLoginStorage(true);
         await clerk.setActive({ session: completeSignUp.createdSessionId });
         router.push("/dashboard");
       } else {
@@ -314,6 +365,8 @@ export default function LoginPage() {
         throw new Error(result.error || "Could not save profile to Supabase");
       }
 
+      setLoginStorage(true);
+
       setCurrentUser((prev) => ({
         ...prev,
         username: profile.username || prev.username,
@@ -337,6 +390,7 @@ export default function LoginPage() {
   const handleSignOut = async () => {
     setIsLoading(true);
     setLoadingMessage("Signing out...");
+    setLoginStorage(false);
     try {
       await clerk.signOut();
       setView("welcome");

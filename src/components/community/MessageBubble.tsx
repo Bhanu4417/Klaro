@@ -91,7 +91,7 @@ export const MessageBubble: React.FC<MessageBubbleProps> = ({
         rotate: isReducedMotion ? 0 : `${rotation}deg`,
       }}
       className={cn(
-        "absolute z-20 whitespace-nowrap pointer-events-none select-none",
+        "absolute z-20 whitespace-normal sm:whitespace-nowrap max-w-[170px] sm:max-w-none pointer-events-none select-none",
         positionClasses,
         className
       )}

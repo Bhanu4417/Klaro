@@ -2,7 +2,7 @@
 
 import React from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { Logo } from "../ui/Logo";
+import { KlaroBot } from "./KlaroBot";
 import { AuthView } from "../../types/auth";
 import { cn } from "../../lib/utils";
 
@@ -64,10 +64,63 @@ export const AuthHeader: React.FC<AuthHeaderProps> = ({ view, className }) => {
 
   const content = getHeaderContent();
 
+  /* Playful one-liners when the mascot is clicked; spam-click and it gets angry,
+     then a fresh round of lines begins. */
+  const speechLines = [
+    "Psst — login first! I don't make the rules.",
+    "Want to check what's really in your food?",
+    "I can sniff out hidden additives in seconds.",
+    "Scan the barcode, I'll do the detective work.",
+    "That 'healthy' snack might be lying to you.",
+    "I've read the labels so you don't have to.",
+    "MRP tricks? I catch those every single day.",
+    "Login and I'll remember everything you scan.",
+    "Your food journal is waiting on the other side.",
+    "Fresh ingredients or fine print — I'll tell you.",
+    "Know what you eat before it knows you back.",
+    "I once caught a juice with nine hidden sugars.",
+    "Scanning is caring — for your own health.",
+    "Login first, then we hunt misleading labels.",
+    "I speak fluent ingredient-list. Truly.",
+    "The community feed is full of food finds.",
+    "One little scan can save your whole meal.",
+    "I'm basically a nutrition detective, really.",
+    "Hunger is temporary, label-checking is forever.",
+    "Sign in — your stomach will thank you later.",
+  ];
+
+  const getBotState = () => {
+    switch (view) {
+      case "welcome":
+        return "idle";
+      case "signin":
+      case "signup":
+      case "onboarding":
+        return "typing";
+      case "verify_email":
+      case "officer_login":
+        // Credential entry — keep the thinking "?" out of password flows
+        return "typing";
+      case "forgot_password":
+      case "reset_sent":
+        return "peek";
+      case "authenticated_preview":
+        return "happy";
+      default:
+        return "idle";
+    }
+  };
+
   return (
     <div className={cn("text-center flex flex-col items-center select-none", className)}>
       <div className="mb-2 transition-transform duration-200 hover:scale-105">
-        <Logo size="md" showText={false} variant="charcoal" />
+        <KlaroBot
+          size="md"
+          state={getBotState()}
+          showShadow={true}
+          interactive={true}
+          speech={speechLines}
+        />
       </div>
 
       <AnimatePresence mode="wait">

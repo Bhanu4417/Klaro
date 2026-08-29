@@ -419,6 +419,8 @@ export default function AdminDashboardPage() {
   const handleAdminSignOut = () => {
     if (typeof window !== "undefined") {
       localStorage.removeItem("klaro_admin_auth");
+      localStorage.removeItem("klaro_logged_in");
+      document.cookie = "klaro_logged_in=; path=/; max-age=0; SameSite=Lax";
     }
     router.push("/login");
   };

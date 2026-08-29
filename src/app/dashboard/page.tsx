@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useEffect, useState, useRef } from "react";
+import React, { useEffect, useState, useRef, useMemo } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { useUser, useClerk } from "@clerk/nextjs";
 import { useRouter } from "next/navigation";
@@ -8,9 +8,12 @@ import Link from "next/link";
 import { getUserProfile } from "../../actions/profile";
 import { UserProfile } from "../../types/auth";
 import { Logo } from "../../components/ui/Logo";
+import { AuthLoadingState } from "../../components/auth/AuthLoadingState";
 import { Button } from "../../components/ui/Button";
 import { ShareModal } from "../../components/ShareModal";
 import { ScanFlow } from "../../components/scan/ScanFlow";
+import { ReportScriptModal } from "../../components/reports/ReportScriptModal";
+import { ImageLightbox } from "../../components/reports/ImageLightbox";
 import {
   LogOut,
   User,
@@ -40,9 +43,13 @@ import {
   ChevronDown,
   Building2,
   ExternalLink,
-  Home
+  Home,
+  Trash2,
+  Paperclip
 } from "lucide-react";
 import { cn } from "../../lib/utils";
+import { createInspectionReport, getLiveReports, voteReport, addReportComment, deleteReport, DBReport } from "../../actions/reports";
+import type { AuditReport } from "../../lib/auditEngine";
 
 interface FeedComment {
   id: string;
@@ -53,8 +60,9 @@ interface FeedComment {
   text: string;
 }
 
-interface FeedPost {
+export interface FeedPost {
   id: string;
+  authorId?: string;
   author: {
     name: string;
     badge: string;
@@ -67,8 +75,9 @@ interface FeedPost {
   brand: string;
   ruleCode: string;
   ruleLabel: string;
-  severity: "high" | "medium" | "low";
+  severity: "high" | "medium" | "low" | "critical";
   description: string;
+  imageUrl?: string;
   evidence: {
     labelRegion: string;
     ocrSnippet: string;
@@ -81,186 +90,25 @@ interface FeedPost {
   userVote?: "up" | "down" | null;
   comments: FeedComment[];
   status: "Under Review" | "Notice Drafted" | "Compounded";
+  /** Full audit dossier persisted in Supabase (all flagged issues) */
+  auditReport?: AuditReport;
 }
 
-const INITIAL_POSTS: FeedPost[] = [
-  {
-    id: "post-1",
-    author: {
-      name: "Insp. Aarav Sharma",
-      badge: "Sr. Legal Metrology Officer",
-      avatar: "https://api.dicebear.com/9.x/lorelei/svg?seed=Aarav&backgroundColor=27272a",
-      zone: "Delhi Central Zone",
-    },
-    timeAgo: "2 hours ago",
-    title: "Brand XYZ 500g Malt Biscuits completely omitted Unit Sale Price (USP) on Principal Display Panel",
-    commodity: "Packaged Malt Biscuits",
-    brand: "Crunchy Bites Pvt. Ltd.",
-    ruleCode: "Rule 6(1)(d)",
-    ruleLabel: "Retail Price & USP Non-Compliance",
-    severity: "high",
-    description:
-      "Field inspection in Connaught Place retail outlet. Package declares MRP ₹120.00 but omits mandatory Unit Sale Price (₹0.24/g) and does not state 'Inclusive of all taxes'. Second Schedule violation.",
-    evidence: {
-      labelRegion: "Lower Right PDP • Coordinates (x: 420, y: 710, w: 180, h: 45)",
-      ocrSnippet: "MRP Rs 120.00 (PKD 07/2026)",
-      flagReason: "Missing ₹ per g/kg specification and tax inclusion text.",
-      measuredValue: "No USP Found",
-      requiredValue: "₹0.24 per g (Mandatory since 2022 Amendment)",
-    },
-    upvotes: 48,
-    commentsCount: 6,
-    userVote: null,
-    status: "Notice Drafted",
-    comments: [
-      {
-        id: "c-1",
-        author: "Insp. Vikram Nair",
-        authorRole: "Zonal Enforcement Head",
-        avatar: "https://api.dicebear.com/9.x/lorelei/svg?seed=Vikram&backgroundColor=27272a",
-        timeAgo: "1 hour ago",
-        text: "Same manufacturer had a repeat infraction in Maharashtra Zone 2 last month under Section 36 of the Legal Metrology Act.",
-      },
-      {
-        id: "c-2",
-        author: "Pooja K.",
-        authorRole: "Legal Metrology Inspector",
-        avatar: "https://api.dicebear.com/9.x/lorelei/svg?seed=Pooja&backgroundColor=27272a",
-        timeAgo: "35 mins ago",
-        text: "Please attach the batch barcode number (890123...) so we can cross-verify whether the warehouse shipment carried the same label revision.",
-      },
-    ],
-  },
-  {
-    id: "post-2",
-    author: {
-      name: "Insp. Pooja Kulkarni",
-      badge: "District Metrology Inspector",
-      avatar: "https://api.dicebear.com/9.x/lorelei/svg?seed=Pooja&backgroundColor=27272a",
-      zone: "Mumbai Sub-division IV",
-    },
-    timeAgo: "4 hours ago",
-    title: "Consumer Grievance Care details completely absent on 1kg Laundry Detergent packaging",
-    commodity: "Household Cleaning Detergent 1kg",
-    brand: "UltraPure Chemical Labs",
-    ruleCode: "Rule 6(1)(h)",
-    ruleLabel: "Consumer Care Contact Omission",
-    severity: "high",
-    description:
-      "Surveillance inspection at Andheri supermarket. The product label lacks any phone number, email ID, or grievance officer designation required for customer complaints.",
-    evidence: {
-      labelRegion: "Rear Information Panel • Bounding Box (x: 80, y: 540, w: 310, h: 80)",
-      ocrSnippet: "[OCR FOUND 0 CONTACT RECORDS]",
-      flagReason: "Mandatory telephone number and email address absent.",
-      measuredValue: "0 Contact Entries",
-      requiredValue: "Valid Tel No. + Email + Postal Address",
-    },
-    upvotes: 35,
-    commentsCount: 3,
-    userVote: null,
-    status: "Under Review",
-    comments: [
-      {
-        id: "c-3",
-        author: "Insp. Rohit Joshi",
-        authorRole: "Inspector",
-        avatar: "https://api.dicebear.com/9.x/lorelei/svg?seed=Rohan&backgroundColor=27272a",
-        timeAgo: "2 hours ago",
-        text: "Section 36 compound notice drafted. Awaiting deputy controller digital approval.",
-      },
-    ],
-  },
-  {
-    id: "post-3",
-    author: {
-      name: "Officer Meera Patel",
-      badge: "Field Surveillance Officer",
-      avatar: "https://api.dicebear.com/9.x/lorelei/svg?seed=Meera&backgroundColor=27272a",
-      zone: "Ahmedabad West Zone",
-    },
-    timeAgo: "6 hours ago",
-    title: "Principal Display Panel letter height measured 2.2mm on 500g pack (Minimum 4.0mm required)",
-    commodity: "Refined Sunflower Oil 500ml",
-    brand: "Kisan Agro Foods",
-    ruleCode: "Rule 7 & 8",
-    ruleLabel: "Sub-standard Numeral/Letter Height",
-    severity: "medium",
-    description:
-      "Optical character segmentation measured net volume numeral height at 2.2mm. Table under Rule 7 mandates letter height of at least 4.0mm for package area between 200cm² to 500cm².",
-    evidence: {
-      labelRegion: "Front Center PDP • Area 240 cm²",
-      ocrSnippet: "Net Vol: 500 ml",
-      flagReason: "Measured font height is 45% below statutory minimum.",
-      measuredValue: "2.2 mm font height",
-      requiredValue: "≥ 4.0 mm font height",
-    },
-    upvotes: 27,
-    commentsCount: 2,
-    userVote: null,
-    status: "Compounded",
-    comments: [
-      {
-        id: "c-4",
-        author: "Insp. Ananya Dutta",
-        authorRole: "Enforcement Officer",
-        avatar: "https://api.dicebear.com/9.x/lorelei/svg?seed=Ananya&backgroundColor=27272a",
-        timeAgo: "4 hours ago",
-        text: "The Klaro optical caliper check verified the pixel-to-millimeter ratio accurately. Good catch.",
-      },
-    ],
-  },
-];
-
-const MY_SUBMITTED_REPORTS = [
-  {
-    id: "rep-1",
-    title: "Amul Butter 500g — Missing USP & Exp Date",
-    commodity: "Pasteurized Table Butter",
-    brand: "Amul",
-    date: "2d ago",
-    status: "Notice Issued",
-    statusColor: "bg-amber-100 text-amber-900 border-amber-300",
-    ruleCode: "Rule 6(1)(d)",
-    upvotes: 84,
-    comments: 12,
-  },
-  {
-    id: "rep-2",
-    title: "Lays Wafer Chips — Illegible Net Qty Font Size",
-    commodity: "Potato Chips Snack",
-    brand: "Lays",
-    date: "5d ago",
-    status: "Compounded",
-    statusColor: "bg-[#EAFBD9] text-[#346415] border-[#B8F27D]",
-    ruleCode: "Rule 7 & 8",
-    upvotes: 142,
-    comments: 29,
-  },
-  {
-    id: "rep-3",
-    title: "Dabur Honey 250g — Consumer Care Email Missing",
-    commodity: "Pure Natural Honey",
-    brand: "Dabur",
-    date: "1w ago",
-    status: "Under Review",
-    statusColor: "bg-blue-100 text-blue-900 border-blue-300",
-    ruleCode: "Rule 6(1)(h)",
-    upvotes: 56,
-    comments: 8,
-  },
-  {
-    id: "rep-4",
-    title: "Tata Salt Lite 1kg — Dual MRP Sticker Detected",
-    commodity: "Iodized Table Salt",
-    brand: "Tata",
-    date: "2w ago",
-    status: "Compounded",
-    statusColor: "bg-[#EAFBD9] text-[#346415] border-[#B8F27D]",
-    ruleCode: "Rule 18(2)",
-    upvotes: 219,
-    comments: 44,
-  },
-];
+/** All flaggable issues for a post's evidence box (full audit when saved, else the single fallback), empty entries removed */
+function getFlagIssues(post: FeedPost): Array<{ ruleCode: string; title: string; requiredValue?: string }> {
+  const issues = post.auditReport?.issues?.length
+    ? post.auditReport.issues.map((iss) => ({
+        ruleCode: iss.ruleCode,
+        title: iss.title,
+        requiredValue: iss.requiredValue,
+      }))
+    : [{
+        ruleCode: post.ruleCode,
+        title: post.evidence.flagReason,
+        requiredValue: post.evidence.requiredValue,
+      }];
+  return issues.filter((iss) => iss.title && iss.title.trim());
+}
 
 // Custom SVG icons requested by user
 const TrendingFlameCustomIcon = ({ className = "w-4 h-4" }: { className?: string }) => (
@@ -355,6 +203,14 @@ const ReportNavbarCustomIcon = ({ className = "w-4 h-4" }: { className?: string 
   </svg>
 );
 
+const ReportDossierCustomIcon = ({ className = "w-4 h-4" }: { className?: string }) => (
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="24" height="24" className={className} fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round">
+    <path d="M19 10.5V10C19 6.22876 19 4.34315 17.8284 3.17157C16.6569 2 14.7712 2 11 2C7.22876 2 5.34315 2 4.17157 3.17157C3 4.34315 3 6.22876 3 10V16C3 17.8638 3 18.7956 3.30448 19.5307C3.71046 20.5108 4.48915 21.2895 5.46927 21.6955C6.20435 22 7.13623 22 9 22" strokeLinejoin="round" />
+    <path d="M7 7H15M7 11H11" />
+    <path d="M15.2825 19.0044C15.2235 18.1157 15.118 17.1658 14.6817 16.0917C14.3095 15.1756 14.4132 13.0205 16.5 13.0205C18.5868 13.0205 18.6664 15.1756 18.2942 16.0917C17.8578 17.1658 17.7765 18.1157 17.7175 19.0044M21 22H12V20.7543C12 20.3078 12.2664 19.9154 12.6528 19.7928L14.9076 19.077C15.0684 19.0259 15.2348 19 15.4021 19H17.5979C17.7652 19 17.9316 19.0259 18.0924 19.077L20.3472 19.7928C20.7336 19.9154 21 20.3078 21 20.7543V22Z" strokeLinejoin="round" />
+  </svg>
+);
+
 export default function DashboardPage() {
   const { isLoaded, isSignedIn, user } = useUser();
   const { signOut } = useClerk();
@@ -420,7 +276,8 @@ export default function DashboardPage() {
   };
 
   // Feed States
-  const [posts, setPosts] = useState<FeedPost[]>(INITIAL_POSTS);
+  const [posts, setPosts] = useState<FeedPost[]>([]);
+  const [isFeedLoaded, setIsFeedLoaded] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
   const [activeFilter, setActiveFilter] = useState<string>("All");
   const [expandedComments, setExpandedComments] = useState<{ [key: string]: boolean }>({});
@@ -429,6 +286,94 @@ export default function DashboardPage() {
   // Quantum QR Share Modal State
   const [shareModalOpen, setShareModalOpen] = useState(false);
   const [sharingPost, setSharingPost] = useState<{ title: string; url: string } | null>(null);
+
+  // Dossier Script Modal State (Notice PDF / My Recent Filed Reports) — tracks the ID so
+  // the modal live-updates when the background save/upload completes
+  const [scriptPostId, setScriptPostId] = useState<string | null>(null);
+  const scriptPost = useMemo(
+    () => posts.find((p) => p.id === scriptPostId) || null,
+    [posts, scriptPostId]
+  );
+
+  const openScript = (post: FeedPost) => setScriptPostId(post.id);
+
+  // Post / Save success toast
+  const [postToast, setPostToast] = useState<{ title: string; sub: string } | null>(null);
+
+  // Evidence image lightbox
+  const [lightboxImage, setLightboxImage] = useState<string | null>(null);
+
+  useEffect(() => {
+    if (!postToast) return;
+    const t = setTimeout(() => setPostToast(null), 3400);
+    return () => clearTimeout(t);
+  }, [postToast]);
+
+  // Load real posts on mount from Supabase — source of truth, no localStorage
+  useEffect(() => {
+    async function loadCommunityPosts() {
+      try {
+        const dbReports = await getLiveReports();
+        if (dbReports && dbReports.length > 0) {
+          const formatted: FeedPost[] = dbReports.map((db) => ({
+            id: db.id,
+            authorId: db.author_id,
+            author: {
+              name: db.author_name || "Community Inspector",
+              badge: db.author_badge || "Community Inspector",
+              avatar: db.author_avatar || "🥑",
+              zone: db.author_zone || "Your Zone",
+            },
+            timeAgo: "Recently",
+            title: db.title,
+            commodity: db.commodity,
+            brand: db.brand,
+            ruleCode: db.rule_code,
+            ruleLabel: db.rule_label,
+            severity: db.severity as any,
+            description: db.description,
+            imageUrl: db.image_url,
+            evidence: {
+              labelRegion: db.evidence_label_region || "Auto-detected PDP",
+              ocrSnippet: db.evidence_ocr_snippet || "",
+              flagReason: db.evidence_flag_reason || "",
+              measuredValue: db.evidence_measured_value,
+              requiredValue: db.evidence_required_value,
+            },
+            upvotes: db.upvotes || 0,
+            commentsCount: db.comments?.length || 0,
+            userVote: (db.user_votes || {})[user?.id || ""] || null,
+            comments: db.comments || [],
+            status: db.status || "Under Review",
+            auditReport: db.audit_report || undefined,
+          }));
+
+          setPosts(formatted);
+        }
+      } catch (err) {
+        console.error("Error loading community posts:", err);
+      } finally {
+        setIsFeedLoaded(true);
+      }
+    }
+
+    loadCommunityPosts();
+  }, [user?.id]);
+
+  // Dynamically derived real user reports & real-time karma
+  const myReports = useMemo(() => {
+    const myName = profile?.displayName || user?.fullName || "You";
+    return posts.filter((p) => p.author.name === myName || (user?.id && p.authorId === user.id));
+  }, [posts, profile, user]);
+
+  const realKarma = useMemo(() => {
+    // Karma strictly equals total upvotes received on reports from the community
+    return myReports.reduce((acc: number, r: FeedPost) => acc + Math.max(0, r.upvotes), 0);
+  }, [myReports]);
+
+  const realReportsCount = myReports.length;
+  const realUpvotedCount = useMemo(() => posts.filter((p) => p.userVote === "up").length, [posts]);
+  const realDownvotedCount = useMemo(() => posts.filter((p) => p.userVote === "down").length, [posts]);
 
   // ---- SCAN FLOW STATE (chinn music 🎶) ----
   const [showScanFlow, setShowScanFlow] = useState(false);
@@ -442,49 +387,182 @@ export default function DashboardPage() {
   const handleScanFile = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (!file) return;
-    const url = URL.createObjectURL(file);
-    setScanImageUrl(url);
-    setScanImageName(file.name);
-    setShowPickerChoice(false);
-    setShowScanFlow(true);
+    // Read as data URL so the raw bytes travel to the server action —
+    // a blob: link would be useless to Cloudinary's servers
+    const reader = new FileReader();
+    reader.onload = () => {
+      setScanImageUrl(reader.result as string);
+      setScanImageName(file.name);
+      setShowPickerChoice(false);
+      setShowScanFlow(true);
+    };
+    reader.readAsDataURL(file);
     e.target.value = "";
   };
-  const handleScanPost = ({ imageUrl, title }: { imageUrl: string; title: string }) => {
+
+  // POST TO FEED: Publicly broadcast report to the community enforcement stream.
+  // The officer's optional note becomes the post description and the image stays private.
+  const handleScanPost = async ({ imageUrl, title, report, comment }: { imageUrl: string; title: string; report?: AuditReport; comment?: string }) => {
+    const topIssue = report?.issues?.[0];
+    const authorName = profile?.displayName || user?.fullName || "You";
+    const authorAvatar = avatar || user?.imageUrl || "🥑";
+    const authorZone = report?.zone || "Your Zone";
+
+    const tempId = `post-${Date.now()}`;
     const newPost: FeedPost = {
-      id: `post-${Date.now()}`,
+      id: tempId,
+      authorId: user?.id,
       author: {
-        name: profile?.displayName || user?.fullName || "You",
+        name: authorName,
         badge: "Community Inspector",
-        avatar: avatar || "https://api.dicebear.com/9.x/lorelei/svg?seed=You&backgroundColor=27272a",
-        zone: "Your Zone",
+        avatar: authorAvatar,
+        zone: authorZone,
       },
       timeAgo: "Just now",
-      title,
-      commodity: "Packaged Commodity (Scanned)",
-      brand: "Detected via Klaro OCR",
-      ruleCode: "Rule 6(1)(d)",
-      ruleLabel: "Retail Price & USP Non-Compliance",
-      severity: "high",
-      description: "Auto-generated from your photo. Klaro detected a potential USP omission — review and submit as inspection dossier.",
+      title: title || `${report?.productName || "Product"} — Statutory Compliance Audit`,
+      commodity: report?.commodity || "Packaged Commodity (Scanned)",
+      brand: report?.brand || "Detected via Klaro AI Vision",
+      ruleCode: topIssue?.ruleCode || "Rule 6(1)(e)",
+      ruleLabel: topIssue?.ruleLabel || "Legal Metrology Non-Compliance",
+      severity: (topIssue?.severity as any) || "high",
+      description: comment || `Klaro AI audited this package and flagged ${report?.issues?.length || 1} statutory non-compliance(s) under Legal Metrology Rules, 2011: ${report?.issues?.map((i: any) => `${i.ruleCode} (${i.title})`).join(", ")}.`,
+      imageUrl: undefined,
       evidence: {
-        labelRegion: "Auto-detected PDP • Confidence 98%",
-        ocrSnippet: "MRP Rs 120.00 (PKD 07/2026)",
-        flagReason: "Missing ₹ per g/kg specification and tax inclusion text.",
-        requiredValue: "₹0.24 per g (Mandatory since 2022 Amendment)",
+        labelRegion: `Auto-detected PDP • Confidence ${report?.confidenceScore || 98.6}%`,
+        ocrSnippet: `Barcode ${report?.barcode || "8901207025372"} • Batch ${report?.batchCode || "1223104434"}`,
+        flagReason: topIssue?.description || "Mandatory declarations omitted on packaging.",
+        measuredValue: topIssue?.measuredValue || "Non-compliant",
+        requiredValue: topIssue?.requiredValue || "Statutory Legal Requirement",
       },
-      upvotes: 1,
+      upvotes: 0,
       commentsCount: 0,
       userVote: null,
       status: "Under Review",
       comments: [],
+      auditReport: report,
     };
+
     setPosts((prev) => [newPost, ...prev]);
+
     setMobileTab("feed");
-    // also reset scan
     setScanImageUrl(null);
+    setPostToast({
+      title: "Report posted to the feed",
+      sub: "Live in the community stream — visible to every officer & citizen.",
+    });
+
+    // Async Supabase sync — image kept private (never rendered on the post), only the
+    // persistent Cloudinary URL + full audit dossier are stored on the report row
+    try {
+      const saveRes = await createInspectionReport({
+        imageUrl,
+        title: newPost.title,
+        commodity: newPost.commodity,
+        brand: newPost.brand,
+        ruleCode: newPost.ruleCode,
+        ruleLabel: newPost.ruleLabel,
+        severity: newPost.severity,
+        description: newPost.description,
+        auditReport: report,
+        evidence: newPost.evidence,
+      });
+
+      if (saveRes.success && saveRes.report) {
+        const savedId = saveRes.report.id;
+        const savedImageUrl = saveRes.report.image_url || undefined;
+        setPosts((current) =>
+          current.map((p) =>
+            p.id === tempId ? { ...p, id: savedId, auditReport: report, imageUrl: savedImageUrl } : p
+          )
+        );
+        setScriptPostId((cur) => (cur === tempId ? savedId : cur));
+      } else {
+        console.error("Report was NOT saved to the database:", saveRes.error);
+      }
+    } catch (err) {
+      console.warn("Background report sync:", err);
+    }
   };
-  const handleScanSave = () => {
+
+  // SAVE REPORT: Privately saves the inspection dossier to the user's personal vault
+  const handleScanSave = async ({ imageUrl, report }: { imageUrl?: string | null; report?: AuditReport }) => {
+    const topIssue = report?.issues?.[0];
+    const authorName = profile?.displayName || user?.fullName || "You";
+    const authorAvatar = avatar || user?.imageUrl || "🥑";
+    const authorZone = report?.zone || "Your Zone";
+
+    const privateReport: FeedPost = {
+      id: `saved-${Date.now()}`,
+      authorId: user?.id,
+      author: {
+        name: authorName,
+        badge: "Private Inspection",
+        avatar: authorAvatar,
+        zone: authorZone,
+      },
+      timeAgo: "Saved Just now",
+      title: `${report?.productName || "Product"} — Private Inspection Dossier`,
+      commodity: report?.commodity || "Packaged Commodity",
+      brand: report?.brand || "Detected via Klaro",
+      ruleCode: topIssue?.ruleCode || "Rule 6(1)(e)",
+      ruleLabel: topIssue?.ruleLabel || "Legal Metrology Non-Compliance",
+      severity: (topIssue?.severity as any) || "high",
+      description: `Court-Ready evidence dossier saved privately for Legal Metrology enforcement reference.`,
+      imageUrl: imageUrl || undefined,
+      evidence: {
+        labelRegion: `Auto-detected PDP • Confidence ${report?.confidenceScore || 98.6}%`,
+        ocrSnippet: `Barcode ${report?.barcode || "8901207025372"} • Batch ${report?.batchCode || "1223104434"}`,
+        flagReason: topIssue?.description || "Mandatory declarations omitted.",
+        measuredValue: topIssue?.measuredValue || "Non-compliant",
+        requiredValue: topIssue?.requiredValue || "Statutory Legal Requirement",
+      },
+      upvotes: 0,
+      commentsCount: 0,
+      userVote: null,
+      status: "Under Review",
+      comments: [],
+      auditReport: report,
+    };
+
+    setPosts((prev) => [privateReport, ...prev]);
+
+    setMobileTab("reports");
     setScanImageUrl(null);
+    setPostToast({
+      title: "Report saved to your vault",
+      sub: "Stored privately — open it anytime from My Recent Filed Reports.",
+    });
+
+    // Persist the private dossier to Supabase (image stays private on the row)
+    try {
+      const saveRes = await createInspectionReport({
+        imageUrl: imageUrl || null,
+        title: privateReport.title,
+        commodity: privateReport.commodity,
+        brand: privateReport.brand,
+        ruleCode: privateReport.ruleCode,
+        ruleLabel: privateReport.ruleLabel,
+        severity: privateReport.severity,
+        description: privateReport.description,
+        auditReport: report,
+        evidence: privateReport.evidence,
+      });
+
+      if (saveRes.success && saveRes.report) {
+        const savedId = saveRes.report.id;
+        const savedImageUrl = saveRes.report.image_url || undefined;
+        setPosts((current) =>
+          current.map((p) =>
+            p.id === privateReport.id ? { ...p, id: savedId, auditReport: report, imageUrl: savedImageUrl } : p
+          )
+        );
+        setScriptPostId((cur) => (cur === privateReport.id ? savedId : cur));
+      } else {
+        console.error("Private report was NOT saved to the database:", saveRes.error);
+      }
+    } catch (err) {
+      console.warn("Background private save sync:", err);
+    }
   };
 
   const handleOpenShare = (title: string, postId: string) => {
@@ -494,6 +572,55 @@ export default function DashboardPage() {
       url: `${origin}/dashboard?post=${postId}`,
     });
     setShareModalOpen(true);
+  };
+
+  // DELETE REPORT: confirmation dialog state, then remove from vault & community stream
+  const [deleteTarget, setDeleteTarget] = useState<string | null>(null);
+  const [isDeleting, setIsDeleting] = useState(false);
+
+  const handleDeleteReport = (postId: string) => setDeleteTarget(postId);
+
+  const confirmDeleteReport = () => {
+    const postId = deleteTarget;
+    if (!postId) return;
+    setIsDeleting(true);
+
+    setPosts((prev) => prev.filter((p) => p.id !== postId));
+    setScriptPostId((current) => (current === postId ? null : current));
+
+    deleteReport(postId)
+      .catch((err) => console.warn("Report delete sync:", err))
+      .finally(() => {
+        setIsDeleting(false);
+        setDeleteTarget(null);
+      });
+  };
+
+  // Upvote / Downvote Toggle — optimistic locally, persisted to Supabase per user
+  const handleVote = (postId: string, type: "up" | "down") => {
+    const current = posts.find((p) => p.id === postId);
+    if (!current) return;
+    const nextVote: "up" | "down" | null = current.userVote === type ? null : type;
+
+    setPosts((prev) =>
+      prev.map((post) => {
+        if (post.id !== postId) return post;
+
+        let delta = 0;
+        if (post.userVote === "up" && nextVote !== "up") delta -= 1;
+        if (post.userVote === "down" && nextVote !== "down") delta -= 1;
+        if (nextVote === "up" && post.userVote !== "up") delta += 1;
+        if (nextVote === "down" && post.userVote !== "down") delta += 1;
+
+        return {
+          ...post,
+          userVote: nextVote,
+          upvotes: Math.max(0, post.upvotes + delta),
+        };
+      })
+    );
+
+    voteReport(postId, nextVote).catch((err) => console.warn("Vote sync:", err));
   };
 
   // Feed Collapsible Sticky Search Bar State (Rock-solid hysteresis threshold)
@@ -528,8 +655,17 @@ export default function DashboardPage() {
     if (!isLoaded) return;
 
     if (!isSignedIn) {
-      router.push("/");
+      if (typeof window !== "undefined") {
+        localStorage.removeItem("klaro_logged_in");
+        document.cookie = "klaro_logged_in=; path=/; max-age=0; SameSite=Lax";
+      }
+      router.push("/login");
       return;
+    }
+
+    if (typeof window !== "undefined") {
+      localStorage.setItem("klaro_logged_in", "true");
+      document.cookie = "klaro_logged_in=true; path=/; max-age=31536000; SameSite=Lax";
     }
 
     async function loadProfile() {
@@ -560,35 +696,18 @@ export default function DashboardPage() {
 
   const handleSignOut = async () => {
     setIsSigningOut(true);
+    if (typeof window !== "undefined") {
+      localStorage.removeItem("klaro_logged_in");
+      localStorage.removeItem("klaro_admin_auth");
+      document.cookie = "klaro_logged_in=; path=/; max-age=0; SameSite=Lax";
+    }
     try {
       await signOut();
-      router.push("/");
+      router.push("/login");
     } catch (err) {
       console.error("Sign out error:", err);
       setIsSigningOut(false);
     }
-  };
-
-  // Upvote / Downvote Toggle
-  const handleVote = (postId: string, type: "up" | "down") => {
-    setPosts((prev) =>
-      prev.map((post) => {
-        if (post.id !== postId) return post;
-        if (post.userVote === type) {
-          return {
-            ...post,
-            userVote: null,
-            upvotes: type === "up" ? post.upvotes - 1 : post.upvotes + 1,
-          };
-        }
-        const delta = post.userVote === "up" ? -2 : post.userVote === "down" ? 2 : type === "up" ? 1 : -1;
-        return {
-          ...post,
-          userVote: type,
-          upvotes: post.upvotes + delta,
-        };
-      })
-    );
   };
 
   // Toggle comments expand
@@ -624,6 +743,8 @@ export default function DashboardPage() {
       })
     );
 
+    addReportComment(postId, newComment).catch((err) => console.warn("Comment sync:", err));
+
     setCommentInputs((prev) => ({ ...prev, [postId]: "" }));
     setExpandedComments((prev) => ({ ...prev, [postId]: true }));
   };
@@ -648,21 +769,8 @@ export default function DashboardPage() {
 
   if (!isLoaded || isLoading) {
     return (
-      <div className="min-h-screen w-full bg-[#E6E4E5] flex flex-col items-center justify-center gap-3 select-none">
-        <svg
-          className="animate-spin h-8 w-8 text-[#18181B]"
-          xmlns="http://www.w3.org/2000/svg"
-          fill="none"
-          viewBox="0 0 24 24"
-        >
-          <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
-          <path
-            className="opacity-75"
-            fill="currentColor"
-            d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
-          />
-        </svg>
-        <p className="text-zinc-600 text-sm font-medium">Loading inspection feed...</p>
+      <div className="min-h-screen w-full bg-[#E6E4E5] flex flex-col items-center justify-center select-none">
+        <AuthLoadingState message="Loading inspection feed…" />
       </div>
     );
   }
@@ -984,33 +1092,49 @@ export default function DashboardPage() {
                       </div>
 
                       {/* Posts Stream */}
-                      {filteredPosts.map((post) => (
-                        <article
-                          key={`feed-${post.id}`}
-                          className="rounded-[22px] bg-[#FCFCFB] border-[1.5px] border-[#D5D2D4] shadow-[0_4px_20px_rgba(0,0,0,0.03),inset_0_1.5px_1.5px_rgba(255,255,255,0.95)] overflow-hidden p-4 space-y-3 text-left"
-                        >
-                          {/* Meta Header */}
-                          <div className="flex items-center justify-between">
-                            <div className="flex items-center gap-2">
-                              <img
-                                src={post.author.avatar}
-                                alt={post.author.name}
-                                className="w-6 h-6 rounded-full bg-zinc-900 border border-zinc-200"
-                              />
-                              <span className="text-zinc-800 font-bold text-xs">{post.author.zone}</span>
+                      {filteredPosts.length === 0 ? (
+                        <div className="p-8 rounded-[22px] bg-[#FCFCFB] border-[1.5px] border-[#D5D2D4] text-center space-y-3">
+                          <ShieldAlert className="w-10 h-10 text-zinc-400 mx-auto" />
+                          <h3 className="text-sm font-bold text-zinc-900">No community violations reported yet</h3>
+                          <p className="text-xs text-zinc-500 max-w-[260px] mx-auto">
+                            Scan any packaged product to audit Legal Metrology declarations and file your first report.
+                          </p>
+                          <button
+                            type="button"
+                            onClick={openPickerChoice}
+                            className="px-4 py-2.5 rounded-xl bg-[#94EC40] text-black font-bold text-xs shadow-sm hover:bg-[#80D42F] transition-all"
+                          >
+                            Scan & Audit Product
+                          </button>
+                        </div>
+                      ) : (
+                        filteredPosts.map((post) => (
+                          <article
+                            key={`feed-${post.id}`}
+                            className="rounded-[22px] bg-[#FCFCFB] border-[1.5px] border-[#D5D2D4] shadow-[0_4px_20px_rgba(0,0,0,0.03),inset_0_1.5px_1.5px_rgba(255,255,255,0.95)] overflow-hidden p-4 space-y-3 text-left"
+                          >
+                            {/* Meta Header */}
+                            <div className="flex items-center justify-between">
+                              <div className="flex items-center gap-2">
+                                <img
+                                  src={post.author.avatar}
+                                  alt={post.author.name}
+                                  className="w-6 h-6 rounded-full bg-zinc-900 border border-zinc-200"
+                                />
+                                <span className="text-zinc-800 font-bold text-xs">{post.author.zone}</span>
+                              </div>
+                              <span className="text-zinc-500 text-[11px] font-medium">{post.timeAgo}</span>
                             </div>
-                            <span className="text-zinc-500 text-[11px] font-medium">{post.timeAgo}</span>
-                          </div>
 
-                          {/* Rule & Title */}
-                          <div>
-                            <span className="px-2 py-0.5 rounded-md text-[10px] font-mono font-bold bg-rose-100 text-rose-800 border border-rose-200 inline-block mb-1">
-                              {post.ruleCode} • {post.ruleLabel}
-                            </span>
-                            <h2 className="text-[15px] font-bold text-zinc-950 tracking-tight leading-snug">
-                              {post.title}
-                            </h2>
-                          </div>
+                            {/* Rule & Title */}
+                            <div>
+                              <span className="px-2 py-0.5 rounded-md text-[10px] font-mono font-bold bg-rose-100 text-rose-800 border border-rose-200 inline-block mb-1">
+                                {post.ruleCode} • {post.ruleLabel}
+                              </span>
+                              <h2 className="text-[15px] font-bold text-zinc-950 tracking-tight leading-snug">
+                                {post.title}
+                              </h2>
+                            </div>
 
                           {/* Evidence Box */}
                           <div className="p-4 rounded-[20px] bg-[#E4E2E3] text-[rgb(18,18,18)] font-mono text-xs space-y-3 border-[1.5px] border-[#C8C5C9] shadow-[0_4px_16px_rgba(0,0,0,0.04),inset_0_1.5px_1.5px_rgba(255,255,255,0.9)] ring-1 ring-black/[0.04]">
@@ -1044,18 +1168,29 @@ export default function DashboardPage() {
                               </div>
                             </div>
 
-                            {/* Bottom Row: Flag Reason & Required Value */}
-                            <div className="grid grid-cols-2 gap-4 text-[11px] pt-0.5">
-                              <div>
-                                <span className="text-xs font-mono font-medium text-rose-700 leading-snug block">
-                                  Flag: {post.evidence.flagReason}
-                                </span>
-                              </div>
-                              <div>
-                                <span className="text-xs font-mono font-medium text-zinc-700 leading-snug block">
-                                  {post.evidence.requiredValue ? `Req: ${post.evidence.requiredValue}` : ""}
-                                </span>
-                              </div>
+                            {/* Bottom Row: First 2 Flagged Issues + View More */}
+                            <div className="pt-0.5 space-y-1.5">
+                              {getFlagIssues(post).slice(0, 2).map((iss, i) => (
+                                <div key={`${post.id}-flag-${i}`} className="flex items-start justify-between gap-3">
+                                  <span className="text-[11px] font-mono font-medium text-rose-700 leading-snug">
+                                    Flag: {iss.title} <span className="text-rose-400 font-bold">({iss.ruleCode})</span>
+                                  </span>
+                                  <span className="text-[11px] font-mono font-medium text-zinc-700 leading-snug text-right shrink-0 max-w-[45%] truncate">
+                                    {iss.requiredValue ? `Req: ${iss.requiredValue}` : ""}
+                                  </span>
+                                </div>
+                              ))}
+
+                              {getFlagIssues(post).length > 2 && (
+                                <button
+                                  type="button"
+                                  onClick={() => openScript(post)}
+                                  className="flex items-center gap-1 text-[10.5px] font-mono font-bold text-zinc-500 hover:text-zinc-900 active:scale-95 transition-all pt-0.5"
+                                >
+                                  <ChevronDown className="w-3.5 h-3.5" />
+                                  <span>View all issues ({getFlagIssues(post).length})</span>
+                                </button>
+                              )}
                             </div>
                           </div>
 
@@ -1079,17 +1214,30 @@ export default function DashboardPage() {
                               </button>
                             </div>
 
-                            <button
-                              type="button"
-                              onClick={() => handleOpenShare(post.title, post.id)}
-                              className="p-2 rounded-[14px] bg-[#ECEAEB] hover:bg-[#E0DEE0] active:scale-95 transition-all text-zinc-600 border border-[#D5D2D4] shadow-[inset_0_1px_1px_rgba(255,255,255,0.85)] flex items-center gap-1.5 font-bold text-xs"
-                            >
-                              <ShareCustomIcon className="w-4 h-4" />
-                              <span>Share</span>
-                            </button>
+                            <div className="flex items-center gap-1.5">
+                              {post.imageUrl && (
+                                <button
+                                  type="button"
+                                  onClick={() => setLightboxImage(post.imageUrl!)}
+                                  title="View evidence image"
+                                  className="p-2 rounded-[14px] bg-[#ECEAEB] hover:bg-[#E0DEE0] active:scale-95 transition-all text-[#346415] border border-[#D5D2D4] shadow-[inset_0_1px_1px_rgba(255,255,255,0.85)]"
+                                >
+                                  <Paperclip className="w-4 h-4 -rotate-45" />
+                                </button>
+                              )}
+
+                              <button
+                                type="button"
+                                onClick={() => handleOpenShare(post.title, post.id)}
+                                className="p-2 rounded-[14px] bg-[#ECEAEB] hover:bg-[#E0DEE0] active:scale-95 transition-all text-zinc-600 border border-[#D5D2D4] shadow-[inset_0_1px_1px_rgba(255,255,255,0.85)] flex items-center gap-1.5 font-bold text-xs"
+                              >
+                                <ShareCustomIcon className="w-4 h-4" />
+                                <span>Share</span>
+                              </button>
+                            </div>
                           </div>
                         </article>
-                      ))}
+                      )))}
                     </div>
                   )}
 
@@ -1123,48 +1271,87 @@ export default function DashboardPage() {
                             <span className="text-sm font-bold text-zinc-900 font-mono">4</span>
                           </div>
                           <div className="p-2 rounded-[14px] bg-[#ECEAEB] border border-[#D5D2D4] shadow-[inset_0_1px_1px_rgba(255,255,255,0.85)]">
-                            <span className="text-[9.5px] font-mono uppercase text-zinc-500 block">Notices Issued</span>
-                            <span className="text-sm font-bold text-amber-700 font-mono">1</span>
+                            <span className="text-[9.5px] font-mono uppercase text-zinc-500 block">Total Filed</span>
+                            <span className="text-sm font-bold text-zinc-900 font-mono">{myReports.length}</span>
+                          </div>
+                          <div className="p-2 rounded-[14px] bg-[#ECEAEB] border border-[#D5D2D4] shadow-[inset_0_1px_1px_rgba(255,255,255,0.85)]">
+                            <span className="text-[9.5px] font-mono uppercase text-zinc-500 block">Notices</span>
+                            <span className="text-sm font-bold text-amber-700 font-mono">
+                              {myReports.filter((r: FeedPost) => r.status === "Notice Drafted").length}
+                            </span>
                           </div>
                           <div className="p-2 rounded-[14px] bg-[#ECEAEB] border border-[#D5D2D4] shadow-[inset_0_1px_1px_rgba(255,255,255,0.85)]">
                             <span className="text-[9.5px] font-mono uppercase text-zinc-500 block">Compounded</span>
-                            <span className="text-sm font-bold text-[#346415] font-mono">2</span>
+                            <span className="text-sm font-bold text-[#346415] font-mono">
+                              {myReports.filter((r: FeedPost) => r.status === "Compounded").length}
+                            </span>
                           </div>
                         </div>
                       </div>
 
-                      {/* Scrollable Reports List Only (Starts below header, scrolls smoothly with pb-36) */}
+                      {/* Scrollable Reports List Only */}
                       <div className="flex-1 overflow-y-auto space-y-3 pr-0.5 no-scrollbar pb-36">
-                        {MY_SUBMITTED_REPORTS.map((rep) => (
-                          <div
-                            key={rep.id}
-                            className="p-4 rounded-[20px] bg-[#FCFCFB] border-[1.5px] border-[#D5D2D4] shadow-[0_4px_16px_rgba(0,0,0,0.03),inset_0_1.5px_1.5px_rgba(255,255,255,0.95)] space-y-2.5"
-                          >
-                            <div className="flex items-center justify-between gap-2">
-                              <span className="px-2 py-0.5 rounded-md text-[10px] font-mono font-bold bg-rose-100 text-rose-800 border border-rose-200">
-                                {rep.ruleCode}
-                              </span>
-                              <span className={cn("px-2 py-0.5 rounded-full text-[10px] font-mono font-bold uppercase border", rep.statusColor)}>
-                                {rep.status}
-                              </span>
-                            </div>
-
-                            <div>
-                              <h3 className="text-sm font-bold text-zinc-900 leading-snug">{rep.title}</h3>
-                              <p className="text-[11px] text-zinc-500 mt-0.5">
-                                Commodity: <span className="font-semibold text-zinc-700">{rep.commodity}</span> • Brand: <span className="font-semibold text-zinc-700">{rep.brand}</span>
-                              </p>
-                            </div>
-
-                            <div className="pt-2 border-t border-[#ECEAEB] flex items-center justify-between text-xs text-zinc-500">
-                              <span className="flex items-center gap-1 font-mono font-bold text-[#346415]">
-                                <ArrowBigUp className="w-4 h-4 fill-current" />
-                                {rep.upvotes} karma
-                              </span>
-                              <span className="text-[10.5px] text-zinc-400 font-medium">{rep.date}</span>
-                            </div>
+                        {myReports.length === 0 ? (
+                          <div className="p-6 rounded-[20px] bg-[#FCFCFB] border-[1.5px] border-[#D5D2D4] text-center space-y-2.5">
+                            <ShieldAlert className="w-8 h-8 text-zinc-400 mx-auto" />
+                            <p className="text-xs font-bold text-zinc-800">No inspection reports filed yet</p>
+                            <p className="text-[11px] text-zinc-500 max-w-[240px] mx-auto">
+                              Take a photo or upload product packaging to generate a verified inspection dossier.
+                            </p>
+                            <button
+                              type="button"
+                              onClick={openPickerChoice}
+                              className="px-4 py-2 rounded-xl bg-[#94EC40] text-black font-bold text-xs shadow-sm hover:bg-[#80D42F] transition-all"
+                            >
+                              Scan Product Now
+                            </button>
                           </div>
-                        ))}
+                        ) : (
+                          myReports.map((rep: FeedPost) => (
+                            <div
+                              key={rep.id}
+                              onClick={() => openScript(rep)}
+                              className="p-4 rounded-[20px] bg-[#FCFCFB] border-[1.5px] border-[#D5D2D4] shadow-[0_4px_16px_rgba(0,0,0,0.03),inset_0_1.5px_1.5px_rgba(255,255,255,0.95)] space-y-2.5 cursor-pointer hover:border-zinc-400 active:scale-[0.99] transition-all"
+                            >
+                              <div className="flex items-center justify-between gap-2">
+                                <span className="px-2 py-0.5 rounded-md text-[10px] font-mono font-bold bg-rose-100 text-rose-800 border border-rose-200">
+                                  {rep.ruleCode}
+                                </span>
+                                <div className="flex items-center gap-1.5">
+                                  <span className={cn(
+                                    "px-2 py-0.5 rounded-full text-[10px] font-mono font-bold uppercase border",
+                                    rep.status === "Compounded" ? "bg-[#EAFBD9] text-[#346415] border-[#B8F27D]" : rep.status === "Notice Drafted" ? "bg-amber-100 text-amber-900 border-amber-300" : "bg-blue-100 text-blue-900 border-blue-300"
+                                  )}>
+                                    {rep.status}
+                                  </span>
+                                  <button
+                                    type="button"
+                                    onClick={(e) => { e.stopPropagation(); handleDeleteReport(rep.id); }}
+                                    title="Delete report"
+                                    className="p-1.5 rounded-lg bg-[#ECEAEB] border border-[#D5D2D4] text-zinc-500 hover:text-rose-700 hover:bg-rose-50 hover:border-rose-300 active:scale-90 transition-all"
+                                  >
+                                    <Trash2 className="w-3.5 h-3.5" />
+                                  </button>
+                                </div>
+                              </div>
+
+                              <div>
+                                <h3 className="text-sm font-bold text-zinc-900 leading-snug">{rep.title}</h3>
+                                <p className="text-[11px] text-zinc-500 mt-0.5">
+                                  Commodity: <span className="font-semibold text-zinc-700">{rep.commodity}</span> • Brand: <span className="font-semibold text-zinc-700">{rep.brand}</span>
+                                </p>
+                              </div>
+
+                              <div className="pt-2 border-t border-[#ECEAEB] flex items-center justify-between text-xs text-zinc-500">
+                                <span className="flex items-center gap-1 font-mono font-bold text-[#346415]">
+                                  <ArrowBigUp className="w-4 h-4 fill-current" />
+                                  {rep.upvotes} karma
+                                </span>
+                                <span className="text-[10.5px] text-zinc-400 font-medium">{rep.timeAgo}</span>
+                              </div>
+                            </div>
+                          ))
+                        )}
                       </div>
 
                     </div>
@@ -1201,23 +1388,23 @@ export default function DashboardPage() {
                           </div>
                         </div>
 
-                        {/* 4 Stats Grid: Karma, Reports, Upvoted, Downvoted */}
+                        {/* 4 Stats Grid: Real Karma, Reports, Upvoted, Downvoted */}
                         <div className="grid grid-cols-4 gap-2 pt-3 border-t border-[#ECEAEB] text-center">
                           <div className="p-2.5 rounded-[14px] bg-[#ECEAEB] border border-[#D5D2D4] shadow-[inset_0_1px_1px_rgba(255,255,255,0.85)]">
                             <span className="text-[9px] font-mono uppercase text-zinc-500 block">Karma</span>
-                            <span className="text-base font-extrabold text-[#346415] font-mono">501</span>
+                            <span className="text-base font-extrabold text-[#346415] font-mono">{realKarma}</span>
                           </div>
                           <div className="p-2.5 rounded-[14px] bg-[#ECEAEB] border border-[#D5D2D4] shadow-[inset_0_1px_1px_rgba(255,255,255,0.85)]">
                             <span className="text-[9px] font-mono uppercase text-zinc-500 block">Reports</span>
-                            <span className="text-base font-extrabold text-zinc-900 font-mono">4</span>
+                            <span className="text-base font-extrabold text-zinc-900 font-mono">{realReportsCount}</span>
                           </div>
                           <div className="p-2.5 rounded-[14px] bg-[#ECEAEB] border border-[#D5D2D4] shadow-[inset_0_1px_1px_rgba(255,255,255,0.85)]">
                             <span className="text-[9px] font-mono uppercase text-zinc-500 block">Upvoted</span>
-                            <span className="text-base font-extrabold text-zinc-900 font-mono">89</span>
+                            <span className="text-base font-extrabold text-zinc-900 font-mono">{realUpvotedCount}</span>
                           </div>
                           <div className="p-2.5 rounded-[14px] bg-[#ECEAEB] border border-[#D5D2D4] shadow-[inset_0_1px_1px_rgba(255,255,255,0.85)]">
                             <span className="text-[9px] font-mono uppercase text-zinc-500 block">Downvoted</span>
-                            <span className="text-base font-extrabold text-rose-700 font-mono">6</span>
+                            <span className="text-base font-extrabold text-rose-700 font-mono">{realDownvotedCount}</span>
                           </div>
                         </div>
 
@@ -1415,18 +1602,29 @@ export default function DashboardPage() {
                             </div>
                           </div>
 
-                          {/* Bottom Row: Flag Reason & Required Value */}
-                          <div className="grid grid-cols-2 gap-4 text-[11px] pt-0.5">
-                            <div>
-                              <span className="text-xs font-mono font-medium text-rose-700 leading-snug block">
-                                Flag: {post.evidence.flagReason}
-                              </span>
-                            </div>
-                            <div>
-                              <span className="text-xs font-mono font-medium text-zinc-700 leading-snug block">
-                                {post.evidence.requiredValue ? `Req: ${post.evidence.requiredValue}` : ""}
-                              </span>
-                            </div>
+                          {/* Bottom Row: First 2 Flagged Issues + View More */}
+                          <div className="pt-0.5 space-y-1.5">
+                            {getFlagIssues(post).slice(0, 2).map((iss, i) => (
+                              <div key={`${post.id}-flag-${i}`} className="flex items-start justify-between gap-3">
+                                <span className="text-[11px] font-mono font-medium text-rose-700 leading-snug">
+                                  Flag: {iss.title} <span className="text-rose-400 font-bold">({iss.ruleCode})</span>
+                                </span>
+                                <span className="text-[11px] font-mono font-medium text-zinc-700 leading-snug text-right shrink-0 max-w-[45%] truncate">
+                                  {iss.requiredValue ? `Req: ${iss.requiredValue}` : ""}
+                                </span>
+                              </div>
+                            ))}
+
+                            {getFlagIssues(post).length > 2 && (
+                              <button
+                                type="button"
+                                onClick={() => openScript(post)}
+                                className="flex items-center gap-1 text-[10.5px] font-mono font-bold text-zinc-500 hover:text-zinc-900 active:scale-95 transition-all pt-0.5"
+                              >
+                                <ChevronDown className="w-3.5 h-3.5" />
+                                <span>View all issues ({getFlagIssues(post).length})</span>
+                              </button>
+                            )}
                           </div>
                         </div>
 
@@ -1442,12 +1640,25 @@ export default function DashboardPage() {
                           </button>
 
                           <div className="flex items-center gap-2">
+                            {post.imageUrl && (
+                              <button
+                                type="button"
+                                onClick={() => setLightboxImage(post.imageUrl!)}
+                                title="View evidence image"
+                                className="flex items-center gap-1 px-3 py-1.5 rounded-xl hover:bg-[#ECEAEB] transition-colors text-zinc-600 hover:text-zinc-900 active:scale-95"
+                              >
+                                <Paperclip className="w-3.5 h-3.5 -rotate-45 text-[#346415]" />
+                                <span>Image</span>
+                              </button>
+                            )}
+
                             <button
                               type="button"
-                              className="flex items-center gap-1 px-3 py-1.5 rounded-xl hover:bg-[#ECEAEB] transition-colors text-zinc-600"
+                              onClick={() => openScript(post)}
+                              className="flex items-center gap-1 px-3 py-1.5 rounded-xl hover:bg-[#ECEAEB] transition-colors text-zinc-600 hover:text-zinc-900 active:scale-95"
                             >
-                              <FileText className="w-3.5 h-3.5 text-[#346415]" />
-                              <span>Notice PDF</span>
+                              <ReportDossierCustomIcon className="w-3.5 h-3.5 text-[#346415]" />
+                              <span>Report</span>
                             </button>
 
                             <button
@@ -1540,23 +1751,23 @@ export default function DashboardPage() {
                 </div>
               </div>
 
-              {/* 4 Stats Grid: Karma, Reports, Upvoted, Downvoted */}
+              {/* 4 Stats Grid: Real Karma, Reports, Upvoted, Downvoted */}
               <div className="grid grid-cols-4 gap-2 pt-2 border-t border-[#ECEAEB] text-center">
                 <div className="p-2 rounded-[14px] bg-[#ECEAEB] border border-[#D5D2D4] shadow-[inset_0_1px_1px_rgba(255,255,255,0.85)]">
                   <span className="text-[9px] font-mono uppercase text-zinc-500 block">Karma</span>
-                  <span className="text-sm font-bold text-[#346415] font-mono">501</span>
+                  <span className="text-sm font-bold text-[#346415] font-mono">{realKarma}</span>
                 </div>
                 <div className="p-2 rounded-[14px] bg-[#ECEAEB] border border-[#D5D2D4] shadow-[inset_0_1px_1px_rgba(255,255,255,0.85)]">
                   <span className="text-[9px] font-mono uppercase text-zinc-500 block">Reports</span>
-                  <span className="text-sm font-bold text-zinc-900 font-mono">4</span>
+                  <span className="text-sm font-bold text-zinc-900 font-mono">{realReportsCount}</span>
                 </div>
                 <div className="p-2 rounded-[14px] bg-[#ECEAEB] border border-[#D5D2D4] shadow-[inset_0_1px_1px_rgba(255,255,255,0.85)]">
                   <span className="text-[9px] font-mono uppercase text-zinc-500 block">Upvoted</span>
-                  <span className="text-sm font-bold text-zinc-900 font-mono">89</span>
+                  <span className="text-sm font-bold text-zinc-900 font-mono">{realUpvotedCount}</span>
                 </div>
                 <div className="p-2 rounded-[14px] bg-[#ECEAEB] border border-[#D5D2D4] shadow-[inset_0_1px_1px_rgba(255,255,255,0.85)]">
                   <span className="text-[9px] font-mono uppercase text-zinc-500 block">Downvoted</span>
-                  <span className="text-sm font-bold text-rose-700 font-mono">6</span>
+                  <span className="text-sm font-bold text-rose-700 font-mono">{realDownvotedCount}</span>
                 </div>
               </div>
 
@@ -1583,22 +1794,49 @@ export default function DashboardPage() {
               <div className="flex items-center gap-2">
                 <FileText className="w-4 h-4 text-zinc-800" />
                 <h4 className="text-xs font-bold font-mono uppercase tracking-wider text-zinc-900">
-                  MY RECENT FILED REPORTS
+                  MY RECENT FILED REPORTS ({myReports.length})
                 </h4>
               </div>
 
               <div className="space-y-2 text-xs">
-                {MY_SUBMITTED_REPORTS.map((rep) => (
-                  <div key={rep.id} className="p-2.5 rounded-[14px] bg-[#ECEAEB] border border-[#D5D2D4] shadow-[inset_0_1px_1px_rgba(255,255,255,0.85)] flex items-center justify-between">
-                    <div>
-                      <span className="text-[10.5px] font-bold text-zinc-900 block font-mono">{rep.ruleCode}</span>
-                      <span className="text-[11px] text-zinc-600 truncate max-w-[170px] block">{rep.title}</span>
-                    </div>
-                    <span className={cn("text-[9.5px] font-mono font-bold px-2 py-0.5 rounded border", rep.statusColor)}>
-                      {rep.status}
-                    </span>
+                {myReports.length === 0 ? (
+                  <div className="p-3 text-center rounded-[14px] bg-[#ECEAEB] border border-[#D5D2D4] text-zinc-500 text-[11px]">
+                    No reports filed yet. Scan a package to file your first dossier.
                   </div>
-                ))}
+                ) : (
+                  myReports.slice(0, 4).map((rep: FeedPost) => (
+                    <div
+                      key={rep.id}
+                      role="button"
+                      tabIndex={0}
+                      onClick={() => openScript(rep)}
+                      onKeyDown={(e) => { if (e.key === "Enter") openScript(rep); }}
+                      title="Open inspection dossier"
+                      className="w-full text-left p-2.5 rounded-[14px] bg-[#ECEAEB] border border-[#D5D2D4] shadow-[inset_0_1px_1px_rgba(255,255,255,0.85)] flex items-center justify-between gap-2 hover:bg-[#E4E2E3] hover:border-zinc-400 active:scale-[0.98] transition-all cursor-pointer"
+                    >
+                      <div className="min-w-0">
+                        <span className="text-[10.5px] font-bold text-zinc-900 block font-mono">{rep.ruleCode}</span>
+                        <span className="text-[11px] text-zinc-600 truncate max-w-[150px] block">{rep.title}</span>
+                      </div>
+                      <div className="flex items-center gap-1.5 shrink-0">
+                        <span className={cn(
+                          "text-[9.5px] font-mono font-bold px-2 py-0.5 rounded border uppercase",
+                          rep.status === "Compounded" ? "bg-[#EAFBD9] text-[#346415] border-[#B8F27D]" : rep.status === "Notice Drafted" ? "bg-amber-100 text-amber-900 border-amber-300" : "bg-blue-100 text-blue-900 border-blue-300"
+                        )}>
+                          {rep.status}
+                        </span>
+                        <button
+                          type="button"
+                          onClick={(e) => { e.stopPropagation(); handleDeleteReport(rep.id); }}
+                          title="Delete report"
+                          className="p-1.5 rounded-lg bg-white/70 border border-[#D5D2D4] text-zinc-500 hover:text-rose-700 hover:bg-rose-50 hover:border-rose-300 active:scale-90 transition-all"
+                        >
+                          <Trash2 className="w-3.5 h-3.5" />
+                        </button>
+                      </div>
+                    </div>
+                  ))
+                )}
               </div>
             </div>
 
@@ -1752,6 +1990,94 @@ export default function DashboardPage() {
       />
 
       {/* ========================================================
+          3b. INSPECTION DOSSIER SCRIPT MODAL (Notice PDF / Filed Reports)
+         ======================================================== */}
+      <ReportScriptModal post={scriptPost} report={scriptPost?.auditReport || null} onClose={() => setScriptPostId(null)} />
+
+      <ImageLightbox src={lightboxImage} onClose={() => setLightboxImage(null)} />
+
+      {/* Delete confirmation dialog */}
+      <AnimatePresence>
+        {deleteTarget && (
+          <div className="fixed inset-0 z-[75] flex items-center justify-center p-4">
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              className="fixed inset-0 bg-[#0B0B0D]/50 backdrop-blur-sm"
+              onClick={() => !isDeleting && setDeleteTarget(null)}
+            />
+            <motion.div
+              initial={{ opacity: 0, scale: 0.9, y: 14 }}
+              animate={{ opacity: 1, scale: 1, y: 0 }}
+              exit={{ opacity: 0, scale: 0.94, y: 8 }}
+              transition={{ type: "spring", stiffness: 450, damping: 28 }}
+              className="relative w-full max-w-[340px] p-5 rounded-[26px] bg-[#FCFCFB] border border-white/80 shadow-[0_24px_60px_rgba(0,0,0,0.28),inset_0_1px_1px_rgba(255,255,255,0.95)] z-[76] space-y-3.5 text-left"
+            >
+              <div className="flex items-center gap-2.5">
+                <div className="w-9 h-9 rounded-full bg-rose-100 border border-rose-300 flex items-center justify-center shrink-0">
+                  <Trash2 className="w-4 h-4 text-rose-600" />
+                </div>
+                <h4
+                  className="text-sm font-[900] text-zinc-950 tracking-tight"
+                  style={{ fontFamily: 'satoshi, "satoshi Fallback", sans-serif', fontWeight: 900 }}
+                >
+                  Delete this report?
+                </h4>
+              </div>
+
+              <p className="text-[11.5px] text-zinc-500 font-medium leading-snug">
+                This permanently removes the report, its dossier and evidence photo from the community feed and your vault. This action cannot be undone.
+              </p>
+
+              <div className="flex items-center gap-2.5 pt-0.5">
+                <button
+                  type="button"
+                  onClick={confirmDeleteReport}
+                  disabled={isDeleting}
+                  className="flex-1 py-2.5 px-3 rounded-xl bg-rose-600 text-white font-bold text-xs shadow-[0_2px_8px_rgba(225,29,72,0.3)] flex items-center justify-center gap-1.5 hover:bg-rose-700 active:scale-95 transition-all disabled:opacity-60"
+                >
+                  <Trash2 className="w-3.5 h-3.5" />
+                  <span>{isDeleting ? "Deleting…" : "Delete"}</span>
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setDeleteTarget(null)}
+                  disabled={isDeleting}
+                  className="flex-1 py-2.5 px-3 rounded-xl bg-[#ECEAEB] text-zinc-800 font-bold text-xs border border-[#D5D2D4] shadow-xs hover:bg-[#E2DFE1] active:scale-95 transition-all disabled:opacity-60"
+                >
+                  Cancel
+                </button>
+              </div>
+            </motion.div>
+          </div>
+        )}
+      </AnimatePresence>
+
+      {/* Post / Save success toast */}
+      <AnimatePresence>
+        {postToast && (
+          <div className="fixed bottom-24 sm:bottom-8 inset-x-0 z-[70] flex justify-center px-4 pointer-events-none">
+            <motion.div
+              initial={{ opacity: 0, y: 28, scale: 0.94 }}
+              animate={{ opacity: 1, y: 0, scale: 1 }}
+              exit={{ opacity: 0, y: 18, scale: 0.96 }}
+              transition={{ type: "spring", stiffness: 420, damping: 30 }}
+              className="pointer-events-auto flex items-center gap-3 px-4 py-3 rounded-[20px] bg-[#FCFCFB] border-[1.5px] border-[#D5D2D4] shadow-[0_18px_44px_rgba(0,0,0,0.18),inset_0_1.5px_1.5px_rgba(255,255,255,0.95)] max-w-[92vw]"
+            >
+              <div className="w-8 h-8 rounded-full bg-[#94EB41] border border-[#80D42F] shadow-[0_2px_8px_rgba(148,235,65,0.35),inset_0_1px_1px_rgba(255,255,255,0.7)] flex items-center justify-center shrink-0">
+                <CheckCircle2 className="w-[18px] h-[18px] text-[rgb(18,18,18)]" strokeWidth={2.4} />
+              </div>
+              <div className="min-w-0 text-left">
+                <p className="text-xs font-bold text-zinc-900 truncate">{postToast.title}</p>
+                <p className="text-[10.5px] text-zinc-500 font-medium leading-snug">{postToast.sub}</p>
+              </div>
+            </motion.div>
+          </div>
+        )}
+      </AnimatePresence>
+
+      {/* ========================================================
           5. SCAN FLOW — Hidden Inputs + Choice Modal + Thermal Printer
          ======================================================== */}
       <input ref={galleryInputRef} type="file" accept="image/*" className="hidden" onChange={handleScanFile} />
@@ -1825,10 +2151,7 @@ export default function DashboardPage() {
         isOpen={showScanFlow}
         imageUrl={scanImageUrl}
         imageName={scanImageName}
-        onClose={() => {
-          setShowScanFlow(false);
-          if (scanImageUrl) URL.revokeObjectURL(scanImageUrl);
-        }}
+        onClose={() => setShowScanFlow(false)}
         onPost={handleScanPost}
         onSave={handleScanSave}
       />

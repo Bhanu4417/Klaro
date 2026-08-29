@@ -1,45 +1,112 @@
 "use client";
 
-import React from "react";
-import { motion } from "framer-motion";
-import { Loader2 } from "lucide-react";
+import React, { useEffect, useState } from "react";
+import { AnimatePresence, motion } from "framer-motion";
+import { KlaroBot } from "./KlaroBot";
 import { cn } from "../../lib/utils";
+
+/* Fun one-liners cycled under the loader — one random start per mount,
+   then a fresh line every few seconds until the screen is done. */
+const LOADER_MESSAGES = [
+  "Counting additives you never asked for…",
+  "Teaching labels to tell the truth…",
+  "Warming up the barcode detective…",
+  "Separating sugar from marketing…",
+  "Consulting the ingredient oracle…",
+  "Bribing a juice box for its secrets…",
+  "Measuring your MRP in honesty units…",
+  "Filing today's sneaky preservatives…",
+  "Rinsing the fine print for you…",
+  "Asking the snacks to confess…",
+  "Cross-checking claims with reality…",
+  "Sharpening the nutrition magnifier…",
+  "Translating chemist into human…",
+  "Hunting down hidden sugars…",
+  "Polishing your food journal…",
+  "Whispering with the preservatives…",
+  "Auditing every gram, twice…",
+  "Unspiking the marketing buzzwords…",
+  "Checking what 'natural' really means…",
+  "Wake-up call for sleepy labels…",
+  "Doing push-ups between packages…",
+  "Rounding up runaway additives…",
+  "Sniffing out artificial colors…",
+  "Negotiating with the fine print…",
+  "Weighing claims against facts…",
+  "Spotting star ingredients for you…",
+  "Sweeping the shelves for truth…",
+  "Bootstrapping the crunch calculator…",
+  "Decoding E-numbers into plain talk…",
+  "Giving misleading labels a timeout…",
+  "Stretching before the scan sprint…",
+  "Counting sheep, then additives…",
+  "Tuning the freshness radar…",
+  "Unwrapping today's food gossip…",
+  "Prepping your community feed…",
+  "Ironing out the ingredient list…",
+  "Fetching fresher facts than labels…",
+  "Jogging through the nutrient grid…",
+  "Bottling some honesty for you…",
+  "Almost there — labels behaving now…",
+];
 
 interface AuthLoadingStateProps {
   message?: string;
+  submessage?: string;
   className?: string;
 }
 
 export const AuthLoadingState: React.FC<AuthLoadingStateProps> = ({
-  message = "Authenticating with food intelligence...",
+  message = "Connecting to Klaro…",
+  submessage,
   className,
 }) => {
+  // Deterministic starting index for SSR hydration consistency
+  const [idx, setIdx] = useState(0);
+
+  useEffect(() => {
+    // Pick random index on client mount, then cycle every 2.6s
+    setIdx(Math.floor(Math.random() * LOADER_MESSAGES.length));
+    const timer = setInterval(() => setIdx((i) => (i + 1) % LOADER_MESSAGES.length), 2600);
+    return () => clearInterval(timer);
+  }, []);
+
+  const rotating = LOADER_MESSAGES[idx];
+
   return (
     <div
       className={cn(
-        "flex flex-col items-center justify-center p-8 text-center space-y-4 select-none min-h-[220px]",
+        "flex flex-col items-center justify-center p-6 text-center select-none min-h-[260px]",
         className
       )}
     >
-      {/* Tactile scanning reticle animation */}
-      <div className="relative w-16 h-16 flex items-center justify-center">
-        {/* Outer pulsing ring */}
-        <div className="absolute inset-0 rounded-2xl border-2 border-[#D4F7B0] animate-ping opacity-40" />
-        
-        {/* Center card box with laser scan */}
-        <div className="relative w-14 h-14 rounded-2xl bg-zinc-100 border border-zinc-200/80 flex items-center justify-center overflow-hidden shadow-[0_1px_2px_rgba(0,0,0,0.02)]">
-          {/* Laser beam */}
-          <div className="absolute inset-x-0 h-0.5 bg-[#94EC40] shadow-[0_0_8px_#94EC40] animate-scan-line" />
-          
-          <Loader2 className="w-6 h-6 text-zinc-800 animate-spin" />
-        </div>
+      {/* Bot doing its little loading workout */}
+      <div className="relative flex items-center justify-center">
+        <KlaroBot state="authenticating" size="lg" showShadow={true} interactive={false} />
       </div>
 
-      <div className="space-y-1">
-        <p className="text-sm font-semibold text-[rgb(18,18,18)] tracking-tight">
+      <div className="mt-5 space-y-1.5">
+        <p className="text-sm font-semibold text-[rgb(18,18,18)] tracking-tight font-satoshi">
           {message}
         </p>
-        <p className="text-xs text-zinc-400 font-mono">Securing session...</p>
+
+        {/* Rotating fun line — fresh every few seconds */}
+        <div className="h-5 flex items-center justify-center overflow-hidden">
+          <AnimatePresence mode="wait" initial={false}>
+            <motion.p
+              key={idx}
+              initial={{ opacity: 0, y: 8 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: -8 }}
+              transition={{ duration: 0.25, ease: "easeOut" }}
+              className="text-xs text-zinc-500 font-saans"
+            >
+              {rotating}
+            </motion.p>
+          </AnimatePresence>
+        </div>
+
+        {submessage && <p className="text-xs text-zinc-400 font-mono">{submessage}</p>}
       </div>
     </div>
   );

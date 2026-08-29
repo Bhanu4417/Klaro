@@ -118,12 +118,20 @@ export const IndiaPixelMap: React.FC<IndiaPixelMapProps> = ({ className }) => {
           const isVisible = shouldReduceMotion || visiblePins.includes(pin.id);
           if (!isVisible) return null;
 
+          /* Bubbles are wide — anchor them inward so nothing ever escapes the
+             map square, regardless of hand-tuned messagePosition in the data. */
+          const h: "left" | "right" =
+            pin.x > 55 ? "left" : pin.x < 38 ? "right" : pin.messagePosition?.includes("left") ? "left" : "right";
+          const v: "top" | "bottom" =
+            pin.y < 20 ? "bottom" : pin.y > 84 ? "top" : pin.messagePosition?.startsWith("top") ? "top" : "bottom";
+          const safePosition = `${v}-${h}` as "top-left" | "top-right" | "bottom-left" | "bottom-right";
+
           return (
             <motion.div
               key={pin.id}
               style={{
-                left: `${pin.x}%`,
-                top: `${pin.y}%`,
+                left: `${Math.min(92, Math.max(8, pin.x))}%`,
+                top: `${Math.min(92, Math.max(8, pin.y))}%`,
               }}
               initial={shouldReduceMotion ? { opacity: 1, scale: 1 } : { opacity: 0, scale: 0.4, y: 12 }}
               animate={{ opacity: 1, scale: 1, y: 0 }}
@@ -150,7 +158,7 @@ export const IndiaPixelMap: React.FC<IndiaPixelMapProps> = ({ className }) => {
               {/* Message Bubble popping from profile with directional arrow */}
               <MessageBubble
                 message={pin.message}
-                position={pin.messagePosition || "top-right"}
+                position={safePosition}
                 rotation={pin.rotation || 0}
                 delay={0.25}
                 isReducedMotion={Boolean(shouldReduceMotion)}
