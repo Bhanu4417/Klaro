@@ -43,7 +43,6 @@ export const HowItWorks: React.FC = () => {
     <section id="how-it-works" className="py-20 sm:py-28 bg-[#E6E4E5] relative overflow-hidden select-none">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         
-        {/* Section Header */}
         <div className="text-center max-w-2xl mx-auto space-y-3 mb-14 sm:mb-16">
           <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-[#ECEAEB] border border-[#D5D2D4] text-xs font-semibold text-zinc-800">
             <Scale className="w-3.5 h-3.5 text-[#417F14]" />
@@ -62,7 +61,6 @@ export const HowItWorks: React.FC = () => {
           </p>
         </div>
 
-        {/* 4 Step Cards Grid */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-5 text-left">
           {steps.map((step) => {
             const Icon = step.icon;

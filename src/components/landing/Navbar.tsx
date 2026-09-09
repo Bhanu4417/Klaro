@@ -31,7 +31,6 @@ export const Navbar: React.FC = () => {
   return (
     <header className="fixed top-0 left-0 right-0 z-50 select-none flex justify-center pointer-events-none">
       
-      {/* DESKTOP NAVBAR: Seamless CSS-interpolated MacBook Notch (Zero text-blur, Zero background flash) */}
       <div className="hidden lg:flex w-full justify-center pointer-events-auto">
         <div
           className={cn(
@@ -41,7 +40,6 @@ export const Navbar: React.FC = () => {
               : "w-full max-w-7xl px-8 py-5 bg-transparent border-0 shadow-none gap-4"
           )}
         >
-          {/* Logo & Brand Name */}
           <Link href="/" className="flex items-center gap-2 group focus:outline-none shrink-0">
             <Logo size="sm" showText={false} />
             <span
@@ -55,7 +53,6 @@ export const Navbar: React.FC = () => {
             </span>
           </Link>
 
-          {/* Nav Links */}
           <nav
             className={cn(
               "flex items-center gap-1 transition-all duration-300",
@@ -75,7 +72,6 @@ export const Navbar: React.FC = () => {
             ))}
           </nav>
 
-          {/* Right Actions */}
           <div className="flex items-center gap-2.5 shrink-0">
             {isLoaded && isSignedIn ? (
               <Link href="/dashboard">
@@ -99,7 +95,6 @@ export const Navbar: React.FC = () => {
               </Link>
             ) : (
               <>
-                {/* Sign In text (Hidden in notch mode) */}
                 <Link
                   href="/login"
                   className={cn(
@@ -110,7 +105,6 @@ export const Navbar: React.FC = () => {
                   Sign in
                 </Link>
 
-                {/* Open Platform Action Button */}
                 <Link href="/login">
                   <Button
                     variant="primary"
@@ -132,7 +126,6 @@ export const Navbar: React.FC = () => {
         </div>
       </div>
 
-      {/* MOBILE NAVBAR (< lg screens) */}
       <div className="lg:hidden w-full px-4 py-3 pointer-events-auto flex items-center justify-between bg-[#E6E4E5]/90 backdrop-blur-md border-b border-[#D5D2D4]">
         <Link href="/" className="flex items-center gap-1.5 group focus:outline-none">
           <Logo size="sm" showText={false} />
@@ -174,7 +167,6 @@ export const Navbar: React.FC = () => {
         </div>
       </div>
 
-      {/* Mobile Drawer Menu */}
       {mobileMenuOpen && (
         <div className="lg:hidden fixed top-14 left-0 right-0 bg-[#ECEAEB] border-b border-[#D5D2D4] px-4 pt-3 pb-6 space-y-3 shadow-xl pointer-events-auto animate-in fade-in slide-in-from-top-2 duration-200">
           <nav className="flex flex-col space-y-1">

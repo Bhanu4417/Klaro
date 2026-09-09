@@ -5,8 +5,6 @@ import { AnimatePresence, motion } from "framer-motion";
 import { KlaroBot } from "./KlaroBot";
 import { cn } from "../../lib/utils";
 
-/* Fun one-liners cycled under the loader — one random start per mount,
-   then a fresh line every few seconds until the screen is done. */
 const LOADER_MESSAGES = [
   "Counting additives you never asked for…",
   "Teaching labels to tell the truth…",
@@ -61,11 +59,9 @@ export const AuthLoadingState: React.FC<AuthLoadingStateProps> = ({
   submessage,
   className,
 }) => {
-  // Deterministic starting index for SSR hydration consistency
   const [idx, setIdx] = useState(0);
 
   useEffect(() => {
-    // Pick random index on client mount, then cycle every 2.6s
     setIdx(Math.floor(Math.random() * LOADER_MESSAGES.length));
     const timer = setInterval(() => setIdx((i) => (i + 1) % LOADER_MESSAGES.length), 2600);
     return () => clearInterval(timer);
@@ -80,7 +76,6 @@ export const AuthLoadingState: React.FC<AuthLoadingStateProps> = ({
         className
       )}
     >
-      {/* Bot doing its little loading workout */}
       <div className="relative flex items-center justify-center">
         <KlaroBot state="authenticating" size="lg" showShadow={true} interactive={false} />
       </div>
@@ -90,7 +85,6 @@ export const AuthLoadingState: React.FC<AuthLoadingStateProps> = ({
           {message}
         </p>
 
-        {/* Rotating fun line — fresh every few seconds */}
         <div className="h-5 flex items-center justify-center overflow-hidden">
           <AnimatePresence mode="wait" initial={false}>
             <motion.p

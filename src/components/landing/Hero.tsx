@@ -12,10 +12,8 @@ export const Hero: React.FC = () => {
     <section className="relative pt-32 pb-20 sm:pt-40 sm:pb-28 lg:pt-48 lg:pb-36 overflow-hidden select-none">
       <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
         
-        {/* Main Content Container (Centered Horizontally) */}
         <div className="space-y-6 sm:space-y-8 max-w-4xl mx-auto flex flex-col items-center">
           
-          {/* Headline & Subhead */}
           <motion.div
             initial={{ opacity: 0, y: 14 }}
             animate={{ opacity: 1, y: 0 }}
@@ -36,7 +34,6 @@ export const Hero: React.FC = () => {
             </p>
           </motion.div>
 
-          {/* Detailed Description */}
           <motion.p
             initial={{ opacity: 0, y: 14 }}
             animate={{ opacity: 1, y: 0 }}
@@ -46,7 +43,6 @@ export const Hero: React.FC = () => {
             Automatically analyze packaged commodity photographs, extract mandatory declarations under the Legal Metrology (Packaged Commodities) Rules, 2011, identify violations, and generate digital inspection dossiers in seconds.
           </motion.p>
 
-          {/* Action CTAs */}
           <motion.div
             initial={{ opacity: 0, y: 14 }}
             animate={{ opacity: 1, y: 0 }}
@@ -72,7 +68,6 @@ export const Hero: React.FC = () => {
             </a>
           </motion.div>
 
-          {/* Chinn music scan trigger — any photo */}
           <motion.div
             initial={{ opacity: 0, y: 8 }}
             animate={{ opacity: 1, y: 0 }}
@@ -82,7 +77,6 @@ export const Hero: React.FC = () => {
             <HomeScanTrigger />
           </motion.div>
 
-          {/* Standards & Authority Trust Row */}
           <motion.div
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}

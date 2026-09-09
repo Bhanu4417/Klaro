@@ -8,7 +8,6 @@ export const ProblemComparison: React.FC = () => {
     <section className="py-20 sm:py-28 bg-[#ECEAEB] border-y border-[#D5D2D4] relative overflow-hidden select-none">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         
-        {/* Section Header */}
         <div className="text-center max-w-3xl mx-auto space-y-3 mb-14 sm:mb-16">
           <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-[#E6E4E5] border border-[#D5D2D4] text-xs font-semibold text-zinc-800">
             <ShieldAlert className="w-3.5 h-3.5 text-amber-700" />
@@ -27,10 +26,8 @@ export const ProblemComparison: React.FC = () => {
           </p>
         </div>
 
-        {/* Side-by-Side Comparison Matrix */}
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-stretch">
           
-          {/* LEFT: Manual Inspection (The Bottleneck) */}
           <div className="lg:col-span-6 rounded-[24px] bg-white border border-[#D5D2D4] p-6 sm:p-8 shadow-sm space-y-6 flex flex-col justify-between text-left">
             <div className="space-y-4">
               <div className="flex items-center justify-between pb-3 border-b border-zinc-200">
@@ -76,10 +73,8 @@ export const ProblemComparison: React.FC = () => {
             </div>
           </div>
 
-          {/* RIGHT: Klaro AI-Assisted Platform (The Solution) */}
           <div className="lg:col-span-6 rounded-[24px] bg-[#0B0B0D] border border-zinc-800 p-6 sm:p-8 shadow-xl space-y-6 flex flex-col justify-between text-left relative overflow-hidden">
             
-            {/* Subtle glow */}
             <div className="absolute top-0 right-0 w-64 h-64 bg-[#94EC40]/5 rounded-full blur-3xl pointer-events-none" />
 
             <div className="space-y-4 relative z-10">

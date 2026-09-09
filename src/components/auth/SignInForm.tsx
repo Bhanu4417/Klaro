@@ -54,7 +54,6 @@ export const SignInForm: React.FC<SignInFormProps> = ({
 
   return (
     <form onSubmit={handleFormSubmit} className="w-full space-y-4" noValidate>
-      {/* Email input */}
       <Input
         label="Email address"
         type="email"
@@ -73,7 +72,6 @@ export const SignInForm: React.FC<SignInFormProps> = ({
         autoFocus
       />
 
-      {/* Password input */}
       <div className="space-y-1">
         <Input
           label="Password"
@@ -90,7 +88,6 @@ export const SignInForm: React.FC<SignInFormProps> = ({
           autoComplete="current-password"
         />
 
-        {/* Remember me and Forgot password */}
         <div className="flex items-center justify-between pt-1 text-xs">
           <label className="flex items-center gap-2 cursor-pointer select-none text-zinc-600">
             <input
@@ -112,7 +109,6 @@ export const SignInForm: React.FC<SignInFormProps> = ({
         </div>
       </div>
 
-      {/* Submit Button */}
       <Button
         type="submit"
         variant="primary"
@@ -125,7 +121,6 @@ export const SignInForm: React.FC<SignInFormProps> = ({
         Sign in to Klaro
       </Button>
 
-      {/* Footer Navigation */}
       <div className="space-y-3 pt-3 border-t border-zinc-100 text-center">
         <p className="text-xs sm:text-[13px] text-zinc-500 font-normal">
           Don't have an account?{" "}

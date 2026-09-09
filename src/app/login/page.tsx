@@ -18,7 +18,6 @@ import { AuthErrorState } from "../../components/auth/AuthErrorState";
 import { AuthLoadingState } from "../../components/auth/AuthLoadingState";
 import { getUserProfile, saveUserProfile } from "../../actions/profile";
 
-// Helper to synchronize login cookie & localStorage
 function setLoginStorage(active: boolean) {
   if (typeof window === "undefined") return;
   if (active) {
@@ -37,14 +36,12 @@ export default function LoginPage() {
   const router = useRouter();
 
   const [view, setView] = useState<AuthView>("welcome");
-  // Default to true during SSR and initial hydration to prevent welcome screen flash & hydration mismatch
   const [isLoading, setIsLoading] = useState<boolean>(true);
   const [loadingMessage, setLoadingMessage] = useState<string>("Connecting to Klaro...");
   const [socialLoading, setSocialLoading] = useState<SocialProvider | null>(null);
   const [authError, setAuthError] = useState<AuthError | null>(null);
   const [isFramed, setIsFramed] = useState(false);
 
-  // Active user / session state
   const [currentUser, setCurrentUser] = useState<UserProfile>({
     id: "",
     email: "",
@@ -58,7 +55,6 @@ export default function LoginPage() {
   const [authEmail, setAuthEmail] = useState("");
   const [resetEmail, setResetEmail] = useState("");
 
-  // Instant client session check & redirect
   useEffect(() => {
     if (typeof window !== "undefined") {
       const isAlreadyLoggedIn = localStorage.getItem("klaro_logged_in") === "true";
@@ -78,7 +74,6 @@ export default function LoginPage() {
     }
   }, [router]);
 
-  // Sync with live Clerk session & direct straight to dashboard
   useEffect(() => {
     async function syncSession() {
       if (!isUserLoaded) return;
@@ -92,7 +87,6 @@ export default function LoginPage() {
           if (profile && profile.username) {
             setCurrentUser(profile);
           } else {
-            // Auto-create default profile in background
             const email = user.emailAddresses[0]?.emailAddress || "";
             const displayName = user.fullName || user.firstName || email.split("@")[0] || "User";
             const username = (user.username || email.split("@")[0] || `user_${user.id.slice(-6)}`).toLowerCase().replace(/[^a-z0-9_]/g, "");
@@ -111,14 +105,12 @@ export default function LoginPage() {
           router.replace("/dashboard");
         }
       } else if (isUserLoaded && !isSignedIn) {
-        // If Clerk has resolved and user is not signed in and has no admin auth, show login view
         if (typeof window !== "undefined") {
           const hasAdmin = !!localStorage.getItem("klaro_admin_auth");
           const hasLocalLogin = localStorage.getItem("klaro_logged_in") === "true";
           if (!hasAdmin && !hasLocalLogin) {
             setIsLoading(false);
           } else if (!hasAdmin && hasLocalLogin) {
-            // Local flag was present but Clerk confirmed user is not signed in
             setLoginStorage(false);
             setIsLoading(false);
           }
@@ -129,7 +121,6 @@ export default function LoginPage() {
     syncSession();
   }, [isUserLoaded, isSignedIn, user, router]);
 
-  // Handle keyboard shortcuts (e.g. Esc to back)
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
       if (e.key === "Escape" && view !== "welcome" && view !== "authenticated_preview") {
@@ -140,7 +131,6 @@ export default function LoginPage() {
     return () => window.removeEventListener("keydown", handleKeyDown);
   }, [view]);
 
-  // Navigation Handlers
   const handleBack = () => {
     setAuthError(null);
     if (view === "signin" || view === "signup" || view === "officer_login") {
@@ -156,7 +146,6 @@ export default function LoginPage() {
     }
   };
 
-  // Officer / Admin Login Handler
   const handleOfficerLogin = (credentials: { email: string; pass: string }) => {
     setIsLoading(true);
     setLoadingMessage("Authenticating administrator credentials...");
@@ -191,7 +180,6 @@ export default function LoginPage() {
     }
   };
 
-  // Social Auth Handler (Google & GitHub - supports new & existing users)
   const handleSelectSocial = async (provider: SocialProvider) => {
     if (!clerk.loaded || !clerk.client) return;
     setSocialLoading(provider);
@@ -200,7 +188,6 @@ export default function LoginPage() {
     const strategy = provider === "google" ? "oauth_google" : "oauth_github";
 
     try {
-      // First attempt signIn OAuth redirect (seamless for existing users)
       await clerk.client.signIn.authenticateWithRedirect({
         strategy,
         redirectUrl: "/sso-callback",
@@ -227,7 +214,6 @@ export default function LoginPage() {
     }
   };
 
-  // Email Sign In Handler
   const handleSignIn = async (data: { email: string; password: string }) => {
     if (!clerk.loaded || !clerk.client) return;
     setIsLoading(true);
@@ -257,7 +243,6 @@ export default function LoginPage() {
     }
   };
 
-  // Email Sign Up Handler
   const handleSignUp = async (data: { email: string; password: string }) => {
     if (!clerk.loaded || !clerk.client) return;
     setIsLoading(true);
@@ -270,7 +255,6 @@ export default function LoginPage() {
         password: data.password,
       });
 
-      // Send verification code
       await signUpRes.prepareEmailAddressVerification({ strategy: "email_code" });
       setAuthEmail(data.email);
       setView("verify_email");
@@ -284,7 +268,6 @@ export default function LoginPage() {
     }
   };
 
-  // OTP Verification Handler
   const handleVerifyEmail = async (code: string) => {
     if (!clerk.loaded || !clerk.client) return;
     setIsLoading(true);
@@ -311,7 +294,6 @@ export default function LoginPage() {
     }
   };
 
-  // Resend OTP Code
   const handleResendCode = async () => {
     if (!clerk.loaded || !clerk.client) return;
     try {
@@ -323,7 +305,6 @@ export default function LoginPage() {
     }
   };
 
-  // Forgot Password Handler
   const handleForgotPassword = async (email: string) => {
     if (!clerk.loaded || !clerk.client) return;
     setIsLoading(true);
@@ -347,7 +328,6 @@ export default function LoginPage() {
     }
   };
 
-  // Complete Onboarding Handler (Saves to Supabase Database)
   const handleCompleteOnboarding = async (profile: Partial<UserProfile>) => {
     setIsLoading(true);
     setLoadingMessage("Saving nutrition profile preferences...");
@@ -386,7 +366,6 @@ export default function LoginPage() {
     }
   };
 
-  // Sign Out Handler
   const handleSignOut = async () => {
     setIsLoading(true);
     setLoadingMessage("Signing out...");
@@ -411,14 +390,12 @@ export default function LoginPage() {
         onBack={handleBack}
         isFramed={isFramed}
       >
-        {/* Error Banner */}
         <AuthErrorState
           error={authError}
           onDismiss={() => setAuthError(null)}
           onRetry={() => setAuthError(null)}
         />
 
-        {/* Dynamic View Rendering */}
         {isLoading ? (
           <AuthLoadingState message={loadingMessage} />
         ) : (

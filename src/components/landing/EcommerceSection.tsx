@@ -10,7 +10,6 @@ export const EcommerceSection: React.FC = () => {
         
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-10 lg:gap-14 items-center">
           
-          {/* LEFT: Context & E-Commerce Mandate */}
           <div className="lg:col-span-6 text-left space-y-6">
             <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-[#E6E4E5] border border-[#D5D2D4] text-xs font-semibold text-zinc-800">
               <Globe className="w-3.5 h-3.5 text-[#417F14]" />
@@ -44,11 +43,9 @@ export const EcommerceSection: React.FC = () => {
             </div>
           </div>
 
-          {/* RIGHT: Visual URL & Marketplace Analysis Widget */}
           <div className="lg:col-span-6 flex justify-center">
             <div className="w-full max-w-lg bg-[#0B0B0D] rounded-[24px] border border-zinc-800 p-6 sm:p-7 text-white shadow-xl text-left font-mono space-y-4">
               
-              {/* URL Input Simulation Bar */}
               <div className="p-3 rounded-xl bg-zinc-900 border border-zinc-700 flex items-center gap-2.5 text-xs">
                 <LinkIcon className="w-4 h-4 text-zinc-400 shrink-0" />
                 <span className="text-zinc-300 truncate font-sans text-[11px] sm:text-xs">
@@ -59,7 +56,6 @@ export const EcommerceSection: React.FC = () => {
                 </span>
               </div>
 
-              {/* Extracted Digital Declaration Audit */}
               <div className="p-4 rounded-xl bg-zinc-900/80 border border-zinc-800 space-y-3 text-xs">
                 <div className="flex items-center justify-between pb-2 border-b border-zinc-800">
                   <span className="text-zinc-400 font-bold">DIGITAL LISTING COMPLIANCE</span>
@@ -86,7 +82,6 @@ export const EcommerceSection: React.FC = () => {
                 </div>
               </div>
 
-              {/* Status Note */}
               <div className="text-[10px] text-zinc-400 font-sans flex items-center justify-between pt-1">
                 <span>Rule 6(10) E-Commerce Mandate Verified</span>
                 <span className="text-[#94EC40] font-mono">Audit ID #ECOM-1082</span>

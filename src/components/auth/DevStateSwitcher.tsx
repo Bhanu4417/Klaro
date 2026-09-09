@@ -41,7 +41,6 @@ export const DevStateSwitcher: React.FC<DevStateSwitcherProps> = ({
   return (
     <aside aria-label="UX State Explorer Toolbar" className="fixed bottom-4 right-4 z-50 select-none">
       <div className="bg-charcoal-950/95 text-paper-50 backdrop-blur-md rounded-2xl border border-charcoal-800/80 shadow-tactile-lg overflow-hidden transition-all duration-200">
-        {/* Toggle Button Bar */}
         <button
           type="button"
           onClick={() => setIsOpen(!isOpen)}
@@ -57,10 +56,8 @@ export const DevStateSwitcher: React.FC<DevStateSwitcherProps> = ({
           {isOpen ? <ChevronDown className="w-3.5 h-3.5" /> : <ChevronUp className="w-3.5 h-3.5" />}
         </button>
 
-        {/* Expanded Controls Drawer */}
         {isOpen && (
           <div className="p-3.5 pt-1 border-t border-zinc-800/60 space-y-3 max-w-xs text-xs">
-            {/* View Selector */}
             <div>
               <span className="text-[10px] uppercase font-mono tracking-wider text-zinc-400 block mb-1.5">
                 Authentication Views
@@ -87,7 +84,6 @@ export const DevStateSwitcher: React.FC<DevStateSwitcherProps> = ({
               </div>
             </div>
 
-            {/* Simulation Toggles */}
             <div className="pt-2 border-t border-charcoal-800/80 space-y-2">
               <span className="text-[10px] uppercase font-mono tracking-wider text-charcoal-400 block">
                 Simulations & Frame

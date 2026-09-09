@@ -71,7 +71,6 @@ export const SignUpForm: React.FC<SignUpFormProps> = ({
 
   return (
     <form onSubmit={handleFormSubmit} className="w-full space-y-4" noValidate>
-      {/* Email input */}
       <Input
         label="Email address"
         type="email"
@@ -90,7 +89,6 @@ export const SignUpForm: React.FC<SignUpFormProps> = ({
         autoFocus
       />
 
-      {/* Password input */}
       <div className="space-y-1.5">
         <Input
           label="Create Password"
@@ -107,7 +105,6 @@ export const SignUpForm: React.FC<SignUpFormProps> = ({
           autoComplete="new-password"
         />
 
-        {/* Password Strength Indicator */}
         {password.length > 0 && (
           <div className="pt-1 space-y-1.5 animate-fade-in">
             <div className="flex items-center justify-between text-[11px]">
@@ -129,7 +126,6 @@ export const SignUpForm: React.FC<SignUpFormProps> = ({
         )}
       </div>
 
-      {/* Confirm Password */}
       <Input
         label="Confirm Password"
         type="password"
@@ -145,7 +141,6 @@ export const SignUpForm: React.FC<SignUpFormProps> = ({
         autoComplete="new-password"
       />
 
-      {/* Submit Button */}
       <Button
         type="submit"
         variant="primary"
@@ -158,7 +153,6 @@ export const SignUpForm: React.FC<SignUpFormProps> = ({
         Create Account & Continue
       </Button>
 
-      {/* Footer Navigation */}
       <div className="space-y-3 pt-3 border-t border-zinc-100 text-center">
         <p className="text-xs sm:text-[13px] text-zinc-500 font-normal">
           Already have an account?{" "}

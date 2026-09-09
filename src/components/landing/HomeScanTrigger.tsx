@@ -40,7 +40,7 @@ export function HomeScanTrigger() {
 
       <AnimatePresence>
         {showChoice && (
-          <>
+          <React.Fragment key="scan-choice">
             <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} className="fixed inset-0 z-[70] bg-black/30 backdrop-blur-sm" onClick={() => setShowChoice(false)} />
             <motion.div
               initial={{ opacity: 0, y: 16 }}
@@ -68,7 +68,7 @@ export function HomeScanTrigger() {
                 </button>
               </div>
             </motion.div>
-          </>
+          </React.Fragment>
         )}
       </AnimatePresence>
 
@@ -81,7 +81,6 @@ export function HomeScanTrigger() {
           if (imageUrl) URL.revokeObjectURL(imageUrl);
         }}
         onPost={() => {
-          // redirect to dashboard to see it
           window.location.href = "/dashboard";
         }}
         onSave={() => {

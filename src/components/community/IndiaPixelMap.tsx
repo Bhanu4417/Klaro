@@ -15,7 +15,6 @@ export const IndiaPixelMap: React.FC<IndiaPixelMapProps> = ({ className }) => {
   const [visiblePins, setVisiblePins] = useState<string[]>([]);
   const [flickerIndex, setFlickerIndex] = useState<number>(0);
 
-  // Active India pixel coordinate lookup
   const activePixelSet = React.useMemo(() => {
     const set = new Set<string>();
     for (const [col, row] of INDIA_MAP_CONFIG.activePixels) {
@@ -24,7 +23,6 @@ export const IndiaPixelMap: React.FC<IndiaPixelMapProps> = ({ className }) => {
     return set;
   }, []);
 
-  // Stagger reveal pins on load
   useEffect(() => {
     INDIA_COMMUNITY_PINS.forEach((pin) => {
       const timer = setTimeout(() => {
@@ -34,7 +32,6 @@ export const IndiaPixelMap: React.FC<IndiaPixelMapProps> = ({ className }) => {
     });
   }, []);
 
-  // Ambient flickering lines loop across matrix rows
   useEffect(() => {
     if (shouldReduceMotion) return;
     const interval = setInterval(() => {
@@ -51,16 +48,13 @@ export const IndiaPixelMap: React.FC<IndiaPixelMapProps> = ({ className }) => {
       )}
       aria-label="Community Food Discovery Map of India"
     >
-      {/* Ambient background soft glow */}
       <div className="absolute top-1/3 left-1/3 w-[450px] h-[450px] bg-[#94EB41]/[0.06] rounded-full blur-[130px] pointer-events-none -z-10" />
 
-      {/* SVG Canvas for High-Resolution Pixel Grid & Map */}
       <div className="relative w-full max-w-[620px] xl:max-w-[700px] aspect-[52/58] flex items-center justify-center">
         <svg
           viewBox={`0 0 ${INDIA_MAP_CONFIG.cols * 10} ${INDIA_MAP_CONFIG.rows * 10}`}
           className="w-full h-full object-contain overflow-visible"
         >
-          {/* Render Full Matrix of Pixel Dots & Flickering Scan Lines */}
           {Array.from({ length: INDIA_MAP_CONFIG.rows }).map((_, r) => {
             const isFlickeringRow = Math.abs(r - flickerIndex) <= 1;
             const isAltFlickerRow = Math.abs(r - ((flickerIndex + 25) % INDIA_MAP_CONFIG.rows)) <= 1;
@@ -68,7 +62,6 @@ export const IndiaPixelMap: React.FC<IndiaPixelMapProps> = ({ className }) => {
             return Array.from({ length: INDIA_MAP_CONFIG.cols }).map((_, c) => {
               const isIndia = activePixelSet.has(`${c},${r}`);
 
-              // Background dots (entire grid like uploaded Image 1)
               if (!isIndia) {
                 const isFlickerDot = (isFlickeringRow || isAltFlickerRow) && (c % 3 === 0);
                 const bgOpacity = isFlickerDot ? 0.35 : 0.12;
@@ -89,7 +82,6 @@ export const IndiaPixelMap: React.FC<IndiaPixelMapProps> = ({ className }) => {
                 );
               }
 
-              // Active India map pixels (vibrant green with natural density variations)
               const pseudoHash = (c * 19 + r * 37) % 10;
               const isRowScan = isFlickeringRow || isAltFlickerRow;
               const opacity = isRowScan ? 1 : pseudoHash > 7 ? 0.95 : pseudoHash > 3 ? 0.8 : 0.65;
@@ -113,13 +105,10 @@ export const IndiaPixelMap: React.FC<IndiaPixelMapProps> = ({ className }) => {
           })}
         </svg>
 
-        {/* Dynamic Profile Pins (No pinging rings, clean spacious positioning) */}
         {INDIA_COMMUNITY_PINS.map((pin) => {
           const isVisible = shouldReduceMotion || visiblePins.includes(pin.id);
           if (!isVisible) return null;
 
-          /* Bubbles are wide — anchor them inward so nothing ever escapes the
-             map square, regardless of hand-tuned messagePosition in the data. */
           const h: "left" | "right" =
             pin.x > 55 ? "left" : pin.x < 38 ? "right" : pin.messagePosition?.includes("left") ? "left" : "right";
           const v: "top" | "bottom" =
@@ -141,7 +130,6 @@ export const IndiaPixelMap: React.FC<IndiaPixelMapProps> = ({ className }) => {
               }}
               className="absolute -translate-x-1/2 -translate-y-1/2 z-30 select-none"
             >
-              {/* Profile Avatar Frame (Rounded Square Squircle) */}
               <div
                 className={cn(
                   "relative w-12 h-12 sm:w-14 sm:h-14 rounded-[18px] p-0.5 bg-zinc-900 border border-zinc-700/80 shadow-[0_10px_28px_rgba(0,0,0,0.7),0_2px_8px_rgba(0,0,0,0.5)]",
@@ -155,7 +143,6 @@ export const IndiaPixelMap: React.FC<IndiaPixelMapProps> = ({ className }) => {
                 />
               </div>
 
-              {/* Message Bubble popping from profile with directional arrow */}
               <MessageBubble
                 message={pin.message}
                 position={safePosition}

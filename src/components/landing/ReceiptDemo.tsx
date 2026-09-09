@@ -13,7 +13,6 @@ export const ReceiptDemo: React.FC = () => {
         
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 lg:gap-16 items-center">
           
-          {/* LEFT: Conceptual Narrative */}
           <div className="lg:col-span-6 text-left space-y-6">
             <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-[#ECEAEB] border border-[#D5D2D4] text-xs font-semibold text-zinc-800">
               <FileText className="w-3.5 h-3.5 text-[#417F14]" />
@@ -31,7 +30,6 @@ export const ReceiptDemo: React.FC = () => {
               Every scan produces a tactile, receipt-style food script. Clean, honest, and stripped of corporate marketing jargon — giving you the raw truth about what’s going inside your body.
             </p>
 
-            {/* Key Receipt Highlights */}
             <div className="space-y-3 pt-2">
               {[
                 "Instant macro-nutrient breakdown (Calories, Fats, Carbs, Protein)",
@@ -59,11 +57,9 @@ export const ReceiptDemo: React.FC = () => {
             </div>
           </div>
 
-          {/* RIGHT: The Physical Scanner Machine & Emerging Thermal Receipt */}
           <div className="lg:col-span-6 flex justify-center">
             <div className="w-full max-w-[400px] flex flex-col items-center">
               
-              {/* Sleek Scanner Dispenser Top Slit */}
               <div className="w-full h-12 rounded-t-[20px] bg-[#0B0B0D] border-x border-t border-zinc-800 shadow-xl flex items-center justify-between px-6 z-20 relative">
                 <div className="flex items-center gap-2">
                   <div className="w-2 h-2 rounded-full bg-[#94EC40] animate-pulse" />
@@ -73,11 +69,9 @@ export const ReceiptDemo: React.FC = () => {
                 </div>
                 <span className="text-[10px] font-mono text-[#94EC40]">READY</span>
 
-                {/* Laser Dispenser Slit */}
                 <div className="absolute bottom-0 left-6 right-6 h-1 bg-zinc-950 rounded-full shadow-inner" />
               </div>
 
-              {/* Emerging Animated Receipt Paper */}
               <motion.div
                 key={isPrinted ? "printed" : "reset"}
                 initial={{ y: -80, opacity: 0.7 }}
@@ -88,14 +82,12 @@ export const ReceiptDemo: React.FC = () => {
                   clipPath: "polygon(0 0, 100% 0, 100% calc(100% - 10px), 96% 100%, 92% calc(100% - 10px), 88% 100%, 84% calc(100% - 10px), 80% 100%, 76% calc(100% - 10px), 72% 100%, 68% calc(100% - 10px), 64% 100%, 60% calc(100% - 10px), 56% 100%, 52% calc(100% - 10px), 48% 100%, 44% calc(100% - 10px), 40% 100%, 36% calc(100% - 10px), 32% 100%, 28% calc(100% - 10px), 24% 100%, 20% calc(100% - 10px), 16% 100%, 12% calc(100% - 10px), 8% 100%, 4% calc(100% - 10px), 0 100%)",
                 }}
               >
-                {/* Receipt Header */}
                 <div className="text-center space-y-1 pb-3 border-b border-dashed border-zinc-300">
                   <span className="text-base font-bold tracking-tight text-zinc-950 font-sans block">KLARO FOOD SCRIPT</span>
                   <span className="text-[10px] text-zinc-500">SCAN ID #2026-08-9412</span>
                   <span className="text-[10px] text-zinc-400 block">AUG 25, 2026 • 21:40 IST</span>
                 </div>
 
-                {/* Product Meta */}
                 <div className="py-3 border-b border-dashed border-zinc-300 space-y-1">
                   <div className="flex justify-between items-center text-xs font-bold text-zinc-900 font-sans">
                     <span>Artisan Oat Milk (Barista)</span>
@@ -107,7 +99,6 @@ export const ReceiptDemo: React.FC = () => {
                   </div>
                 </div>
 
-                {/* Nutrition Breakdown Table */}
                 <div className="py-3 border-b border-dashed border-zinc-300 space-y-1 text-xs">
                   <div className="flex justify-between font-bold text-zinc-900">
                     <span>CALORIES</span>
@@ -131,7 +122,6 @@ export const ReceiptDemo: React.FC = () => {
                   </div>
                 </div>
 
-                {/* Ingredients & Flags */}
                 <div className="py-3 border-b border-dashed border-zinc-300 space-y-1.5 text-xs">
                   <span className="font-bold text-zinc-900 block">INGREDIENTS LIST</span>
                   <p className="text-[10px] leading-relaxed text-zinc-600 font-sans">
@@ -143,13 +133,11 @@ export const ReceiptDemo: React.FC = () => {
                   </div>
                 </div>
 
-                {/* Barcode & Clean Score Stamp */}
                 <div className="pt-4 pb-6 text-center space-y-3">
                   <div className="inline-block px-3 py-1 rounded border-2 border-dashed border-[#417F14] text-[#346415] font-bold text-xs">
                     ★ 96% CLEAN SCORE VERIFIED ★
                   </div>
 
-                  {/* Clean Authentic Barcode */}
                   <div className="flex flex-col items-center gap-1.5">
                     <div className="flex items-center justify-center gap-[1.5px] h-8 px-3 py-1 bg-white border border-zinc-200 rounded-md">
                       <div className="w-[1.5px] h-7 bg-zinc-950" />

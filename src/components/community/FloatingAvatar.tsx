@@ -51,7 +51,6 @@ export const FloatingAvatar: React.FC<FloatingAvatarProps> = ({
         ease: [0.16, 1, 0.3, 1],
       }}
     >
-      {/* Ambient floating loop container */}
       <motion.div
         animate={
           isReducedMotion
@@ -69,7 +68,6 @@ export const FloatingAvatar: React.FC<FloatingAvatarProps> = ({
         }}
         className="relative group cursor-default"
       >
-        {/* Rounded square avatar frame (same roundness as brand components/logo) */}
         <div
           style={{ width: profile.size, height: profile.size }}
           className={cn(
@@ -84,11 +82,9 @@ export const FloatingAvatar: React.FC<FloatingAvatarProps> = ({
             className="w-full h-full rounded-[16px] object-cover select-none pointer-events-none"
           />
 
-          {/* Active status indicator dot */}
           <span className="absolute -bottom-1 -right-1 w-3.5 h-3.5 rounded-full bg-[#94EB41] border-2 border-zinc-900 shadow-sm" />
         </div>
 
-        {/* Associated Message Bubble */}
         {profile.message && (
           <MessageBubble
             message={profile.message}

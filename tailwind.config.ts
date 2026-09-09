@@ -95,11 +95,15 @@ const config: Config = {
           "0%, 100%": { opacity: "1" },
           "50%": { opacity: "0.5" },
         },
+        shimmer: {
+          "100%": { transform: "translateX(100%)" },
+        },
       },
       animation: {
         "fade-in": "fade-in 0.25s cubic-bezier(0.16, 1, 0.3, 1) forwards",
         "scan-line": "scan-line 2.5s ease-in-out infinite",
         "pulse-subtle": "pulse-subtle 2s cubic-bezier(0.4, 0, 0.6, 1) infinite",
+        shimmer: "shimmer 1.6s infinite",
       },
     },
   },

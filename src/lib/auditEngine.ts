@@ -1,7 +1,3 @@
-/**
- * Klaro Legal Metrology Compliance & Package Audit Engine
- * Evaluates package imagery against Legal Metrology (Packaged Commodities) Rules, 2011 & Amendments
- */
 
 export interface AuditIssue {
   id: string;
@@ -41,11 +37,20 @@ export interface AuditReport {
     consumerCare?: string;
     countryOfOrigin?: string;
   };
+  compoundingOrder?: {
+    signedAt: string;
+    officerName: string;
+    officerRole: string;
+    status: string;
+    penaltyAmount?: string;
+    sectionCode?: string;
+    noticeRef?: string;
+    remarks?: string;
+    signatureHash?: string;
+  };
+  statutoryNotice?: any;
 }
 
-/**
- * Analyzes packaging imagery and generates a multi-issue compliance audit
- */
 export function analyzePackagingImage(fileName: string = "", imageUrl?: string | null): AuditReport {
   const lower = (fileName + " " + (imageUrl || "")).toLowerCase();
   const dateStr = new Date().toLocaleDateString("en-IN", {
@@ -62,7 +67,6 @@ export function analyzePackagingImage(fileName: string = "", imageUrl?: string |
   const dossierNum = `KLR-${new Date().getFullYear()}-${String(new Date().getMonth() + 1).padStart(2, "0")}-${Math.floor(1000 + Math.random() * 9000)}`;
   const hash = Array.from({ length: 8 }, () => Math.floor(Math.random() * 16).toString(16)).join("") + "…e" + Math.floor(10 + Math.random() * 89) + "b";
 
-  // Scenario 1: Honey Jar (like Dabur Honey / Bottle)
   if (lower.includes("honey") || lower.includes("dabur") || lower.includes("jar") || lower.includes("bottle") || lower.includes("1787993203308")) {
     return {
       id: `audit-${Date.now()}`,
@@ -152,7 +156,6 @@ export function analyzePackagingImage(fileName: string = "", imageUrl?: string |
     };
   }
 
-  // Scenario 2: Biscuits / Bakery Pouch
   if (lower.includes("biscuit") || lower.includes("cookie") || lower.includes("cracker") || lower.includes("malt") || lower.includes("bakery")) {
     return {
       id: `audit-${Date.now()}`,
@@ -216,7 +219,6 @@ export function analyzePackagingImage(fileName: string = "", imageUrl?: string |
     };
   }
 
-  // Default / Generalized Food Label Audit (Multiple Issues)
   return {
     id: `audit-${Date.now()}`,
     productName: "Packaged Consumer Commodity (Scanned)",

@@ -23,8 +23,8 @@ export interface DiscoveryStep {
   avatarSeed: string;
   city: string;
   state: string;
-  x: number; // percentage from left (strictly verified inside India landmass)
-  y: number; // percentage from top (strictly verified inside India landmass)
+  x: number;
+  y: number;
   camera: {
     scale: number;
     x: number;

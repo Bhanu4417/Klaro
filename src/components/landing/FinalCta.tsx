@@ -12,7 +12,6 @@ export const FinalCta: React.FC = () => {
         
         <div className="rounded-[32px] bg-[#0B0B0D] border border-zinc-800 p-8 sm:p-14 lg:p-16 text-center space-y-6 sm:space-y-8 shadow-[0_24px_70px_rgba(0,0,0,0.4)] relative overflow-hidden">
           
-          {/* Subtle Ambient Dot Grid */}
           <div className="absolute inset-0 opacity-20 pointer-events-none">
             <svg className="w-full h-full" xmlns="http://www.w3.org/2000/svg">
               <defs>
@@ -24,13 +23,11 @@ export const FinalCta: React.FC = () => {
             </svg>
           </div>
 
-          {/* Pill Badge */}
           <div className="relative z-10 inline-flex items-center gap-1.5 px-3.5 py-1 rounded-full bg-zinc-900 border border-zinc-700/80 text-xs font-semibold text-[#94EC40] shadow-sm">
             <ShieldCheck className="w-3.5 h-3.5 text-[#94EC40]" />
             <span className="font-mono text-[11px] uppercase tracking-wider">NEXT-GEN LEGAL METROLOGY ENFORCEMENT</span>
           </div>
 
-          {/* Headline */}
           <div className="relative z-10 space-y-3 max-w-2xl mx-auto">
             <h2
               className="text-3xl sm:text-4xl lg:text-5xl font-[800] text-white tracking-[-0.035em] leading-[1.12]"
@@ -43,7 +40,6 @@ export const FinalCta: React.FC = () => {
             </p>
           </div>
 
-          {/* Primary CTA */}
           <div className="relative z-10 flex flex-col sm:flex-row items-center justify-center gap-3 pt-2">
             <Link href="/login">
               <Button
@@ -64,7 +60,6 @@ export const FinalCta: React.FC = () => {
             </a>
           </div>
 
-          {/* Trust markers */}
           <div className="relative z-10 pt-4 flex flex-wrap items-center justify-center gap-6 text-xs text-zinc-500 font-medium">
             <span>✓ Legal Metrology Act, 2009 Compliant</span>
             <span>✓ LMPC Rules 2011 Rule Engine</span>

@@ -72,7 +72,6 @@ export const ProfileOnboarding: React.FC<ProfileOnboardingProps> = ({
       return;
     }
 
-    // Launch celebratory confetti
     try {
       confetti({
         particleCount: 60,
@@ -81,7 +80,6 @@ export const ProfileOnboarding: React.FC<ProfileOnboardingProps> = ({
         colors: ["#2C7850", "#65B288", "#18181B", "#C4E3D0"],
       });
     } catch {
-      // ignore in environments without canvas
     }
 
     setErrors({});
@@ -99,7 +97,6 @@ export const ProfileOnboarding: React.FC<ProfileOnboardingProps> = ({
 
   return (
     <form onSubmit={handleFormSubmit} className="w-full space-y-5 text-left" noValidate>
-      {/* Profile Photo / Avatar Picker */}
       <div className="flex flex-col items-center justify-center space-y-3">
         <div className="relative group">
           <div className="w-20 h-20 rounded-3xl bg-paper-100 border-2 border-paper-300 flex items-center justify-center text-3xl shadow-tactile-sm overflow-hidden select-none">
@@ -131,7 +128,6 @@ export const ProfileOnboarding: React.FC<ProfileOnboardingProps> = ({
           </label>
         </div>
 
-        {/* Quick foodie avatar emojis */}
         <div className="flex items-center gap-1.5 p-1 rounded-2xl bg-paper-100 border border-paper-200">
           {AVATAR_PRESETS.map((emoji) => (
             <button
@@ -153,7 +149,6 @@ export const ProfileOnboarding: React.FC<ProfileOnboardingProps> = ({
         </div>
       </div>
 
-      {/* Username Handle */}
       <div className="space-y-1">
         <div className="relative">
           <Input
@@ -182,7 +177,6 @@ export const ProfileOnboarding: React.FC<ProfileOnboardingProps> = ({
         </div>
       </div>
 
-      {/* Display Name */}
       <Input
         label="Display Name"
         type="text"
@@ -197,7 +191,6 @@ export const ProfileOnboarding: React.FC<ProfileOnboardingProps> = ({
         disabled={isLoading}
       />
 
-      {/* Dietary Focus / Allergen Preferences */}
       <div className="space-y-2 pt-1">
         <div className="flex items-center justify-between">
           <label className="text-xs font-medium uppercase tracking-wider text-zinc-600 select-none block">
@@ -226,7 +219,6 @@ export const ProfileOnboarding: React.FC<ProfileOnboardingProps> = ({
         </div>
       </div>
 
-      {/* Submit Button */}
       <Button
         type="submit"
         variant="primary"

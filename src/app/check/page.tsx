@@ -31,7 +31,6 @@ export default function CheckDesignPage() {
   const [showShadow, setShowShadow] = useState<boolean>(true);
   const [interactiveTracking, setInteractiveTracking] = useState<boolean>(true);
 
-  // Mock form inputs for live reaction testing
   const [mockEmail, setMockEmail] = useState("");
   const [mockPassword, setMockPassword] = useState("");
   const [mockIsSubmitting, setMockIsSubmitting] = useState(false);
@@ -91,7 +90,6 @@ export default function CheckDesignPage() {
     { label: "Ultra Violet", color: "#A855F7" },
   ];
 
-  // Handle mock form submission
   const handleMockSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     setMockIsSubmitting(true);
@@ -111,7 +109,6 @@ export default function CheckDesignPage() {
 
   return (
     <div className="min-h-screen w-full bg-[#08080A] text-zinc-100 font-sans selection:bg-[#94EC40] selection:text-black">
-      {/* 1. TOP NAVIGATION HEADER */}
       <header className="sticky top-0 z-50 w-full border-b border-zinc-800/80 bg-[#0B0B0E]/90 backdrop-blur-md px-4 sm:px-8 py-3.5 flex items-center justify-between">
         <div className="flex items-center gap-3">
           <div className="w-8 h-8 rounded-xl bg-gradient-to-br from-zinc-800 to-zinc-950 border border-zinc-700/80 flex items-center justify-center shadow-sm">
@@ -149,22 +146,17 @@ export default function CheckDesignPage() {
         </div>
       </header>
 
-      {/* 2. MAIN WORKSPACE CONTAINER */}
       <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-8">
         
-        {/* HERO BANNER & STAGE */}
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-stretch">
           
-          {/* LEFT: INTERACTIVE BOT THEATER STAGE (7 COLS) */}
           <div className="lg:col-span-7 flex flex-col justify-between rounded-[32px] bg-[#0E0E12] border border-zinc-800/90 p-6 sm:p-10 relative overflow-hidden shadow-[0_20px_50px_rgba(0,0,0,0.5)]">
             
-            {/* Ambient Background Glow Effect */}
             <div
               className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-96 h-96 rounded-full blur-[110px] pointer-events-none opacity-20 transition-all duration-700"
               style={{ backgroundColor: glowColor }}
             />
 
-            {/* Stage Grid Overlay */}
             <div
               className="absolute inset-0 opacity-[0.04] pointer-events-none"
               style={{
@@ -173,7 +165,6 @@ export default function CheckDesignPage() {
               }}
             />
 
-            {/* Stage Top Badges */}
             <div className="relative z-10 flex items-center justify-between">
               <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-zinc-900/80 border border-zinc-700/60 text-xs font-mono text-zinc-300">
                 <span className="w-2 h-2 rounded-full animate-pulse" style={{ backgroundColor: glowColor }} />
@@ -185,7 +176,6 @@ export default function CheckDesignPage() {
               </span>
             </div>
 
-            {/* CENTER: THE BOT CHARACTER IN ALL ITS GLORY */}
             <div className="relative z-10 my-8 sm:my-14 flex flex-col items-center justify-center min-h-[220px]">
               <KlaroBot
                 state={botState}
@@ -194,7 +184,6 @@ export default function CheckDesignPage() {
                 showShadow={showShadow}
                 interactive={interactiveTracking}
                 onClick={() => {
-                  // Cycle state on click
                   const states: BotState[] = ["idle", "scanning", "authenticating", "happy", "peek", "typing", "error"];
                   const nextIdx = (states.indexOf(botState) + 1) % states.length;
                   setBotState(states[nextIdx]);
@@ -211,7 +200,6 @@ export default function CheckDesignPage() {
               </div>
             </div>
 
-            {/* Stage Bottom Quick State Selector */}
             <div className="relative z-10 grid grid-cols-2 sm:grid-cols-4 md:grid-cols-7 gap-1.5 pt-4 border-t border-zinc-800/80">
               {statesList.map((st) => {
                 const IconComponent = st.icon;
@@ -235,10 +223,8 @@ export default function CheckDesignPage() {
             </div>
           </div>
 
-          {/* RIGHT: LIVE INTERACTIVE LOGIN SIMULATOR (5 COLS) */}
           <div className="lg:col-span-5 flex flex-col justify-between rounded-[32px] bg-[#E6E4E5] text-zinc-900 p-6 sm:p-8 border border-zinc-300 shadow-[0_20px_50px_rgba(0,0,0,0.25)] relative">
             <div>
-              {/* Card Header with Mini Mascot Preview */}
               <div className="flex items-center justify-between pb-5 border-b border-zinc-300/80 mb-6">
                 <div>
                   <h2 className="text-lg font-bold text-zinc-900 tracking-tight font-satoshi flex items-center gap-2">
@@ -255,9 +241,7 @@ export default function CheckDesignPage() {
                 </div>
               </div>
 
-              {/* Interactive Mock Form */}
               <form onSubmit={handleMockSubmit} className="space-y-4">
-                {/* Email Field */}
                 <div className="space-y-1.5">
                   <label className="text-xs font-semibold text-zinc-700 flex items-center justify-between">
                     <span>Email Address</span>
@@ -280,7 +264,6 @@ export default function CheckDesignPage() {
                   </div>
                 </div>
 
-                {/* Password Field */}
                 <div className="space-y-1.5">
                   <label className="text-xs font-semibold text-zinc-700 flex items-center justify-between">
                     <span>Secret Key / Password</span>
@@ -303,7 +286,6 @@ export default function CheckDesignPage() {
                   </div>
                 </div>
 
-                {/* Quick Action Buttons */}
                 <div className="pt-2 space-y-2">
                   <button
                     type="submit"
@@ -346,7 +328,6 @@ export default function CheckDesignPage() {
               </form>
             </div>
 
-            {/* Live Success Banner when submitted */}
             <AnimatePresence>
               {mockSubmitted && (
                 <motion.div
@@ -363,7 +344,6 @@ export default function CheckDesignPage() {
           </div>
         </div>
 
-        {/* 3. BOT CONTROLS & CUSTOMIZATION STUDIO */}
         <div className="rounded-[32px] bg-[#0E0E12] border border-zinc-800/90 p-6 sm:p-8 space-y-6">
           <div className="flex items-center gap-2 pb-4 border-b border-zinc-800">
             <Sliders className="w-4 h-4 text-[#94EC40]" />
@@ -373,7 +353,6 @@ export default function CheckDesignPage() {
           </div>
 
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-            {/* 1. Size Controls */}
             <div className="space-y-2.5">
               <label className="text-xs font-mono font-semibold text-zinc-400 uppercase tracking-wider">
                 Display Size
@@ -396,7 +375,6 @@ export default function CheckDesignPage() {
               </div>
             </div>
 
-            {/* 2. Glow Accent Colors */}
             <div className="space-y-2.5">
               <label className="text-xs font-mono font-semibold text-zinc-400 uppercase tracking-wider">
                 Glow Accent
@@ -420,7 +398,6 @@ export default function CheckDesignPage() {
               </div>
             </div>
 
-            {/* 3. Toggles */}
             <div className="space-y-2.5">
               <label className="text-xs font-mono font-semibold text-zinc-400 uppercase tracking-wider">
                 Features & Physics
@@ -448,7 +425,6 @@ export default function CheckDesignPage() {
               </div>
             </div>
 
-            {/* 4. Quick Embed Info */}
             <div className="space-y-2.5">
               <label className="text-xs font-mono font-semibold text-zinc-400 uppercase tracking-wider">
                 Component Usage
@@ -464,7 +440,6 @@ export default function CheckDesignPage() {
           </div>
         </div>
 
-        {/* 4. GALLERY OF ALL SIZES & STATES */}
         <div className="rounded-[32px] bg-[#0E0E12] border border-zinc-800/90 p-6 sm:p-8 space-y-6">
           <div className="flex items-center justify-between pb-4 border-b border-zinc-800">
             <h3 className="text-base font-bold text-white font-satoshi flex items-center gap-2">

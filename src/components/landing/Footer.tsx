@@ -12,7 +12,6 @@ export const Footer: React.FC = () => {
         
         <div className="grid grid-cols-1 md:grid-cols-12 gap-8 lg:gap-12 pb-12 border-b border-[#D5D2D4]">
           
-          {/* Brand Col */}
           <div className="md:col-span-5 space-y-3">
             <Link href="/" className="inline-flex items-center gap-2">
               <Logo size="sm" showText={false} />
@@ -29,7 +28,6 @@ export const Footer: React.FC = () => {
             </p>
           </div>
 
-          {/* Links Col 1: Platform & Rules */}
           <div className="md:col-span-3 space-y-2.5">
             <span className="text-[11px] font-mono font-bold uppercase tracking-wider text-zinc-500 block">
               PLATFORM & AUDIT
@@ -58,7 +56,6 @@ export const Footer: React.FC = () => {
             </ul>
           </div>
 
-          {/* Links Col 2: Access & Legal */}
           <div className="md:col-span-4 space-y-2.5">
             <span className="text-[11px] font-mono font-bold uppercase tracking-wider text-zinc-500 block">
               OFFICER ACCESS & LEGAL
@@ -87,7 +84,6 @@ export const Footer: React.FC = () => {
 
         </div>
 
-        {/* Copyright */}
         <div className="pt-6 flex flex-col sm:flex-row items-center justify-between text-xs text-zinc-500 gap-2">
           <span>© {new Date().getFullYear()} Klaro Legal Metrology Intelligence.</span>
           <span className="font-mono text-[11px]">Enforcement Infrastructure for Packaged Commodities</span>

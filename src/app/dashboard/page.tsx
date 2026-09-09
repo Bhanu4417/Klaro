@@ -9,6 +9,8 @@ import { getUserProfile } from "../../actions/profile";
 import { UserProfile } from "../../types/auth";
 import { Logo } from "../../components/ui/Logo";
 import { AuthLoadingState } from "../../components/auth/AuthLoadingState";
+import { CommentsDialog } from "../../components/community/CommentsDialog";
+import { PostSkeleton } from "../../components/feed/PostSkeleton";
 import { Button } from "../../components/ui/Button";
 import { ShareModal } from "../../components/ShareModal";
 import { ScanFlow } from "../../components/scan/ScanFlow";
@@ -47,17 +49,20 @@ import {
   Trash2,
   Paperclip
 } from "lucide-react";
-import { cn } from "../../lib/utils";
-import { createInspectionReport, getLiveReports, voteReport, addReportComment, deleteReport, DBReport } from "../../actions/reports";
+import { cn, timeAgo } from "../../lib/utils";
+import { Avatar } from "../../components/ui/Avatar";
+import { createInspectionReport, getLiveReports, seedDemoReports, voteReport, addReportComment, deleteReportComment, deleteReport, DBReport } from "../../actions/reports";
 import type { AuditReport } from "../../lib/auditEngine";
 
 interface FeedComment {
   id: string;
+  authorId?: string;
   author: string;
   authorRole: string;
   avatar: string;
   timeAgo: string;
   text: string;
+  replyTo?: { id: string; author: string };
 }
 
 export interface FeedPost {
@@ -86,15 +91,14 @@ export interface FeedPost {
     requiredValue?: string;
   };
   upvotes: number;
+  downvotes: number;
   commentsCount: number;
   userVote?: "up" | "down" | null;
   comments: FeedComment[];
   status: "Under Review" | "Notice Drafted" | "Compounded";
-  /** Full audit dossier persisted in Supabase (all flagged issues) */
   auditReport?: AuditReport;
 }
 
-/** All flaggable issues for a post's evidence box (full audit when saved, else the single fallback), empty entries removed */
 function getFlagIssues(post: FeedPost): Array<{ ruleCode: string; title: string; requiredValue?: string }> {
   const issues = post.auditReport?.issues?.length
     ? post.auditReport.issues.map((iss) => ({
@@ -110,7 +114,6 @@ function getFlagIssues(post: FeedPost): Array<{ ruleCode: string; title: string;
   return issues.filter((iss) => iss.title && iss.title.trim());
 }
 
-// Custom SVG icons requested by user
 const TrendingFlameCustomIcon = ({ className = "w-4 h-4" }: { className?: string }) => (
   <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="24" height="24" className={className} fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
     <path d="M13.8561 22C26.0783 19 19.2338 7 10.9227 2C9.9453 5.5 8.47838 6.5 5.54497 10C1.66121 14.6339 3.5895 20 8.96719 22C8.1524 21 6.04958 18.9008 7.5 16C8 15 9 14 8.5 12C9.47778 12.5 11.5 13 12 15.5C12.8148 14.5 13.6604 12.4 12.8783 10C19 14.5 16.5 19 13.8561 22Z" />
@@ -126,8 +129,8 @@ const TrendingCustomIcon = ({ className = "w-4 h-4" }: { className?: string }) =
 
 const HomeNavIcon = ({ className = "w-5 h-5" }: { className?: string }) => (
   <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="24" height="24" className={className} fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
-    <path d="M22 10.5L12.8825 2.82207C12.6355 2.61407 12.3229 2.5 12 2.5C11.6771 2.5 11.3645 2.61407 11.1175 2.82207L2 10.5" />
-    <path d="M20.5 9.5V16C20.5 18.3456 20.5 19.5184 19.8801 20.3263C19.7205 20.5343 19.5343 20.7205 19.3263 20.8801C18.5184 21.5 17.3456 21.5 15 21.5V17C15 15.5858 15 14.8787 14.5607 14.4393C14.1213 14 13.4142 14 12 14C10.5858 14 9.87868 14 9.43934 14.4393C9 14.8787 9 15.5858 9 17V21.5C6.65442 21.5 5.48164 21.5 4.67372 20.8801C4.46572 20.7205 4.27954 20.5343 4.11994 20.3263C3.5 19.5184 3.5 18.3456 3.5 16V9.5" />
+    <path d="M3 11.9896V14.5C3 17.7998 3 19.4497 4.02513 20.4749C5.05025 21.5 6.70017 21.5 10 21.5H14C17.2998 21.5 18.9497 21.5 19.9749 20.4749C21 19.4497 21 17.7998 21 14.5V11.9896C21 10.3083 21 9.46773 20.6441 8.74005C20.2882 8.01237 19.6247 7.49628 18.2976 6.46411L16.2976 4.90855C14.2331 3.30285 13.2009 2.5 12 2.5C10.7991 2.5 9.76689 3.30285 7.70242 4.90855L5.70241 6.46411C4.37533 7.49628 3.71179 8.01237 3.3559 8.74005C3 9.46773 3 10.3083 3 11.9896Z" />
+    <path d="M15 21.5V16.5C15 15.0858 15 14.3787 14.5607 13.9393C14.1213 13.5 13.4142 13.5 12 13.5C10.5858 13.5 9.87868 13.5 9.43934 13.9393C9 14.3787 9 15.0858 9 16.5V21.5" />
   </svg>
 );
 
@@ -220,11 +223,9 @@ export default function DashboardPage() {
   const [isLoading, setIsLoading] = useState(true);
   const [isSigningOut, setIsSigningOut] = useState(false);
 
-  // Mobile navigation tab state: home | feed | reports | profile
   const TABS: Array<"home" | "feed" | "reports" | "profile"> = ["home", "feed", "reports", "profile"];
   const [mobileTab, setMobileTab] = useState<"home" | "feed" | "reports" | "profile">("home");
 
-  // Mobile Touch Swipe Gestures (Left / Right)
   const [touchStartX, setTouchStartX] = useState<number | null>(null);
   const [touchEndX, setTouchEndX] = useState<number | null>(null);
   const [touchStartY, setTouchStartY] = useState<number | null>(null);
@@ -249,20 +250,16 @@ export default function DashboardPage() {
     const distanceX = touchStartX - touchEndX;
     const distanceY = (touchStartY !== null && touchEndY !== null) ? Math.abs(touchStartY - touchEndY) : 0;
 
-    // Only switch tabs if the horizontal swipe is distinctly greater than vertical scroll
     if (Math.abs(distanceX) > distanceY && Math.abs(distanceX) > minSwipeDistance) {
       const currentIndex = TABS.indexOf(mobileTab);
       if (distanceX > 0 && currentIndex < TABS.length - 1) {
-        // Swiped Left -> Next Tab
         setMobileTab(TABS[currentIndex + 1]);
       } else if (distanceX < 0 && currentIndex > 0) {
-        // Swiped Right -> Previous Tab
         setMobileTab(TABS[currentIndex - 1]);
       }
     }
   };
 
-  // Trending Carousel Scroll Vignette States
   const [canScrollLeft, setCanScrollLeft] = useState(false);
   const [canScrollRight, setCanScrollRight] = useState(true);
   const trendingScrollRef = useRef<HTMLDivElement>(null);
@@ -275,20 +272,15 @@ export default function DashboardPage() {
     }
   };
 
-  // Feed States
   const [posts, setPosts] = useState<FeedPost[]>([]);
   const [isFeedLoaded, setIsFeedLoaded] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
   const [activeFilter, setActiveFilter] = useState<string>("All");
-  const [expandedComments, setExpandedComments] = useState<{ [key: string]: boolean }>({});
   const [commentInputs, setCommentInputs] = useState<{ [key: string]: string }>({});
 
-  // Quantum QR Share Modal State
   const [shareModalOpen, setShareModalOpen] = useState(false);
   const [sharingPost, setSharingPost] = useState<{ title: string; url: string } | null>(null);
 
-  // Dossier Script Modal State (Notice PDF / My Recent Filed Reports) — tracks the ID so
-  // the modal live-updates when the background save/upload completes
   const [scriptPostId, setScriptPostId] = useState<string | null>(null);
   const scriptPost = useMemo(
     () => posts.find((p) => p.id === scriptPostId) || null,
@@ -297,10 +289,8 @@ export default function DashboardPage() {
 
   const openScript = (post: FeedPost) => setScriptPostId(post.id);
 
-  // Post / Save success toast
   const [postToast, setPostToast] = useState<{ title: string; sub: string } | null>(null);
 
-  // Evidence image lightbox
   const [lightboxImage, setLightboxImage] = useState<string | null>(null);
 
   useEffect(() => {
@@ -309,11 +299,11 @@ export default function DashboardPage() {
     return () => clearTimeout(t);
   }, [postToast]);
 
-  // Load real posts on mount from Supabase — source of truth, no localStorage
   useEffect(() => {
-    async function loadCommunityPosts() {
-      try {
-        const dbReports = await getLiveReports();
+  async function loadCommunityPosts() {
+    try {
+      await seedDemoReports();
+      const dbReports = await getLiveReports();
         if (dbReports && dbReports.length > 0) {
           const formatted: FeedPost[] = dbReports.map((db) => ({
             id: db.id,
@@ -324,7 +314,7 @@ export default function DashboardPage() {
               avatar: db.author_avatar || "🥑",
               zone: db.author_zone || "Your Zone",
             },
-            timeAgo: "Recently",
+            timeAgo: timeAgo(db.created_at),
             title: db.title,
             commodity: db.commodity,
             brand: db.brand,
@@ -341,6 +331,7 @@ export default function DashboardPage() {
               requiredValue: db.evidence_required_value,
             },
             upvotes: db.upvotes || 0,
+            downvotes: db.downvotes || 0,
             commentsCount: db.comments?.length || 0,
             userVote: (db.user_votes || {})[user?.id || ""] || null,
             comments: db.comments || [],
@@ -360,22 +351,24 @@ export default function DashboardPage() {
     loadCommunityPosts();
   }, [user?.id]);
 
-  // Dynamically derived real user reports & real-time karma
   const myReports = useMemo(() => {
     const myName = profile?.displayName || user?.fullName || "You";
     return posts.filter((p) => p.author.name === myName || (user?.id && p.authorId === user.id));
   }, [posts, profile, user]);
 
+  const scoreOf = (p: FeedPost) => p.upvotes - p.downvotes;
+
+  const isOfficialBadge = (badge?: string) =>
+    !!badge && !/community/i.test(badge);
+
   const realKarma = useMemo(() => {
-    // Karma strictly equals total upvotes received on reports from the community
-    return myReports.reduce((acc: number, r: FeedPost) => acc + Math.max(0, r.upvotes), 0);
+    return myReports.reduce((acc: number, r: FeedPost) => acc + Math.max(0, scoreOf(r)), 0);
   }, [myReports]);
 
   const realReportsCount = myReports.length;
   const realUpvotedCount = useMemo(() => posts.filter((p) => p.userVote === "up").length, [posts]);
   const realDownvotedCount = useMemo(() => posts.filter((p) => p.userVote === "down").length, [posts]);
 
-  // ---- SCAN FLOW STATE (chinn music 🎶) ----
   const [showScanFlow, setShowScanFlow] = useState(false);
   const [scanImageUrl, setScanImageUrl] = useState<string | null>(null);
   const [scanImageName, setScanImageName] = useState<string>("");
@@ -387,8 +380,6 @@ export default function DashboardPage() {
   const handleScanFile = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (!file) return;
-    // Read as data URL so the raw bytes travel to the server action —
-    // a blob: link would be useless to Cloudinary's servers
     const reader = new FileReader();
     reader.onload = () => {
       setScanImageUrl(reader.result as string);
@@ -400,8 +391,6 @@ export default function DashboardPage() {
     e.target.value = "";
   };
 
-  // POST TO FEED: Publicly broadcast report to the community enforcement stream.
-  // The officer's optional note becomes the post description and the image stays private.
   const handleScanPost = async ({ imageUrl, title, report, comment }: { imageUrl: string; title: string; report?: AuditReport; comment?: string }) => {
     const topIssue = report?.issues?.[0];
     const authorName = profile?.displayName || user?.fullName || "You";
@@ -435,6 +424,7 @@ export default function DashboardPage() {
         requiredValue: topIssue?.requiredValue || "Statutory Legal Requirement",
       },
       upvotes: 0,
+      downvotes: 0,
       commentsCount: 0,
       userVote: null,
       status: "Under Review",
@@ -451,8 +441,6 @@ export default function DashboardPage() {
       sub: "Live in the community stream — visible to every officer & citizen.",
     });
 
-    // Async Supabase sync — image kept private (never rendered on the post), only the
-    // persistent Cloudinary URL + full audit dossier are stored on the report row
     try {
       const saveRes = await createInspectionReport({
         imageUrl,
@@ -484,7 +472,6 @@ export default function DashboardPage() {
     }
   };
 
-  // SAVE REPORT: Privately saves the inspection dossier to the user's personal vault
   const handleScanSave = async ({ imageUrl, report }: { imageUrl?: string | null; report?: AuditReport }) => {
     const topIssue = report?.issues?.[0];
     const authorName = profile?.displayName || user?.fullName || "You";
@@ -517,6 +504,7 @@ export default function DashboardPage() {
         requiredValue: topIssue?.requiredValue || "Statutory Legal Requirement",
       },
       upvotes: 0,
+      downvotes: 0,
       commentsCount: 0,
       userVote: null,
       status: "Under Review",
@@ -533,7 +521,6 @@ export default function DashboardPage() {
       sub: "Stored privately — open it anytime from My Recent Filed Reports.",
     });
 
-    // Persist the private dossier to Supabase (image stays private on the row)
     try {
       const saveRes = await createInspectionReport({
         imageUrl: imageUrl || null,
@@ -574,7 +561,6 @@ export default function DashboardPage() {
     setShareModalOpen(true);
   };
 
-  // DELETE REPORT: confirmation dialog state, then remove from vault & community stream
   const [deleteTarget, setDeleteTarget] = useState<string | null>(null);
   const [isDeleting, setIsDeleting] = useState(false);
 
@@ -596,7 +582,6 @@ export default function DashboardPage() {
       });
   };
 
-  // Upvote / Downvote Toggle — optimistic locally, persisted to Supabase per user
   const handleVote = (postId: string, type: "up" | "down") => {
     const current = posts.find((p) => p.id === postId);
     if (!current) return;
@@ -606,16 +591,18 @@ export default function DashboardPage() {
       prev.map((post) => {
         if (post.id !== postId) return post;
 
-        let delta = 0;
-        if (post.userVote === "up" && nextVote !== "up") delta -= 1;
-        if (post.userVote === "down" && nextVote !== "down") delta -= 1;
-        if (nextVote === "up" && post.userVote !== "up") delta += 1;
-        if (nextVote === "down" && post.userVote !== "down") delta += 1;
+        let upDelta = 0;
+        let downDelta = 0;
+        if (post.userVote === "up" && nextVote !== "up") upDelta -= 1;
+        if (post.userVote === "down" && nextVote !== "down") downDelta -= 1;
+        if (nextVote === "up" && post.userVote !== "up") upDelta += 1;
+        if (nextVote === "down" && post.userVote !== "down") downDelta += 1;
 
         return {
           ...post,
           userVote: nextVote,
-          upvotes: Math.max(0, post.upvotes + delta),
+          upvotes: post.upvotes + upDelta,
+          downvotes: post.downvotes + downDelta,
         };
       })
     );
@@ -623,7 +610,6 @@ export default function DashboardPage() {
     voteReport(postId, nextVote).catch((err) => console.warn("Vote sync:", err));
   };
 
-  // Feed Collapsible Sticky Search Bar State (Rock-solid hysteresis threshold)
   const [isSearchCollapsed, setIsSearchCollapsed] = useState(false);
 
   useEffect(() => {
@@ -634,7 +620,6 @@ export default function DashboardPage() {
         window.requestAnimationFrame(() => {
           const currentY = window.scrollY || document.documentElement.scrollTop;
 
-          // Deterministic threshold hysteresis: Collapses once past 55px, expands when back near top (< 25px)
           if (currentY > 55) {
             setIsSearchCollapsed(true);
           } else if (currentY < 25) {
@@ -659,7 +644,7 @@ export default function DashboardPage() {
         localStorage.removeItem("klaro_logged_in");
         document.cookie = "klaro_logged_in=; path=/; max-age=0; SameSite=Lax";
       }
-      router.push("/login");
+      router.replace("/login");
       return;
     }
 
@@ -703,33 +688,33 @@ export default function DashboardPage() {
     }
     try {
       await signOut();
-      router.push("/login");
+      router.replace("/login");
     } catch (err) {
       console.error("Sign out error:", err);
-      setIsSigningOut(false);
+      router.replace("/login");
     }
   };
 
-  // Toggle comments expand
-  const toggleComments = (postId: string) => {
-    setExpandedComments((prev) => ({
-      ...prev,
-      [postId]: !prev[postId],
-    }));
+  const [commentsModalPostId, setCommentsModalPostId] = useState<string | null>(null);
+  const commentsModalPost = posts.find((p) => p.id === commentsModalPostId) || null;
+
+  const openComments = (postId: string) => {
+    setCommentsModalPostId(postId);
   };
 
-  // Add Comment
-  const handleAddComment = (postId: string) => {
+  const handleAddComment = (postId: string, replyTo?: { id: string; author: string }) => {
     const text = commentInputs[postId]?.trim();
     if (!text) return;
 
     const newComment: FeedComment = {
       id: `c-${Date.now()}`,
+      authorId: user?.id,
       author: profile?.displayName || user?.fullName || "You",
       authorRole: "Enforcement Officer",
       avatar: profile?.avatarUrl || user?.imageUrl || "https://api.dicebear.com/9.x/lorelei/svg?seed=You&backgroundColor=27272a",
       timeAgo: "Just now",
       text,
+      ...(replyTo ? { replyTo } : {}),
     };
 
     setPosts((prev) =>
@@ -746,10 +731,30 @@ export default function DashboardPage() {
     addReportComment(postId, newComment).catch((err) => console.warn("Comment sync:", err));
 
     setCommentInputs((prev) => ({ ...prev, [postId]: "" }));
-    setExpandedComments((prev) => ({ ...prev, [postId]: true }));
   };
 
-  // Filtered Posts
+  const isOwnComment = (c: FeedComment) => {
+    if (c.authorId && user?.id) return c.authorId === user.id;
+    return c.author === (profile?.displayName || user?.fullName || "You");
+  };
+
+  const handleDeleteComment = (postId: string, commentId: string) => {
+    let removed = 0;
+    setPosts((prev) =>
+      prev.map((post) => {
+        if (post.id !== postId) return post;
+        const remaining = post.comments.filter(
+          (c) => c.id !== commentId && c.replyTo?.id !== commentId
+        );
+        removed = post.comments.length - remaining.length;
+        return { ...post, comments: remaining, commentsCount: remaining.length };
+      })
+    );
+
+    deleteReportComment(postId, commentId)
+      .catch((err) => console.warn("Comment delete sync:", err));
+  };
+
   const filteredPosts = posts.filter((post) => {
     const matchesSearch =
       post.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
@@ -780,11 +785,9 @@ export default function DashboardPage() {
   return (
     <div className="min-h-screen w-full bg-[#E6E4E5] text-[rgb(18,18,18)] antialiased font-sans flex flex-col selection:bg-[#94EC40] selection:text-[rgb(18,18,18)]">
       
-      {/* 1. TOP DASHBOARD SUSPENDED NOTCH NAVBAR */}
       <header className="hidden md:block sticky top-0 z-40 w-full pointer-events-none">
         <div className="max-w-7xl mx-auto px-3 sm:px-6 lg:px-8">
           <div className="relative pointer-events-auto filter drop-shadow-[0_4px_16px_rgba(0,0,0,0.04)]">
-            {/* Left Squircle Edge Cap (Inverted Top + Rounded Bottom) */}
             <svg
               width="39"
               height="54"
@@ -805,7 +808,6 @@ export default function DashboardPage() {
               />
             </svg>
 
-            {/* Right Squircle Edge Cap (Inverted Top + Rounded Bottom) */}
             <svg
               width="39"
               height="54"
@@ -826,10 +828,8 @@ export default function DashboardPage() {
               />
             </svg>
 
-            {/* Navbar Central Bar (Square Rectangle, corners handled by caps) */}
             <div className="h-[54px] bg-[#FCFCFB] border-b-[1.5px] border-[#D5D2D4] px-4 sm:px-6 flex items-center justify-between gap-4">
               
-              {/* Klaro Logo */}
               <div className="flex items-center gap-3 shrink-0">
                 <Link href="/dashboard" className="flex items-center gap-2">
                   <Logo size="sm" showText={false} />
@@ -842,7 +842,6 @@ export default function DashboardPage() {
                 </Link>
               </div>
 
-              {/* Search Bar */}
               <div className="flex-1 max-w-xl relative">
                 <Search className="w-4 h-4 text-zinc-400 absolute left-3.5 top-1/2 -translate-y-1/2" />
                 <input
@@ -854,7 +853,6 @@ export default function DashboardPage() {
                 />
               </div>
 
-              {/* Report CTA Button */}
               <div className="flex items-center gap-2.5 shrink-0">
                 <button
                   type="button"
@@ -871,7 +869,6 @@ export default function DashboardPage() {
         </div>
       </header>
 
-      {/* 2. MAIN REDDIT-STYLE FEED CONTENT */}
       <main
         className={cn(
           "flex-1 max-w-7xl w-full mx-auto px-3 sm:px-6 lg:px-8",
@@ -882,12 +879,8 @@ export default function DashboardPage() {
       >
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-4 sm:gap-6 items-start">
           
-          {/* LEFT COLUMN: Community Feed & Mobile Views */}
           <div className="lg:col-span-8 space-y-3 sm:space-y-4 bg-transparent pt-0 sm:pt-0">
             
-            {/* ========================================================
-                MOBILE TAB VIEWS WITH SMOOTH SWIPE GESTURES & ANIMATIONS
-               ======================================================== */}
             <div
               onTouchStart={onTouchStart}
               onTouchMove={onTouchMove}
@@ -902,11 +895,9 @@ export default function DashboardPage() {
                   exit={{ opacity: 0, x: -12 }}
                   transition={{ duration: 0.2, ease: "easeOut" }}
                 >
-                  {/* TAB 1: HOME */}
                   {mobileTab === "home" && (
                     <div className="flex flex-col justify-between h-[calc(100dvh-5.5rem)] max-h-[calc(100dvh-5.5rem)] gap-2.5 pt-0.5 pb-16 px-1 text-left overflow-hidden">
                       
-                      {/* Top Bar: Klaro Icon on Left + "klaro" text to the right */}
                       <div className="flex items-center justify-between shrink-0">
                         <Link href="/" className="flex items-center gap-2 focus:outline-none">
                           <Logo size="sm" showText={false} />
@@ -919,7 +910,6 @@ export default function DashboardPage() {
                         </Link>
                       </div>
 
-                      {/* Bold 2-Line Headline with green hand icon in front of So */}
                       <div className="pt-0.5">
                         <h1
                           className="text-[30px] sm:text-[36px] font-[900] text-[rgb(18,18,18)] tracking-[-0.04em] leading-[1.08]"
@@ -933,7 +923,6 @@ export default function DashboardPage() {
                         </h1>
                       </div>
 
-                      {/* Photo Upload Action Box */}
                       <div
                         onClick={openPickerChoice}
                         role="button"
@@ -952,7 +941,6 @@ export default function DashboardPage() {
                         </div>
                       </div>
 
-                      {/* Trending Now Section with Flame Icon */}
                       <div className="space-y-2 pt-1 shrink-0">
                         <div className="flex items-center justify-between">
                           <div className="flex items-center gap-2">
@@ -969,9 +957,7 @@ export default function DashboardPage() {
                           <span className="text-[10.5px] font-mono text-zinc-400 font-bold uppercase tracking-wider">Swipe →</span>
                         </div>
 
-                        {/* Relative Container with Dynamic Blurry Dark Gradient Masks at Outer Edges */}
                         <div className="relative -mx-2 px-2 overflow-hidden">
-                          {/* Left Dark Blurry Vignette Fade */}
                           <div
                             className={cn(
                               "absolute left-0 top-0 bottom-0 w-4 bg-gradient-to-r from-[#E6E4E5] to-transparent pointer-events-none z-10 transition-opacity duration-300 backdrop-blur-[1px]",
@@ -979,7 +965,6 @@ export default function DashboardPage() {
                             )}
                           />
 
-                          {/* Right Dark Blurry Vignette Fade */}
                           <div
                             className={cn(
                               "absolute right-0 top-0 bottom-0 w-4 bg-gradient-to-l from-[#E6E4E5] to-transparent pointer-events-none z-10 transition-opacity duration-300 backdrop-blur-[1px]",
@@ -987,7 +972,6 @@ export default function DashboardPage() {
                             )}
                           />
 
-                          {/* Horizontal Scroll / Swipe Container of Report Blocks */}
                           <div
                             ref={trendingScrollRef}
                             onScroll={handleTrendingScroll}
@@ -1001,7 +985,6 @@ export default function DashboardPage() {
                                 key={`trending-${post.id}`}
                                 className="w-[265px] shrink-0 snap-start p-3.5 rounded-[20px] bg-[#E4E2E3] text-[rgb(18,18,18)] font-mono space-y-2 border-[1.5px] border-[#C8C5C9] shadow-[0_4px_16px_rgba(0,0,0,0.04),inset_0_1.5px_1.5px_rgba(255,255,255,0.9)] ring-1 ring-black/[0.04] text-left"
                               >
-                                {/* Header with Commodity and Brand */}
                                 <div className="flex items-center justify-between border-b border-[#D2CFD3] pb-1.5 text-[10px]">
                                   <span className="truncate pr-1 text-zinc-900 font-bold text-xs max-w-[135px]">{post.commodity}</span>
                                   <span className="text-[#346415] shrink-0 font-extrabold bg-[#EAFBD9] px-2 py-0.5 rounded-md border border-[#B8F27D] text-[9px] truncate max-w-[115px]">
@@ -1009,19 +992,16 @@ export default function DashboardPage() {
                                   </span>
                                 </div>
 
-                                {/* OCR Region */}
                                 <div>
                                   <span className="text-[8.5px] text-zinc-500 font-bold uppercase tracking-wider block">OCR REGION</span>
                                   <span className="text-zinc-900 font-bold block text-[10.5px] leading-tight mt-0.5">{post.evidence.labelRegion}</span>
                                 </div>
 
-                                {/* OCR Extracted String */}
                                 <div>
                                   <span className="text-[8.5px] text-zinc-500 font-bold uppercase tracking-wider block">OCR EXTRACTED STRING</span>
                                   <span className="text-[#92400E] font-extrabold block text-[11px] leading-tight mt-0.5">{post.evidence.ocrSnippet}</span>
                                 </div>
 
-                                {/* Flag & Req */}
                                 <div className="pt-1.5 border-t border-[#D2CFD3] space-y-0.5 text-[10px] leading-tight">
                                   <span className="text-rose-700 font-bold block truncate">Flag: {post.evidence.flagReason}</span>
                                   {post.evidence.requiredValue && (
@@ -1037,17 +1017,14 @@ export default function DashboardPage() {
                     </div>
                   )}
 
-                  {/* TAB 2: FEED (Community Violation Stream) */}
                   {mobileTab === "feed" && (
                     <div className="space-y-4 pt-1 text-left pb-28">
-                      {/* Sticky Search & Filter Header Box */}
                       <div
                         className={cn(
                           "sticky top-1 z-30 rounded-2xl bg-[#FCFCFB]/95 backdrop-blur-md border border-[#D5D2D4] shadow-sm transition-all duration-300 ease-out text-left",
                           isSearchCollapsed ? "p-2 shadow-md" : "p-3.5"
                         )}
                       >
-                        {/* Search Input Box */}
                         <div className="relative">
                           <Search className="w-4 h-4 text-zinc-400 absolute left-3 top-1/2 -translate-y-1/2" />
                           <input
@@ -1062,7 +1039,6 @@ export default function DashboardPage() {
                           />
                         </div>
 
-                        {/* Filter Pills - Clean and sleek */}
                         <div
                           className={cn(
                             "overflow-hidden transition-all duration-300 ease-out",
@@ -1091,8 +1067,9 @@ export default function DashboardPage() {
                         </div>
                       </div>
 
-                      {/* Posts Stream */}
-                      {filteredPosts.length === 0 ? (
+                      {!isFeedLoaded ? (
+                        <PostSkeleton count={3} />
+                      ) : filteredPosts.length === 0 ? (
                         <div className="p-8 rounded-[22px] bg-[#FCFCFB] border-[1.5px] border-[#D5D2D4] text-center space-y-3">
                           <ShieldAlert className="w-10 h-10 text-zinc-400 mx-auto" />
                           <h3 className="text-sm font-bold text-zinc-900">No community violations reported yet</h3>
@@ -1113,20 +1090,18 @@ export default function DashboardPage() {
                             key={`feed-${post.id}`}
                             className="rounded-[22px] bg-[#FCFCFB] border-[1.5px] border-[#D5D2D4] shadow-[0_4px_20px_rgba(0,0,0,0.03),inset_0_1.5px_1.5px_rgba(255,255,255,0.95)] overflow-hidden p-4 space-y-3 text-left"
                           >
-                            {/* Meta Header */}
                             <div className="flex items-center justify-between">
                               <div className="flex items-center gap-2">
-                                <img
-                                  src={post.author.avatar}
-                                  alt={post.author.name}
-                                  className="w-6 h-6 rounded-full bg-zinc-900 border border-zinc-200"
+                                <Avatar
+                                  avatar={post.author.avatar}
+                                  name={post.author.name}
+                                  className="w-6 h-6 rounded-full border border-zinc-200"
                                 />
                                 <span className="text-zinc-800 font-bold text-xs">{post.author.zone}</span>
                               </div>
                               <span className="text-zinc-500 text-[11px] font-medium">{post.timeAgo}</span>
                             </div>
 
-                            {/* Rule & Title */}
                             <div>
                               <span className="px-2 py-0.5 rounded-md text-[10px] font-mono font-bold bg-rose-100 text-rose-800 border border-rose-200 inline-block mb-1">
                                 {post.ruleCode} • {post.ruleLabel}
@@ -1136,9 +1111,7 @@ export default function DashboardPage() {
                               </h2>
                             </div>
 
-                          {/* Evidence Box */}
                           <div className="p-4 rounded-[20px] bg-[#E4E2E3] text-[rgb(18,18,18)] font-mono text-xs space-y-3 border-[1.5px] border-[#C8C5C9] shadow-[0_4px_16px_rgba(0,0,0,0.04),inset_0_1.5px_1.5px_rgba(255,255,255,0.9)] ring-1 ring-black/[0.04]">
-                            {/* Top Row: Commodity & Brand Pill */}
                             <div className="flex items-center justify-between border-b border-[#D5D2D6] pb-2.5">
                               <span className="text-[13px] font-mono font-medium text-zinc-900 truncate pr-2">
                                 {post.commodity}
@@ -1148,7 +1121,6 @@ export default function DashboardPage() {
                               </span>
                             </div>
 
-                            {/* Middle Row: OCR Region & OCR Extracted String */}
                             <div className="grid grid-cols-2 gap-4 text-[11px] border-b border-[#D5D2D6] pb-3">
                               <div>
                                 <span className="text-[10px] font-mono font-bold uppercase tracking-wider text-zinc-500 block mb-1">
@@ -1168,7 +1140,6 @@ export default function DashboardPage() {
                               </div>
                             </div>
 
-                            {/* Bottom Row: First 2 Flagged Issues + View More */}
                             <div className="pt-0.5 space-y-1.5">
                               {getFlagIssues(post).slice(0, 2).map((iss, i) => (
                                 <div key={`${post.id}-flag-${i}`} className="flex items-start justify-between gap-3">
@@ -1194,7 +1165,6 @@ export default function DashboardPage() {
                             </div>
                           </div>
 
-                          {/* Bottom Engagement */}
                           <div className="pt-2 flex items-center justify-between border-t border-[#ECEAEB]">
                             <div className="flex items-center gap-1.5 bg-[#ECEAEB] border border-[#D5D2D4] shadow-[inset_0_1px_1px_rgba(255,255,255,0.85)] rounded-[14px] px-2 py-1">
                               <button
@@ -1204,7 +1174,7 @@ export default function DashboardPage() {
                               >
                                 <ArrowBigUp className="w-5 h-5 fill-current" />
                               </button>
-                              <span className="text-xs font-bold font-mono text-zinc-800 px-1">{post.upvotes}</span>
+                              <span className={cn("text-xs font-bold font-mono px-1", scoreOf(post) < 0 ? "text-rose-600" : "text-zinc-800")}>{scoreOf(post)}</span>
                               <button
                                 type="button"
                                 onClick={() => handleVote(post.id, "down")}
@@ -1241,11 +1211,9 @@ export default function DashboardPage() {
                     </div>
                   )}
 
-                  {/* TAB 3: REPORTS (User's Submitted Violation Reports - Pinned Header, Dedicated Scroll Area) */}
                   {mobileTab === "reports" && (
                     <div className="flex flex-col h-[calc(100dvh-5.5rem)] max-h-[calc(100dvh-5.5rem)] space-y-3 pt-0.5 text-left overflow-hidden">
                       
-                      {/* Pinned Reports Header Box (Stays in its place, never scrolls or covers cards) */}
                       <div className="shrink-0 p-4 rounded-[22px] bg-[#FCFCFB] border-[1.5px] border-[#D5D2D4] shadow-[0_4px_20px_rgba(0,0,0,0.03),inset_0_1.5px_1.5px_rgba(255,255,255,0.95)] space-y-3">
                         <div className="flex items-center justify-between">
                           <div className="flex items-center gap-2">
@@ -1264,7 +1232,6 @@ export default function DashboardPage() {
                           </div>
                         </div>
 
-                        {/* Quick Summary Counter Bar */}
                         <div className="grid grid-cols-3 gap-2 pt-2 border-t border-[#ECEAEB] text-center">
                           <div className="p-2 rounded-[14px] bg-[#ECEAEB] border border-[#D5D2D4] shadow-[inset_0_1px_1px_rgba(255,255,255,0.85)]">
                             <span className="text-[9.5px] font-mono uppercase text-zinc-500 block">Total Filed</span>
@@ -1289,7 +1256,6 @@ export default function DashboardPage() {
                         </div>
                       </div>
 
-                      {/* Scrollable Reports List Only */}
                       <div className="flex-1 overflow-y-auto space-y-3 pr-0.5 no-scrollbar pb-36">
                         {myReports.length === 0 ? (
                           <div className="p-6 rounded-[20px] bg-[#FCFCFB] border-[1.5px] border-[#D5D2D4] text-center space-y-2.5">
@@ -1318,6 +1284,19 @@ export default function DashboardPage() {
                                   {rep.ruleCode}
                                 </span>
                                 <div className="flex items-center gap-1.5">
+                                  {(rep.status === "Notice Drafted" || rep.status === "Compounded" || rep.auditReport?.compoundingOrder) && (
+                                    <span
+                                      onClick={(e) => {
+                                        e.stopPropagation();
+                                        openScript(rep);
+                                      }}
+                                      title="Official Statutory Notice Attached — tap to view"
+                                      className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[9.5px] font-mono font-bold bg-[#EAFBD9] text-[#346415] border border-[#B8F27D] hover:bg-[#D5F7B3] active:scale-95 transition-all shadow-xs cursor-pointer"
+                                    >
+                                      <Paperclip className="w-3 h-3 -rotate-45" />
+                                      <span>Notice Attached</span>
+                                    </span>
+                                  )}
                                   <span className={cn(
                                     "px-2 py-0.5 rounded-full text-[10px] font-mono font-bold uppercase border",
                                     rep.status === "Compounded" ? "bg-[#EAFBD9] text-[#346415] border-[#B8F27D]" : rep.status === "Notice Drafted" ? "bg-amber-100 text-amber-900 border-amber-300" : "bg-blue-100 text-blue-900 border-blue-300"
@@ -1345,7 +1324,7 @@ export default function DashboardPage() {
                               <div className="pt-2 border-t border-[#ECEAEB] flex items-center justify-between text-xs text-zinc-500">
                                 <span className="flex items-center gap-1 font-mono font-bold text-[#346415]">
                                   <ArrowBigUp className="w-4 h-4 fill-current" />
-                                  {rep.upvotes} karma
+                                  {scoreOf(rep)} karma
                                 </span>
                                 <span className="text-[10.5px] text-zinc-400 font-medium">{rep.timeAgo}</span>
                               </div>
@@ -1357,11 +1336,9 @@ export default function DashboardPage() {
                     </div>
                   )}
 
-                  {/* TAB 4: PROFILE (User Profile & Community Karma Stats) */}
                   {mobileTab === "profile" && (
                     <div className="space-y-4 pt-1 text-left pb-6">
                       
-                      {/* User Profile Card */}
                       <div className="p-5 rounded-[22px] bg-[#FCFCFB] border-[1.5px] border-[#D5D2D4] shadow-[0_4px_20px_rgba(0,0,0,0.03),inset_0_1.5px_1.5px_rgba(255,255,255,0.95)] space-y-4">
                         <div className="flex items-center gap-3.5">
                           <div className="w-14 h-14 rounded-2xl overflow-hidden border-2 border-zinc-300 shrink-0 shadow-sm flex items-center justify-center text-2xl bg-white">
@@ -1388,7 +1365,6 @@ export default function DashboardPage() {
                           </div>
                         </div>
 
-                        {/* 4 Stats Grid: Real Karma, Reports, Upvoted, Downvoted */}
                         <div className="grid grid-cols-4 gap-2 pt-3 border-t border-[#ECEAEB] text-center">
                           <div className="p-2.5 rounded-[14px] bg-[#ECEAEB] border border-[#D5D2D4] shadow-[inset_0_1px_1px_rgba(255,255,255,0.85)]">
                             <span className="text-[9px] font-mono uppercase text-zinc-500 block">Karma</span>
@@ -1415,7 +1391,6 @@ export default function DashboardPage() {
                           </p>
                         </div>
 
-                        {/* Sign Out Button */}
                         <button
                           type="button"
                           onClick={handleSignOut}
@@ -1433,12 +1408,8 @@ export default function DashboardPage() {
               </AnimatePresence>
             </div>
 
-            {/* ========================================================
-                E. DESKTOP VIEW ONLY (Full 12-Column Layout)
-               ======================================================== */}
             <div className="hidden sm:block space-y-4">
               
-              {/* Desktop Create Scan / Filter Header Bar */}
               <div className="p-4 rounded-2xl bg-[#FCFCFB] border border-[#D5D2D4] shadow-[0_4px_16px_rgba(0,0,0,0.02)] space-y-3">
                 <div className="flex items-center gap-3">
                   <div className="w-9 h-9 rounded-full overflow-hidden shrink-0 border border-zinc-200 flex items-center justify-center text-sm bg-white">
@@ -1458,7 +1429,6 @@ export default function DashboardPage() {
                   </div>
                 </div>
 
-                {/* Filter Pills */}
                 <div className="flex items-center gap-2 overflow-x-auto pb-1 pt-1 text-xs no-scrollbar">
                   {["All", "High Severity", "MRP (Rule 6d)", "Care (Rule 6h)", "Font Size (Rule 7)"].map((filter) => (
                     <button
@@ -1478,8 +1448,9 @@ export default function DashboardPage() {
                 </div>
               </div>
 
-              {/* Desktop Posts Stream */}
-              {filteredPosts.length === 0 ? (
+              {!isFeedLoaded ? (
+                <PostSkeleton count={4} />
+              ) : filteredPosts.length === 0 ? (
                 <div className="p-12 rounded-2xl bg-[#FCFCFB] border border-[#D5D2D4] text-center space-y-2">
                   <p className="text-sm font-bold text-zinc-800">No violations match your search</p>
                   <p className="text-xs text-zinc-500">Try clearing filters or searching another keyword.</p>
@@ -1492,7 +1463,6 @@ export default function DashboardPage() {
                   >
                     <div className="p-5 flex items-start gap-4">
                       
-                      {/* Left Vote Column */}
                       <div className="flex flex-col items-center gap-1 bg-[#ECEAEB] p-1.5 rounded-xl shrink-0">
                         <button
                           type="button"
@@ -1505,8 +1475,8 @@ export default function DashboardPage() {
                         >
                           <ArrowBigUp className="w-5 h-5 fill-current" />
                         </button>
-                        <span className="text-xs font-bold font-mono text-zinc-800">
-                          {post.upvotes}
+                        <span className={cn("text-xs font-bold font-mono", scoreOf(post) < 0 ? "text-rose-600" : "text-zinc-800")}>
+                          {scoreOf(post)}
                         </span>
                         <button
                           type="button"
@@ -1521,39 +1491,57 @@ export default function DashboardPage() {
                         </button>
                       </div>
 
-                      {/* Main Post Body */}
                       <div className="flex-1 w-full space-y-2.5 text-left">
                         
-                        {/* Meta Header */}
                         <div className="flex flex-wrap items-center justify-between gap-2 text-xs">
                           <div className="flex items-center gap-2">
-                            <img
-                              src={post.author.avatar}
-                              alt={post.author.name}
-                              className="w-5 h-5 rounded-full bg-zinc-900"
+                            <Avatar
+                              avatar={post.author.avatar}
+                              name={post.author.name}
+                              className="w-5 h-5 rounded-full"
                             />
-                            <span className="font-bold text-zinc-900">{post.author.name}</span>
+                            <span className="font-bold text-zinc-900 flex items-center gap-1">
+                              {post.author.name}
+                              {isOfficialBadge(post.author.badge) && (
+                                <ShieldCheck className="w-3.5 h-3.5 text-[#346415]" aria-label="Verified Legal Metrology Officer" />
+                              )}
+                            </span>
                             <span className="text-zinc-400">•</span>
                             <span className="text-zinc-500 text-[11px]">{post.author.zone}</span>
                             <span className="text-zinc-400">•</span>
                             <span className="text-zinc-400 text-[11px]">{post.timeAgo}</span>
                           </div>
 
-                          <span
-                            className={cn(
-                              "px-2.5 py-0.5 rounded-full text-[10px] font-mono font-bold uppercase",
-                              post.status === "Notice Drafted"
-                                ? "bg-amber-100 text-amber-900 border border-amber-300"
-                                : post.status === "Compounded"
-                                ? "bg-[#EAFBD9] text-[#346415] border border-[#B8F27D]"
-                                : "bg-zinc-100 text-zinc-700 border border-zinc-300"
+                          <div className="flex items-center gap-1.5">
+                            {(post.status === "Notice Drafted" || post.status === "Compounded" || post.auditReport?.compoundingOrder) && (
+                              <button
+                                type="button"
+                                onClick={(e) => {
+                                  e.stopPropagation();
+                                  openScript(post);
+                                }}
+                                title="Official Statutory Notice Attached — click to inspect"
+                                className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[9.5px] font-mono font-bold bg-[#EAFBD9] text-[#346415] border border-[#B8F27D] hover:bg-[#D5F7B3] active:scale-95 transition-all shadow-xs cursor-pointer"
+                              >
+                                <Paperclip className="w-3 h-3 -rotate-45" />
+                                <span>Notice</span>
+                              </button>
                             )}
-                          >
-                            {post.status}
-                          </span>
+                            <span
+                              className={cn(
+                                "px-2.5 py-0.5 rounded-full text-[10px] font-mono font-bold uppercase",
+                                post.status === "Notice Drafted"
+                                  ? "bg-amber-100 text-amber-900 border border-amber-300"
+                                  : post.status === "Compounded"
+                                  ? "bg-[#EAFBD9] text-[#346415] border border-[#B8F27D]"
+                                  : "bg-zinc-100 text-zinc-700 border border-zinc-300"
+                              )}
+                            >
+                              {post.status}
+                            </span>
+                          </div>
                         </div>
 
-                        {/* Title */}
                         <div>
                           <div className="flex items-center gap-2 mb-1">
                             <span className="px-2 py-0.5 rounded-md text-[10.5px] font-mono font-bold bg-rose-100 text-rose-800 border border-rose-200">
@@ -1565,14 +1553,11 @@ export default function DashboardPage() {
                           </h2>
                         </div>
 
-                        {/* Description */}
                         <p className="text-[13px] text-zinc-600 leading-relaxed font-normal">
                           {post.description}
                         </p>
 
-                        {/* Evidence Box */}
                         <div className="p-4 rounded-2xl bg-[#E4E2E3] text-[rgb(18,18,18)] font-mono text-xs space-y-3 border-[1.5px] border-[#C8C5C9] shadow-[0_4px_16px_rgba(0,0,0,0.04),inset_0_1px_1px_rgba(255,255,255,0.9)] ring-1 ring-black/[0.04]">
-                          {/* Top Row: Commodity & Brand Pill */}
                           <div className="flex items-center justify-between border-b border-[#D5D2D6] pb-2.5">
                             <span className="text-[13px] font-mono font-medium text-zinc-900 truncate pr-2">
                               {post.commodity}
@@ -1582,7 +1567,6 @@ export default function DashboardPage() {
                             </span>
                           </div>
 
-                          {/* Middle Row: OCR Region & OCR Extracted String */}
                           <div className="grid grid-cols-2 gap-4 text-[11px] border-b border-[#D5D2D6] pb-3">
                             <div>
                               <span className="text-[10px] font-mono font-bold uppercase tracking-wider text-zinc-500 block mb-1">
@@ -1602,7 +1586,6 @@ export default function DashboardPage() {
                             </div>
                           </div>
 
-                          {/* Bottom Row: First 2 Flagged Issues + View More */}
                           <div className="pt-0.5 space-y-1.5">
                             {getFlagIssues(post).slice(0, 2).map((iss, i) => (
                               <div key={`${post.id}-flag-${i}`} className="flex items-start justify-between gap-3">
@@ -1628,11 +1611,10 @@ export default function DashboardPage() {
                           </div>
                         </div>
 
-                        {/* Engagement Bar */}
                         <div className="pt-2 flex items-center justify-between border-t border-[#ECEAEB] text-xs text-zinc-600 font-medium">
                           <button
                             type="button"
-                            onClick={() => toggleComments(post.id)}
+                            onClick={() => openComments(post.id)}
                             className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl hover:bg-[#ECEAEB] transition-colors"
                           >
                             <MessageSquare className="w-4 h-4" />
@@ -1672,43 +1654,7 @@ export default function DashboardPage() {
                           </div>
                         </div>
 
-                        {/* Comments Collapsible */}
-                        {expandedComments[post.id] && (
-                          <div className="pt-3 border-t border-[#ECEAEB] space-y-3">
-                            <div className="space-y-2">
-                              {post.comments.map((comment) => (
-                                <div key={comment.id} className="p-3 rounded-xl bg-[#ECEAEB]/80 text-xs space-y-1">
-                                  <div className="flex items-center justify-between text-[11px]">
-                                    <div className="flex items-center gap-1.5">
-                                      <img src={comment.avatar} alt={comment.author} className="w-4 h-4 rounded-full bg-zinc-900" />
-                                      <span className="font-bold text-zinc-900">{comment.author}</span>
-                                      <span className="text-[10px] text-zinc-500">({comment.authorRole})</span>
-                                    </div>
-                                    <span className="text-[10px] text-zinc-400">{comment.timeAgo}</span>
-                                  </div>
-                                  <p className="text-zinc-700 font-normal leading-relaxed pl-5">{comment.text}</p>
-                                </div>
-                              ))}
-                            </div>
-                            <div className="flex items-center gap-2 pt-1">
-                              <input
-                                type="text"
-                                value={commentInputs[post.id] || ""}
-                                onChange={(e) => setCommentInputs((prev) => ({ ...prev, [post.id]: e.target.value }))}
-                                onKeyDown={(e) => { if (e.key === "Enter") handleAddComment(post.id); }}
-                                placeholder="Add an officer note..."
-                                className="flex-1 px-3.5 py-2 rounded-xl bg-white border border-[#D5D2D4] text-xs text-zinc-800 placeholder-zinc-400 outline-none ring-0 ring-offset-0 focus:outline-none focus-visible:outline-none focus:ring-2 focus:ring-[#94EC40]/30 focus:border-[#94EC40] focus-visible:ring-2 focus-visible:ring-[#94EC40]/30 focus-visible:border-[#94EC40] transition-colors"
-                              />
-                              <button
-                                type="button"
-                                onClick={() => handleAddComment(post.id)}
-                                className="p-2 rounded-xl bg-[#0B0B0D] text-white hover:bg-zinc-800 transition-colors"
-                              >
-                                <Send className="w-3.5 h-3.5 text-[#94EC40]" />
-                              </button>
-                            </div>
-                          </div>
-                        )}
+
 
                       </div>
 
@@ -1721,10 +1667,8 @@ export default function DashboardPage() {
 
           </div>
 
-          {/* RIGHT SIDEBAR: Fixed — does not move at all when scrolling feed */}
           <aside className="hidden lg:block lg:col-span-4 space-y-4 text-left sticky top-[72px] self-start max-h-[calc(100vh-80px)] overflow-y-auto no-scrollbar overscroll-contain scrollbar-none">
             
-            {/* User Identity Card */}
             <div className="p-5 rounded-[22px] bg-[#FCFCFB] border-[1.5px] border-[#D5D2D4] shadow-[0_4px_20px_rgba(0,0,0,0.03),inset_0_1.5px_1.5px_rgba(255,255,255,0.95)] space-y-4">
               <div className="flex items-center gap-3">
                 <div className="w-14 h-14 rounded-2xl overflow-hidden border-2 border-zinc-300 shrink-0 shadow-sm flex items-center justify-center text-2xl bg-white">
@@ -1751,7 +1695,6 @@ export default function DashboardPage() {
                 </div>
               </div>
 
-              {/* 4 Stats Grid: Real Karma, Reports, Upvoted, Downvoted */}
               <div className="grid grid-cols-4 gap-2 pt-2 border-t border-[#ECEAEB] text-center">
                 <div className="p-2 rounded-[14px] bg-[#ECEAEB] border border-[#D5D2D4] shadow-[inset_0_1px_1px_rgba(255,255,255,0.85)]">
                   <span className="text-[9px] font-mono uppercase text-zinc-500 block">Karma</span>
@@ -1789,7 +1732,6 @@ export default function DashboardPage() {
               </button>
             </div>
 
-            {/* My Recent Submitted Reports Preview */}
             <div className="p-5 rounded-[22px] bg-[#FCFCFB] border-[1.5px] border-[#D5D2D4] shadow-[0_4px_20px_rgba(0,0,0,0.03),inset_0_1.5px_1.5px_rgba(255,255,255,0.95)] space-y-3">
               <div className="flex items-center gap-2">
                 <FileText className="w-4 h-4 text-zinc-800" />
@@ -1819,6 +1761,14 @@ export default function DashboardPage() {
                         <span className="text-[11px] text-zinc-600 truncate max-w-[150px] block">{rep.title}</span>
                       </div>
                       <div className="flex items-center gap-1.5 shrink-0">
+                        {(rep.status === "Notice Drafted" || rep.status === "Compounded" || rep.auditReport?.compoundingOrder) && (
+                          <span
+                            title="Notice Attached"
+                            className="inline-flex items-center p-1 rounded-md bg-[#EAFBD9] text-[#346415] border border-[#B8F27D]"
+                          >
+                            <Paperclip className="w-2.5 h-2.5 -rotate-45" />
+                          </span>
+                        )}
                         <span className={cn(
                           "text-[9.5px] font-mono font-bold px-2 py-0.5 rounded border uppercase",
                           rep.status === "Compounded" ? "bg-[#EAFBD9] text-[#346415] border-[#B8F27D]" : rep.status === "Notice Drafted" ? "bg-amber-100 text-amber-900 border-amber-300" : "bg-blue-100 text-blue-900 border-blue-300"
@@ -1840,7 +1790,6 @@ export default function DashboardPage() {
               </div>
             </div>
 
-            {/* Legal Metrology Act Reference (Distinct Light-Tinted Slate/Grey Card in Satoshi Font with Green Underline) */}
             <div
               className="p-4 rounded-[22px] bg-[#E0DFDC] text-[rgb(18,18,18)] space-y-2 border-[1.5px] border-[#CBC7C4] shadow-[0_4px_16px_rgba(0,0,0,0.04),inset_0_1.5px_1.5px_rgba(255,255,255,0.85)]"
               style={{ fontFamily: 'satoshi, "satoshi Fallback", sans-serif' }}
@@ -1866,9 +1815,6 @@ export default function DashboardPage() {
         </div>
       </main>
 
-      {/* ========================================================
-          3. PLASTIC LIQUID GLASS 5-ITEM FLOATING NAVBAR (Mobile)
-         ======================================================== */}
       <nav
         className="fixed bottom-5 left-1/2 -translate-x-1/2 z-50 sm:hidden flex items-center justify-between w-[285px] px-3.5 py-2 rounded-full bg-[#FCFCFB]/75 backdrop-blur-2xl border border-white/80"
         style={{
@@ -1876,7 +1822,6 @@ export default function DashboardPage() {
         }}
         aria-label="Mobile Navigation"
       >
-        {/* 1. Home Icon (Custom SVG) */}
         <button
           type="button"
           onClick={() => setMobileTab("home")}
@@ -1898,7 +1843,6 @@ export default function DashboardPage() {
           </span>
         </button>
 
-        {/* 2. Feed Icon (Custom SVG, Right to Home) */}
         <button
           type="button"
           onClick={() => setMobileTab("feed")}
@@ -1920,7 +1864,6 @@ export default function DashboardPage() {
           </span>
         </button>
 
-        {/* 3. Center Green Plus Button — opens picker */}
         <button
           type="button"
           onClick={openPickerChoice}
@@ -1930,7 +1873,6 @@ export default function DashboardPage() {
           <Plus className="w-5 h-5 stroke-[2.8]" />
         </button>
 
-        {/* 4. Reports Icon (Custom SVG) */}
         <button
           type="button"
           onClick={() => setMobileTab("reports")}
@@ -1952,7 +1894,6 @@ export default function DashboardPage() {
           </span>
         </button>
 
-        {/* 5. Profile Icon (Right to Reports) */}
         <button
           type="button"
           onClick={() => setMobileTab("profile")}
@@ -1979,9 +1920,6 @@ export default function DashboardPage() {
         </button>
       </nav>
 
-      {/* ========================================================
-          4. QUANTUM ARRIVING QR SHARE MODAL
-         ======================================================== */}
       <ShareModal
         isOpen={shareModalOpen}
         onClose={() => setShareModalOpen(false)}
@@ -1989,14 +1927,26 @@ export default function DashboardPage() {
         shareUrl={sharingPost?.url}
       />
 
-      {/* ========================================================
-          3b. INSPECTION DOSSIER SCRIPT MODAL (Notice PDF / Filed Reports)
-         ======================================================== */}
       <ReportScriptModal post={scriptPost} report={scriptPost?.auditReport || null} onClose={() => setScriptPostId(null)} />
+
+      <CommentsDialog
+        post={commentsModalPost}
+        inputValue={commentsModalPostId ? commentInputs[commentsModalPostId] || "" : ""}
+        onInputChange={(v) =>
+          setCommentInputs((prev) => ({ ...prev, [commentsModalPostId as string]: v }))
+        }
+        onSubmit={(replyTo) => {
+          if (commentsModalPostId) handleAddComment(commentsModalPostId, replyTo);
+        }}
+        onClose={() => setCommentsModalPostId(null)}
+        isOwnComment={isOwnComment}
+        onDeleteComment={(cid) => {
+          if (commentsModalPostId) handleDeleteComment(commentsModalPostId, cid);
+        }}
+      />
 
       <ImageLightbox src={lightboxImage} onClose={() => setLightboxImage(null)} />
 
-      {/* Delete confirmation dialog */}
       <AnimatePresence>
         {deleteTarget && (
           <div className="fixed inset-0 z-[75] flex items-center justify-center p-4">
@@ -2054,7 +2004,6 @@ export default function DashboardPage() {
         )}
       </AnimatePresence>
 
-      {/* Post / Save success toast */}
       <AnimatePresence>
         {postToast && (
           <div className="fixed bottom-24 sm:bottom-8 inset-x-0 z-[70] flex justify-center px-4 pointer-events-none">
@@ -2077,9 +2026,6 @@ export default function DashboardPage() {
         )}
       </AnimatePresence>
 
-      {/* ========================================================
-          5. SCAN FLOW — Hidden Inputs + Choice Modal + Thermal Printer
-         ======================================================== */}
       <input ref={galleryInputRef} type="file" accept="image/*" className="hidden" onChange={handleScanFile} />
       <input ref={cameraInputRef} type="file" accept="image/*" capture="environment" className="hidden" onChange={handleScanFile} />
 

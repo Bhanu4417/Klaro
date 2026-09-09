@@ -1,6 +1,5 @@
 const map = require("@svg-maps/india");
 const data = map.default || map;
-// We don't have a full DOM but we can parse the d strings.
 const paths = data.locations.map(l => l.path);
 let minX = Infinity, minY = Infinity, maxX = -Infinity, maxY = -Infinity;
 

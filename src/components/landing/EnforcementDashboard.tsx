@@ -67,7 +67,6 @@ export const EnforcementDashboard: React.FC = () => {
     <section id="enforcement-dashboard" className="py-20 sm:py-28 bg-[#ECEAEB] border-y border-[#D5D2D4] relative overflow-hidden select-none">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         
-        {/* Section Header */}
         <div className="text-center max-w-3xl mx-auto space-y-3 mb-14">
           <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-[#E6E4E5] border border-[#D5D2D4] text-xs font-semibold text-zinc-800">
             <LayoutDashboard className="w-3.5 h-3.5 text-[#417F14]" />
@@ -86,10 +85,8 @@ export const EnforcementDashboard: React.FC = () => {
           </p>
         </div>
 
-        {/* Dashboard Frame */}
         <div className="bg-[#0B0B0D] rounded-[28px] border border-zinc-800 p-6 sm:p-8 lg:p-10 shadow-2xl text-left text-white space-y-8">
           
-          {/* Metric KPIs Header */}
           <div>
             <div className="flex items-center justify-between pb-4 border-b border-zinc-800">
               <div>
@@ -132,7 +129,6 @@ export const EnforcementDashboard: React.FC = () => {
             </div>
           </div>
 
-          {/* Recent Inspection Records Table */}
           <div className="space-y-4">
             <div className="flex items-center justify-between">
               <span className="text-xs font-mono uppercase tracking-wider text-zinc-400 font-bold">

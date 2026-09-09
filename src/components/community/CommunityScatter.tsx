@@ -21,14 +21,11 @@ export const CommunityScatter: React.FC<CommunityScatterProps> = ({ className })
       )}
       aria-label="Community product discovery visualization"
     >
-      {/* Ambient dark depth glows */}
       <div className="absolute top-1/4 left-1/4 w-[460px] h-[460px] bg-[#94EB41]/[0.07] rounded-full blur-[120px] pointer-events-none -z-10" />
       <div className="absolute bottom-1/4 right-1/4 w-[420px] h-[420px] bg-[#94EB41]/[0.05] rounded-full blur-[100px] pointer-events-none -z-10" />
 
-      {/* Subtle organic grid glow point */}
       <div className="absolute inset-0 bg-[radial-gradient(#ffffff0a_1px,transparent_1px)] [background-size:24px_24px] opacity-40 pointer-events-none" />
 
-      {/* Scattered Avatars & Message Bubbles */}
       <div className="relative w-full h-full max-w-[800px] max-h-[860px] p-6">
         {COMMUNITY_PROFILES.map((profile) => (
           <FloatingAvatar

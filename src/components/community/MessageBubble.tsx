@@ -30,7 +30,6 @@ export const MessageBubble: React.FC<MessageBubbleProps> = ({
     bottom: "top-[calc(100%+10px)] left-1/2 -translate-x-1/2",
   }[position];
 
-  // Tail pointing to avatar
   const renderTail = () => {
     switch (position) {
       case "bottom-right":

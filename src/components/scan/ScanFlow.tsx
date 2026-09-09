@@ -17,17 +17,14 @@ interface ScanFlowProps {
   onSave?: (data: { imageUrl: string; report?: AuditReport }) => void;
 }
 
-// High-fidelity retail barcode renderer
 export function BarcodeGraphic({ code = "8 901207 025372", className = "" }: { code?: string; className?: string }) {
   return (
     <div className={cn("flex flex-col items-center gap-1", className)}>
       <div className="flex items-center justify-center gap-[1.5px] h-7 px-3 py-0.5 bg-white border border-zinc-200 rounded-md">
-        {/* Guard Left */}
         <div className="w-[1.5px] h-6 bg-zinc-950" />
         <div className="w-[1px] h-6 bg-transparent" />
         <div className="w-[1.5px] h-6 bg-zinc-950" />
         
-        {/* Data Pattern */}
         <div className="w-[2.5px] h-5 bg-zinc-950" />
         <div className="w-[1px] h-5 bg-transparent" />
         <div className="w-[1.5px] h-5 bg-zinc-950" />
@@ -40,13 +37,11 @@ export function BarcodeGraphic({ code = "8 901207 025372", className = "" }: { c
         <div className="w-[1px] h-5 bg-transparent" />
         <div className="w-[2px] h-5 bg-zinc-950" />
 
-        {/* Center Guard */}
         <div className="w-[1px] h-6 bg-transparent" />
         <div className="w-[1.5px] h-6 bg-zinc-950" />
         <div className="w-[1px] h-6 bg-transparent" />
         <div className="w-[1.5px] h-6 bg-zinc-950" />
 
-        {/* Data Pattern Right */}
         <div className="w-[2px] h-5 bg-zinc-950" />
         <div className="w-[1.5px] h-5 bg-transparent" />
         <div className="w-[3px] h-5 bg-zinc-950" />
@@ -56,7 +51,6 @@ export function BarcodeGraphic({ code = "8 901207 025372", className = "" }: { c
         <div className="w-[3px] h-5 bg-zinc-950" />
         <div className="w-[1.5px] h-5 bg-zinc-950" />
 
-        {/* Guard Right */}
         <div className="w-[1.5px] h-6 bg-zinc-950" />
         <div className="w-[1px] h-6 bg-transparent" />
         <div className="w-[1.5px] h-6 bg-zinc-950" />
@@ -88,11 +82,9 @@ export function ScanFlow({ isOpen, imageUrl, imageName, onClose, onPost, onSave 
   const [doneSteps, setDoneSteps] = useState<boolean[]>([false, false, false]);
   const [machineGone, setMachineGone] = useState(false);
 
-  // Optional note prompt shown when posting the dossier to the community feed
   const [showPostPrompt, setShowPostPrompt] = useState(false);
   const [postComment, setPostComment] = useState("");
 
-  // Compute dynamic multi-issue audit report for the image
   const report: AuditReport = useMemo(() => {
     return analyzePackagingImage(imageName, imageUrl);
   }, [imageName, imageUrl]);
@@ -113,15 +105,12 @@ export function ScanFlow({ isOpen, imageUrl, imageName, onClose, onPost, onSave 
     if (!isOpen) return;
     const timers: NodeJS.Timeout[] = [];
     
-    // Step 1: Scanning Image & OCR
     timers.push(setTimeout(() => setDoneSteps((p) => [true, p[1], p[2]]), 900));
     timers.push(setTimeout(() => setActiveStep(1), 1050));
 
-    // Step 2: Looking for Legal Metrology Issues
     timers.push(setTimeout(() => setDoneSteps((p) => [p[0], true, p[2]]), 2100));
     timers.push(setTimeout(() => setActiveStep(2), 2250));
 
-    // Step 3: Generating Legal Inspection Dossier
     timers.push(setTimeout(() => setDoneSteps((p) => [p[0], p[1], true]), 3100));
     timers.push(
       setTimeout(() => {
@@ -133,7 +122,6 @@ export function ScanFlow({ isOpen, imageUrl, imageName, onClose, onPost, onSave 
       setTimeout(() => {
         setPrinterStage("complete");
         setPhase("complete");
-        // Automatically fade away the printer and expand script to full screen smoothly
         setTimeout(() => {
           setMachineGone(true);
           setPhase("detached");
@@ -207,7 +195,6 @@ export function ScanFlow({ isOpen, imageUrl, imageName, onClose, onPost, onSave 
                         {(phase === "steps" || phase === "printing") && (
                           <motion.div initial={{ opacity: 1 }} exit={{ opacity: 0, y: -6 }} transition={{ duration: 0.3 }} className="space-y-3">
                             
-                            {/* Top info bar with Thumbnail & Klaro Bot Companion */}
                             <div className="flex gap-2.5 items-center justify-between pb-2.5 border-b border-[#D5D2D4]/60">
                               <div className="flex items-center gap-2.5 min-w-0">
                                 {imageUrl ? (
@@ -227,7 +214,6 @@ export function ScanFlow({ isOpen, imageUrl, imageName, onClose, onPost, onSave 
                                 </div>
                               </div>
 
-                              {/* Animated Klaro Bot in Scanning / Authenticating state */}
                               <div className="shrink-0 scale-90">
                                 <KlaroBot
                                   state={phase === "printing" ? "authenticating" : activeStep === 1 ? "scanning" : "typing"}
@@ -238,7 +224,6 @@ export function ScanFlow({ isOpen, imageUrl, imageName, onClose, onPost, onSave 
                               </div>
                             </div>
 
-                            {/* Horizontal 3-Step Progress Indicator */}
                             <div className="relative pt-1 pb-1">
                               <div className="absolute top-[15px] left-[14px] right-[14px] h-[2px] bg-[#D5D2D4] rounded-full" />
                               <motion.div
@@ -301,7 +286,6 @@ export function ScanFlow({ isOpen, imageUrl, imageName, onClose, onPost, onSave 
                                 })}
                               </div>
 
-                              {/* Multi-issue preview badge during checking phase */}
                               <AnimatePresence>
                                 {doneSteps[1] && (
                                   <motion.div
@@ -344,7 +328,6 @@ export function ScanFlow({ isOpen, imageUrl, imageName, onClose, onPost, onSave 
           </AnimatePresence>
         </div>
 
-        {/* OPTIONAL NOTE PROMPT — shown when the officer taps "Post to feed" */}
         <AnimatePresence>
           {showPostPrompt && (
             <div className="fixed inset-0 z-[95] flex items-center justify-center p-4">
@@ -424,7 +407,6 @@ export function ScanFlow({ isOpen, imageUrl, imageName, onClose, onPost, onSave 
 function PaperContent({ imageUrl, report }: { imageUrl: string | null; report: AuditReport }) {
   return (
     <>
-      {/* Dossier Header */}
       <div className="text-center space-y-1 pb-3 border-b border-dashed border-zinc-300">
         <span className="text-sm font-bold tracking-tight text-zinc-950 block font-satoshi">
           KLARO LEGAL METROLOGY DOSSIER
@@ -437,7 +419,6 @@ function PaperContent({ imageUrl, report }: { imageUrl: string | null; report: A
         </span>
       </div>
 
-      {/* Package Photo & Product Details */}
       {imageUrl && (
         <div className="py-3 border-b border-dashed border-zinc-300 flex gap-3 items-center">
           <img src={imageUrl} alt="proof" className="w-16 h-16 rounded-xl object-cover border border-zinc-200 shrink-0" />
@@ -458,7 +439,6 @@ function PaperContent({ imageUrl, report }: { imageUrl: string | null; report: A
         </div>
       )}
 
-      {/* MULTIPLE VIOLATIONS SECTION */}
       <div className="py-3 border-b border-dashed border-zinc-300 space-y-3">
         <div className="flex items-center justify-between">
           <span className="text-[10px] font-mono font-bold tracking-widest text-zinc-500 block">
@@ -504,7 +484,6 @@ function PaperContent({ imageUrl, report }: { imageUrl: string | null; report: A
         ))}
       </div>
 
-      {/* Statutory Rule Citation Box */}
       <div className="py-3 border-b border-dashed border-zinc-300 space-y-1.5">
         <span className="text-[10px] font-mono font-bold tracking-widest text-zinc-500 block">
           LEGAL METROLOGY ACT CITATIONS
@@ -520,7 +499,6 @@ function PaperContent({ imageUrl, report }: { imageUrl: string | null; report: A
         </div>
       </div>
 
-      {/* Barcode & Verification Seal */}
       <div className="pt-3 space-y-2">
         <BarcodeGraphic code={report.barcode} />
         <div className="flex items-center justify-between text-[10px] font-mono pt-1">
@@ -549,7 +527,6 @@ function DetachedPaperContent({
     <div className="p-5 sm:p-6 font-mono text-left">
       <PaperContent imageUrl={imageUrl} report={report} />
       
-      {/* Footer Section with Smaller Post & Save Buttons in One Horizontal Line */}
       <div className="pt-3.5 mt-3.5 border-t border-dashed border-zinc-300 space-y-2.5">
         <div className="flex items-center gap-2.5 pt-0.5">
           <button
@@ -570,7 +547,6 @@ function DetachedPaperContent({
           </button>
         </div>
 
-        {/* Legal Privacy Note */}
         <p className="text-[10px] text-zinc-500 font-medium text-center leading-snug font-mono">
           This dossier is hashed on-device and ready for legal submission to Metrology Enforcement Officers.
         </p>

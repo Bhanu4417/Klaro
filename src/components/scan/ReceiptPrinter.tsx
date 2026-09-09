@@ -340,7 +340,6 @@ function ReceiptPrinterOutput({
           transform: {
             duration: shouldMove ? 1.75 : 0,
             ease: shouldUseSteppedFeed ? "linear" : easeInOut,
-            // @ts-ignore - times is valid for motion
             times: shouldUseSteppedFeed ? printingKeyframeTimes : undefined,
           },
         }}

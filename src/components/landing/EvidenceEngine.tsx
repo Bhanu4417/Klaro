@@ -38,7 +38,6 @@ export const EvidenceEngine: React.FC = () => {
     <section id="evidence-engine" className="py-20 sm:py-28 bg-[#E6E4E5] relative overflow-hidden select-none">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         
-        {/* Section Header */}
         <div className="text-center max-w-3xl mx-auto space-y-3 mb-14 sm:mb-16">
           <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-[#ECEAEB] border border-[#D5D2D4] text-xs font-semibold text-zinc-800">
             <Crosshair className="w-3.5 h-3.5 text-[#417F14]" />
@@ -57,7 +56,6 @@ export const EvidenceEngine: React.FC = () => {
           </p>
         </div>
 
-        {/* 3 Evidence Cards */}
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 text-left">
           {evidencePoints.map((ev) => (
             <div
@@ -78,7 +76,6 @@ export const EvidenceEngine: React.FC = () => {
                   {ev.title}
                 </h3>
 
-                {/* Cropped OCR Snippet Box */}
                 <div className="p-3 rounded-xl bg-zinc-900 text-zinc-100 font-mono text-xs space-y-1">
                   <div className="flex items-center justify-between text-[10px] text-zinc-400 border-b border-zinc-800 pb-1">
                     <span>EXTRACTED OCR PAYLOAD</span>
@@ -88,7 +85,6 @@ export const EvidenceEngine: React.FC = () => {
                   <p className="text-[10px] text-zinc-400">{ev.location}</p>
                 </div>
 
-                {/* Legal Metrology Law Citation */}
                 <div className="p-3 rounded-xl bg-[#ECEAEB] border border-[#D5D2D4] space-y-1">
                   <span className="text-[10px] font-mono font-bold text-zinc-600 uppercase block">
                     LEGAL BASIS & CITATION

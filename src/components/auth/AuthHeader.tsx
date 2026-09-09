@@ -11,6 +11,46 @@ interface AuthHeaderProps {
   className?: string;
 }
 
+const SPEECH_LINES = [
+  "Psst — login first! I don't make the rules.",
+  "Want to check what's really in your food?",
+  "I can sniff out hidden additives in seconds.",
+  "Scan the barcode, I'll do the detective work.",
+  "That 'healthy' snack might be lying to you.",
+  "I've read the labels so you don't have to.",
+  "MRP tricks? I catch those every single day.",
+  "Login and I'll remember everything you scan.",
+  "Your food journal is waiting on the other side.",
+  "Fresh ingredients or fine print — I'll tell you.",
+  "Know what you eat before it knows you back.",
+  "I once caught a juice with nine hidden sugars.",
+  "Scanning is caring — for your own health.",
+  "Login first, then we hunt misleading labels.",
+  "I speak fluent ingredient-list. Truly.",
+  "The community feed is full of food finds.",
+  "One little scan can save your whole meal.",
+  "I'm basically a nutrition detective, really.",
+  "Hunger is temporary, label-checking is forever.",
+  "Sign in — your stomach will thank you later.",
+];
+
+const OFFICER_SPEECH_LINES = [
+  "Aye aye, sir!",
+  "Scanning the perimeter, sir.",
+  "Labels under inspection, sir!",
+  "No smuggled sugars on my watch.",
+  "Officer mode: engaged.",
+  "Every MRP cross-checked, sir!",
+  "Requesting permission to scan, sir.",
+  "All snacks suspicious until proven healthy.",
+  "Patrolling the shelves, sir.",
+  "I have clearance for classified kitchens.",
+  "Status: hungry for justice, sir.",
+  "Discipline in every ingredient, sir.",
+  "All clear on the snacks front, sir.",
+  "Sir, yes sir!",
+];
+
 export const AuthHeader: React.FC<AuthHeaderProps> = ({ view, className }) => {
   const getHeaderContent = () => {
     switch (view) {
@@ -64,31 +104,6 @@ export const AuthHeader: React.FC<AuthHeaderProps> = ({ view, className }) => {
 
   const content = getHeaderContent();
 
-  /* Playful one-liners when the mascot is clicked; spam-click and it gets angry,
-     then a fresh round of lines begins. */
-  const speechLines = [
-    "Psst — login first! I don't make the rules.",
-    "Want to check what's really in your food?",
-    "I can sniff out hidden additives in seconds.",
-    "Scan the barcode, I'll do the detective work.",
-    "That 'healthy' snack might be lying to you.",
-    "I've read the labels so you don't have to.",
-    "MRP tricks? I catch those every single day.",
-    "Login and I'll remember everything you scan.",
-    "Your food journal is waiting on the other side.",
-    "Fresh ingredients or fine print — I'll tell you.",
-    "Know what you eat before it knows you back.",
-    "I once caught a juice with nine hidden sugars.",
-    "Scanning is caring — for your own health.",
-    "Login first, then we hunt misleading labels.",
-    "I speak fluent ingredient-list. Truly.",
-    "The community feed is full of food finds.",
-    "One little scan can save your whole meal.",
-    "I'm basically a nutrition detective, really.",
-    "Hunger is temporary, label-checking is forever.",
-    "Sign in — your stomach will thank you later.",
-  ];
-
   const getBotState = () => {
     switch (view) {
       case "welcome":
@@ -97,9 +112,9 @@ export const AuthHeader: React.FC<AuthHeaderProps> = ({ view, className }) => {
       case "signup":
       case "onboarding":
         return "typing";
-      case "verify_email":
       case "officer_login":
-        // Credential entry — keep the thinking "?" out of password flows
+        return "idle";
+      case "verify_email":
         return "typing";
       case "forgot_password":
       case "reset_sent":
@@ -119,7 +134,8 @@ export const AuthHeader: React.FC<AuthHeaderProps> = ({ view, className }) => {
           state={getBotState()}
           showShadow={true}
           interactive={true}
-          speech={speechLines}
+          speech={view === "officer_login" ? OFFICER_SPEECH_LINES : SPEECH_LINES}
+          speechTone={view === "officer_login" ? "officer" : "standard"}
         />
       </div>
 

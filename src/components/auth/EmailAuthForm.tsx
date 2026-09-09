@@ -28,7 +28,6 @@ export const EmailAuthForm: React.FC<EmailAuthFormProps> = ({
 
   return (
     <div className="w-full">
-      {/* Mode toggle pills */}
       <div className="grid grid-cols-2 p-1 mb-5 bg-zinc-100 rounded-xl border border-zinc-200/60 select-none">
         <button
           type="button"

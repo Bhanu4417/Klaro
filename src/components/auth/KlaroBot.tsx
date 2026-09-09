@@ -27,8 +27,7 @@ export interface KlaroBotProps {
   interactive?: boolean;
   showShadow?: boolean;
   glowColor?: string;
-  /** Fun one-liners shown in a speech bubble when the bot is clicked.
-       Spam-click it and it gets angry. Omit to keep clicks silent. */
+  speechTone?: "standard" | "officer";
   speech?: string[];
   className?: string;
   onClick?: () => void;
@@ -38,7 +37,6 @@ const ERROR_COLOR = "#FF5353";
 const PUPIL_COLOR = "#141416";
 const EYE_COLOR = "#FFFFFF";
 
-/* Compact footprint per size. Everything scales via `em` */
 const SIZE_CONFIG = {
   sm: { px: 40, font: 10 },
   md: { px: 60, font: 15 },
@@ -47,18 +45,11 @@ const SIZE_CONFIG = {
   hero: { px: 176, font: 44 },
 } as const;
 
-/* Vibrant brand green - electric, vivid Klaro neon */
 const BODY_GRADIENT = "linear-gradient(180deg, #A8F55D 0%, #94EC40 55%, #7ADB2B 100%)";
 
-/* Duolingo-style loading workout: one choreographed 3s loop.
-   hop → tilt left → tilt right → wiggle → bob → settle, then repeat. */
 const LOAD_TIMES = [0, 0.14, 0.28, 0.42, 0.56, 0.7, 0.84, 1];
 const LOAD_LOOP = { repeat: Infinity, duration: 3, ease: "easeInOut", times: LOAD_TIMES } as const;
 
-/* ---------- Eye primitives ---------- */
-
-/* White sclera with a roaming black eyeball.
-   Either driven by cursor springs (pupilX/pupilY) or a scripted `pose`. */
 const ScleraEye: React.FC<{
   pupilX?: MotionValue<number>;
   pupilY?: MotionValue<number>;
@@ -88,7 +79,6 @@ const ScleraEye: React.FC<{
       transition={pose ? { ...LOAD_LOOP, duration: pose.duration ?? 3, times: pose.times ?? LOAD_TIMES } : undefined}
       className="absolute left-1/2 top-1/2"
     >
-      {/* Annoyed eye-roll layer — driven imperatively on click */}
       <motion.div animate={rollControls}>
         <div
           className="rounded-full"
@@ -100,7 +90,6 @@ const ScleraEye: React.FC<{
             marginTop: "-0.16em",
           }}
         >
-          {/* Pupil catchlight */}
           <div
             className="rounded-full bg-white/90"
             style={{ width: "0.08em", height: "0.08em", margin: "0.05em 0 0 0.05em" }}
@@ -135,7 +124,6 @@ const CrossEye: React.FC = () => (
   </svg>
 );
 
-/* Angry eye: slanted brow over a fully red glowing eye, like a classic angry face */
 const AngryEye: React.FC<{ flip?: boolean }> = ({ flip = false }) => (
   <div className="flex flex-col items-center" style={{ gap: "0.04em" }}>
     <div
@@ -167,21 +155,28 @@ export const KlaroBot: React.FC<KlaroBotProps> = ({
   interactive = true,
   showShadow = true,
   glowColor = "#94EC40",
+  speechTone = "standard",
   speech,
   className,
   onClick,
 }) => {
   const [isHovered, setIsHovered] = useState(false);
   const [isBlinking, setIsBlinking] = useState(false);
-  const [bubble, setBubble] = useState<string | null>(null);
   const [angry, setAngry] = useState(false);
+  const [thoughtIdx, setThoughtIdx] = useState(0);
   const botRef = useRef<HTMLDivElement>(null);
   const clickCount = useRef(0);
-  const bubbleTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
   const angerTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
 
-  /* Click → bulge squash-and-spring, annoyed eye-roll, then the speech bubble.
-     Every 5th click tips it over into an angry face. */
+  useEffect(() => {
+    if (!speech?.length || angry) return;
+    setThoughtIdx(Math.floor(Math.random() * speech.length));
+    const timer = setInterval(() => {
+      setThoughtIdx((i) => (i + 1) % speech.length);
+    }, 4200);
+    return () => clearInterval(timer);
+  }, [speech, angry]);
+
   const handleClick = () => {
     onClick?.();
 
@@ -200,25 +195,18 @@ export const KlaroBot: React.FC<KlaroBotProps> = ({
 
     if (angry) return;
 
-    /* Every 5th click → anger episode, then the chatter resumes fresh */
     if (clickCount.current % 5 === 0) {
-      setBubble(null);
       setAngry(true);
-      if (bubbleTimer.current) clearTimeout(bubbleTimer.current);
       if (angerTimer.current) clearTimeout(angerTimer.current);
       angerTimer.current = setTimeout(() => setAngry(false), 2600);
       return;
     }
 
-    const msg = speech[(clickCount.current - 1) % speech.length];
-    setBubble(msg);
-    if (bubbleTimer.current) clearTimeout(bubbleTimer.current);
-    bubbleTimer.current = setTimeout(() => setBubble(null), 2400);
+    setThoughtIdx((i) => (i + 1) % speech.length);
   };
 
   useEffect(
     () => () => {
-      if (bubbleTimer.current) clearTimeout(bubbleTimer.current);
       if (angerTimer.current) clearTimeout(angerTimer.current);
     },
     []
@@ -232,15 +220,11 @@ export const KlaroBot: React.FC<KlaroBotProps> = ({
   const tiltX = useSpring(0, springConfig);
   const tiltY = useSpring(0, springConfig);
 
-  /* Poke bulge + annoyed eye-roll, fired on every click */
   const pokeControls = useAnimationControls();
   const rollControls = useAnimationControls();
 
-  // Cursor tracking only in idle
   const trackingEnabled = interactive && state === "idle";
 
-  /* Pupils roam the full sclera slack toward the cursor; the whole face
-     drifts along at half strength so the follow reads clearly. */
   useEffect(() => {
     if (!trackingEnabled) {
       pupilX.set(0);
@@ -259,9 +243,9 @@ export const KlaroBot: React.FC<KlaroBotProps> = ({
       const normX = Math.max(-1, Math.min(1, (e.clientX - (rect.left + rect.width / 2)) / 220));
       const normY = Math.max(-1, Math.min(1, (e.clientY - (rect.top + rect.height / 2)) / 220));
 
-      pupilX.set(normX * f * 0.11); // full horizontal slack inside the sclera
+      pupilX.set(normX * f * 0.11);
       pupilY.set(normY * f * 0.15);
-      faceX.set(normX * f * 0.05); // face leans with the gaze
+      faceX.set(normX * f * 0.05);
       faceY.set(normY * f * 0.06);
       tiltY.set(normX * 6);
       tiltX.set(-normY * 4);
@@ -271,7 +255,6 @@ export const KlaroBot: React.FC<KlaroBotProps> = ({
     return () => window.removeEventListener("mousemove", handleMouseMove);
   }, [trackingEnabled, size, pupilX, pupilY, faceX, faceY, tiltX, tiltY]);
 
-  /* Natural blinking in idle */
   useEffect(() => {
     if (state !== "idle") return;
 
@@ -288,7 +271,6 @@ export const KlaroBot: React.FC<KlaroBotProps> = ({
 
   const { px, font } = SIZE_CONFIG[size];
 
-  /* Floating body levitation & reaction animations */
   const bodyVariants: Variants = {
     idle: {
       y: [-1.5, 1.5, -1.5],
@@ -300,13 +282,11 @@ export const KlaroBot: React.FC<KlaroBotProps> = ({
       transition: { repeat: Infinity, duration: 0.8, ease: "easeInOut" },
     },
     scanning: {
-      // Person-thinking body language: slow pondering head-tilt with a thoughtful bob
       y: [-1, 0.6, -1.6, 0.6, -1],
       rotate: [2, 7, 4, 8.5, 2],
       transition: { repeat: Infinity, duration: 3.4, ease: "easeInOut" },
     },
     authenticating: {
-      // Duolingo-style workout: hop, tilt left, tilt right, wiggle, bob, settle
       y: [0, -8, 0, 0, -6, 0, -3, 0],
       rotate: [0, -2, -9, 9, 2, -6, 3, 0],
       scaleX: [1, 0.95, 1.05, 1.05, 0.96, 1.02, 0.98, 1],
@@ -329,7 +309,6 @@ export const KlaroBot: React.FC<KlaroBotProps> = ({
 
   const renderEyes = () => {
     if (angry) {
-      /* Angry face: slanted brows + pulsing red glowing eyes */
       return (
         <div className="flex items-center justify-center" style={{ gap: "0.44em" }}>
           <AngryEye />
@@ -339,7 +318,6 @@ export const KlaroBot: React.FC<KlaroBotProps> = ({
     }
     switch (state) {
       case "scanning":
-        /* Thinking gaze: eyes drift up as if pondering, wander side to side */
         return (
           <div className="flex items-center justify-center" style={{ gap: "0.48em" }}>
             <ScleraEye
@@ -363,7 +341,6 @@ export const KlaroBot: React.FC<KlaroBotProps> = ({
           </div>
         );
       case "typing":
-        /* Reading: pupils sweep across the line, looking down */
         return (
           <div className="flex items-center justify-center" style={{ gap: "0.48em" }}>
             <ScleraEye
@@ -377,7 +354,6 @@ export const KlaroBot: React.FC<KlaroBotProps> = ({
           </div>
         );
       case "authenticating":
-        /* Eyes ride along with the workout: up on hops, look left, look right */
         return (
           <div className="flex items-center justify-center" style={{ gap: "0.48em" }}>
             <ScleraEye
@@ -402,7 +378,6 @@ export const KlaroBot: React.FC<KlaroBotProps> = ({
           </div>
         );
       case "peek":
-        /* Password: eyes calmly shut — one clean line per eye, soft sleep breathing */
         return (
           <div className="flex items-center justify-center" style={{ gap: "0.48em" }}>
             <motion.div
@@ -439,7 +414,6 @@ export const KlaroBot: React.FC<KlaroBotProps> = ({
 
   const renderMouth = () => {
     if (angry) {
-      /* Deep angry frown, like the classic grumpy face */
       return (
         <svg viewBox="0 0 16 12" fill="none" style={{ width: "0.85em", height: "0.55em" }}>
           <path d="M2 10 Q8 2 14 10" stroke={ERROR_COLOR} strokeWidth="3" strokeLinecap="round" />
@@ -447,7 +421,6 @@ export const KlaroBot: React.FC<KlaroBotProps> = ({
       );
     }
     if (state === "scanning") {
-      /* Thoughtful "hmm" — a small line drifted to one side */
       return (
         <motion.div
           animate={{ x: ["0.05em", "0.07em", "0.03em", "0.07em", "0.05em"] }}
@@ -468,7 +441,6 @@ export const KlaroBot: React.FC<KlaroBotProps> = ({
       );
     }
     if (state === "authenticating") {
-      /* Open excited smile pumping with the workout */
       return (
         <motion.div
           animate={{ scaleX: [1, 1.25, 1, 1.1, 1.2, 1, 1.05, 1] }}
@@ -505,8 +477,13 @@ export const KlaroBot: React.FC<KlaroBotProps> = ({
     );
   };
 
-  /* Clean floating thought bubble: white disc with a green "?" and a
-     trailing pair of thought dots — no stalk, no black. */
+  const NOTE_THEME = {
+    body: "linear-gradient(135deg, #ffffff 0%, #f3ffe8 100%)",
+    border: "rgba(148, 236, 64, 0.48)",
+    text: "#346415",
+    filter: "drop-shadow(0 0.35em 0.8em rgba(48, 87, 22, 0.15)) drop-shadow(0 0.08em 0.2em rgba(48, 87, 22, 0.1))",
+  };
+
   const renderThoughtBubble = () => (
     <AnimatePresence>
       {state === "scanning" && (
@@ -536,7 +513,6 @@ export const KlaroBot: React.FC<KlaroBotProps> = ({
           >
             ?
           </motion.div>
-          {/* Thought-bubble trail dots leading back to the head */}
           <div className="rounded-full bg-white/95 shadow-sm" style={{ width: "0.3em", height: "0.3em", marginTop: "0.06em", marginRight: "0.55em" }} />
           <div className="rounded-full bg-white/85 shadow-sm" style={{ width: "0.19em", height: "0.19em", marginTop: "0.05em", marginRight: "0.95em" }} />
         </motion.div>
@@ -558,29 +534,63 @@ export const KlaroBot: React.FC<KlaroBotProps> = ({
       className={cn("relative select-none cursor-pointer group shrink-0 flex flex-col items-center justify-center", className)}
       style={{ width: px, height: px, fontSize: font }}
     >
-      {/* Speech bubble — pops on click, cycles through the one-liners */}
       <AnimatePresence>
-        {bubble && (
+        {speech?.length && !angry && (
           <motion.div
-            initial={{ opacity: 0, y: 8, scale: 0.8 }}
-            animate={{ opacity: 1, y: 0, scale: 1 }}
-            exit={{ opacity: 0, y: -6, scale: 0.9 }}
-            transition={{ type: "spring", stiffness: 420, damping: 26 }}
-            className="absolute z-40 whitespace-nowrap rounded-xl bg-white font-semibold shadow-lg pointer-events-none"
-            style={{
-              bottom: "calc(100% + 0.5em)",
-              left: "50%",
-              x: "-50%",
-              fontSize: Math.max(11, font * 0.75),
-              padding: "0.4em 0.8em",
-              color: "#3f6212",
-            }}
+            initial={{ opacity: 0, scale: 0.5, y: 10 }}
+            animate={{ opacity: 1, scale: 1, y: 0 }}
+            exit={{ opacity: 0, scale: 0.5, y: 8 }}
+            transition={{ type: "spring", stiffness: 320, damping: 24 }}
+            className="absolute z-40 pointer-events-none"
+            style={{ bottom: "calc(100% + 0.65em)", left: "50%", x: "-50%", width: "max-content", maxWidth: "min(82vw, 19em)" }}
           >
-            {bubble}
-            <div
-              className="absolute left-1/2 bg-white"
-              style={{ width: "0.55em", height: "0.55em", bottom: "-0.24em", transform: "translateX(-50%) rotate(45deg)" }}
-            />
+            <div className="relative flex flex-col items-center" style={{ filter: NOTE_THEME.filter }}>
+              <motion.div
+                layout
+                transition={{ type: "spring", stiffness: 350, damping: 32 }}
+                className="relative overflow-visible rounded-[1.35em] border backdrop-blur-sm"
+                style={{
+                  padding: "0.9em 1.15em",
+                  background: NOTE_THEME.body,
+                  borderColor: NOTE_THEME.border,
+                  boxShadow: "inset 0 0.08em 0 rgba(255,255,255,0.9)",
+                }}
+              >
+                <AnimatePresence mode="wait" initial={false}>
+                  <motion.span
+                    key={thoughtIdx}
+                    initial={{ opacity: 0, y: 6, filter: "blur(3px)" }}
+                    animate={{ opacity: 1, y: 0, filter: "blur(0px)" }}
+                    exit={{ opacity: 0, y: -6, filter: "blur(3px)" }}
+                    transition={{ duration: 0.4, ease: "easeInOut" }}
+                    className="relative z-10 block whitespace-normal text-center font-semibold leading-[1.35]"
+                    style={{ fontSize: Math.max(11, font * 0.72), color: NOTE_THEME.text }}
+                  >
+                    {speech[thoughtIdx % speech.length]}
+                  </motion.span>
+                </AnimatePresence>
+              </motion.div>
+
+              <motion.div
+                initial={{ opacity: 0, scale: 0 }}
+                animate={{ opacity: 1, scale: 1 }}
+                transition={{ delay: 0.15, type: "spring", stiffness: 320, damping: 22 }}
+                className="relative flex flex-col items-center"
+              >
+                <div
+                  className="rounded-full border"
+                  style={{ width: "0.3em", height: "0.3em", marginTop: "0.14em", marginLeft: "1.1em", background: NOTE_THEME.body, borderColor: NOTE_THEME.border }}
+                />
+                <div
+                  className="rounded-full border"
+                  style={{ width: "0.2em", height: "0.2em", marginTop: "0.09em", marginLeft: "0.45em", background: NOTE_THEME.body, borderColor: NOTE_THEME.border }}
+                />
+                <div
+                  className="rounded-full border"
+                  style={{ width: "0.11em", height: "0.11em", marginTop: "0.07em", marginLeft: "-0.1em", background: NOTE_THEME.body, borderColor: NOTE_THEME.border }}
+                />
+              </motion.div>
+            </div>
           </motion.div>
         )}
       </AnimatePresence>
@@ -597,9 +607,7 @@ export const KlaroBot: React.FC<KlaroBotProps> = ({
       >
         {renderThoughtBubble()}
 
-        {/* Poke bulge — squashes in on click, springs back out */}
         <motion.div animate={pokeControls} className="relative z-10 w-full h-full flex items-center justify-center">
-          {/* VIBRANT BRAND GREEN SQUIRCLE BODY */}
         <div
           className="relative w-full h-full flex flex-col items-center justify-center overflow-hidden"
           style={{
@@ -610,13 +618,11 @@ export const KlaroBot: React.FC<KlaroBotProps> = ({
               "0 0.15em 0.45em rgba(0,0,0,0.18), inset 0 0.1em 0.14em rgba(255,255,255,0.6), inset 0 -0.2em 0.4em rgba(20,60,0,0.22)",
           }}
         >
-          {/* Top-light sheen */}
           <div
             className="absolute inset-x-0 top-0 h-[45%] pointer-events-none"
             style={{ background: "linear-gradient(180deg, rgba(255,255,255,0.28), transparent)" }}
           />
 
-          {/* Error alarm ring */}
           {isError && (
             <motion.div
               initial={{ opacity: 0 }}
@@ -627,7 +633,6 @@ export const KlaroBot: React.FC<KlaroBotProps> = ({
             />
           )}
 
-          {/* Eyes — morph smoothly (angry ↔ normal and between states) */}
           <motion.div style={{ x: faceX, y: faceY }} className="relative z-10 flex items-center justify-center">
             <AnimatePresence mode="wait" initial={false}>
               <motion.div
@@ -643,7 +648,6 @@ export const KlaroBot: React.FC<KlaroBotProps> = ({
             </AnimatePresence>
           </motion.div>
 
-          {/* Mouth — morphs in sync with the eyes */}
           <div className="relative z-10 flex justify-center" style={{ marginTop: "0.52em" }}>
             <AnimatePresence mode="wait" initial={false}>
               <motion.div
@@ -662,7 +666,6 @@ export const KlaroBot: React.FC<KlaroBotProps> = ({
         </motion.div>
       </motion.div>
 
-      {/* Floor levitation shadow — pumps with the loading workout */}
       {showShadow && (
         <motion.div
           animate={

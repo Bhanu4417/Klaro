@@ -39,7 +39,6 @@ export const AuthenticatedAppPreview: React.FC<AuthenticatedAppPreviewProps> = (
 
   return (
     <div className="w-full space-y-6 text-left animate-fade-in">
-      {/* Top User Bar */}
       <div className="flex items-center justify-between pb-4 border-b border-paper-200">
         <div className="flex items-center gap-3">
           <div className="w-12 h-12 rounded-2xl bg-paper-200 border border-paper-300 flex items-center justify-center text-2xl overflow-hidden shadow-tactile-sm shrink-0">
@@ -73,7 +72,6 @@ export const AuthenticatedAppPreview: React.FC<AuthenticatedAppPreviewProps> = (
         </button>
       </div>
 
-      {/* Daily Scanning Summary / Stat Strip */}
       <div className="grid grid-cols-3 gap-2 bg-zinc-100/70 p-3 rounded-2xl border border-zinc-200/60 text-center">
         <div className="space-y-0.5">
           <span className="text-[10px] font-mono uppercase tracking-wider text-zinc-400">Scans</span>
@@ -89,9 +87,7 @@ export const AuthenticatedAppPreview: React.FC<AuthenticatedAppPreviewProps> = (
         </div>
       </div>
 
-      {/* Scanned Food Card */}
       <div className="relative bg-zinc-50/70 rounded-2xl border border-zinc-200/60 p-4 space-y-3.5 shadow-sm">
-        {/* Receipt Top Tag */}
         <div className="flex items-center justify-between text-xs">
           <div className="flex items-center gap-1.5">
             <Badge variant="botanical" size="sm">
@@ -102,7 +98,6 @@ export const AuthenticatedAppPreview: React.FC<AuthenticatedAppPreviewProps> = (
           <span className="text-[10px] font-mono text-zinc-400">SCAN #2026-08</span>
         </div>
 
-        {/* Product Details */}
         <div>
           <h3 className="text-base font-semibold text-[rgb(18,18,18)] font-sans tracking-tight">
             Artisan Oat Milk — Barista Blend
@@ -112,7 +107,6 @@ export const AuthenticatedAppPreview: React.FC<AuthenticatedAppPreviewProps> = (
           </p>
         </div>
 
-        {/* Ingredient Breakdown */}
         <div className="bg-white p-3 rounded-xl border border-zinc-200/70 text-xs space-y-1.5">
           <div className="flex items-center justify-between font-mono text-[10px] uppercase text-zinc-400 border-b border-zinc-100 pb-1">
             <span>Ingredients Analysis</span>
@@ -123,7 +117,6 @@ export const AuthenticatedAppPreview: React.FC<AuthenticatedAppPreviewProps> = (
           </p>
         </div>
 
-        {/* Macros Mini Bar */}
         <div className="grid grid-cols-4 gap-1 text-center text-[11px] py-1 bg-white rounded-xl border border-zinc-200/70">
           <div>
             <span className="text-zinc-400 text-[9px] uppercase font-mono block">Calories</span>
@@ -143,7 +136,6 @@ export const AuthenticatedAppPreview: React.FC<AuthenticatedAppPreviewProps> = (
           </div>
         </div>
 
-        {/* Card Actions */}
         <div className="flex items-center justify-between pt-1">
           <button
             type="button"
@@ -164,7 +156,6 @@ export const AuthenticatedAppPreview: React.FC<AuthenticatedAppPreviewProps> = (
         </div>
       </div>
 
-      {/* Action Buttons */}
       <div className="space-y-2.5 pt-2">
         <Button
           variant="primary"

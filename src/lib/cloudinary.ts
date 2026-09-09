@@ -1,10 +1,5 @@
-/**
- * Cloudinary Image Upload Service for Klaro Inspection Dossiers
- * Cloud Name: dzkdfwh1v
- */
 
 const CLOUDINARY_CLOUD_NAME = "dzkdfwh1v";
-// Unsigned upload preset created in the Cloudinary dashboard (Settings → Upload presets)
 const CLOUDINARY_UPLOAD_PRESET = process.env.CLOUDINARY_UPLOAD_PRESET || "klaro_unsigned";
 
 export interface CloudinaryUploadResponse {
@@ -14,9 +9,6 @@ export interface CloudinaryUploadResponse {
   error?: string;
 }
 
-/**
- * Uploads an image (data URL, blob, or file) to Cloudinary
- */
 export async function uploadToCloudinary(
   fileData: string | Blob | File,
   folder: string = "klaro_inspections"
@@ -43,7 +35,6 @@ export async function uploadToCloudinary(
       };
     }
 
-    // Upload rejected — only a persistent Cloudinary https URL may be persisted to Supabase
     console.error("Cloudinary upload failed:", data.error?.message || "Unknown error");
     return {
       success: false,

@@ -63,7 +63,12 @@ export default function RootLayout({
   children: React.ReactNode;
 }) {
   return (
-    <ClerkProvider publishableKey={process.env.NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY}>
+    <ClerkProvider
+      publishableKey={process.env.NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY}
+      signInUrl="/login"
+      signUpUrl="/login"
+      afterSignOutUrl="/login"
+    >
       <html lang="en" suppressHydrationWarning className={`bg-[#E6E4E5] ${satoshi.variable}`}>
         <body suppressHydrationWarning className="antialiased font-sans text-charcoal-900 bg-[#E6E4E5] selection:bg-[#94EC40] selection:text-[#121212]">
           {children}

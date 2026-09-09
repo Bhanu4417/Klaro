@@ -5,7 +5,6 @@ import { motion, AnimatePresence } from "framer-motion";
 import { X, Check, Copy, Share2 } from "lucide-react";
 import { cn } from "../lib/utils";
 
-// Valid 21x21 Version 1 QR Matrix (1 = dark, 0 = light)
 const QR_MATRIX_21: number[][] = [
   [1, 1, 1, 1, 1, 1, 1, 0, 1, 0, 0, 1, 0, 0, 1, 1, 1, 1, 1, 1, 1],
   [1, 0, 0, 0, 0, 0, 1, 0, 0, 1, 1, 0, 1, 0, 1, 0, 0, 0, 0, 0, 1],
@@ -30,20 +29,18 @@ const QR_MATRIX_21: number[][] = [
   [1, 1, 1, 1, 1, 1, 1, 0, 0, 1, 0, 1, 0, 1, 1, 0, 1, 0, 1, 0, 1],
 ];
 
-// Compact Stage Settings
-const CELL = 9; // 9px per module -> 21 * 9 = 189px
-const SUB = 3; // 3x3 subdivision = 9 grains per module
-const GRAIN_SIZE = 3; // Exact 3px integer grain
+const CELL = 9;
+const SUB = 3;
+const GRAIN_SIZE = 3;
 const STAGE_W = 220;
 const STAGE_H = 220;
-const QR_SIZE = 21 * CELL; // 189px
-const QR_OFFSET = (STAGE_W - QR_SIZE) / 2; // 15.5px centered
+const QR_SIZE = 21 * CELL;
+const QR_OFFSET = (STAGE_W - QR_SIZE) / 2;
 
-const T_FLIGHT = 580; // Mark flight in ms
-const T_STAGGER = 640; // Stagger across marks
-const TOTAL_DURATION = T_FLIGHT + T_STAGGER; // 1220ms
+const T_FLIGHT = 580;
+const T_STAGGER = 640;
+const TOTAL_DURATION = T_FLIGHT + T_STAGGER;
 
-// Quintic Ease Out: 1 - (1-t)^5
 function easeOutQuint(t: number): number {
   const clamped = Math.max(0, Math.min(1, t));
   return 1 - Math.pow(1 - clamped, 5);
@@ -87,7 +84,6 @@ export function ShareModal({
   const animFrameRef = useRef<number | null>(null);
   const lastTimeRef = useRef<number | null>(null);
 
-  // Pre-calculate QR modules
   const qrParticles: ParticleData[] = useMemo(() => {
     const launchX = STAGE_W / 2;
     const launchY = STAGE_H + 20;
@@ -144,7 +140,6 @@ export function ShareModal({
     });
   }, []);
 
-  // Frame Draw Call
   const renderFrame = useCallback(
     (clockMs: number) => {
       const canvas = canvasRef.current;
@@ -157,7 +152,6 @@ export function ShareModal({
         window.matchMedia &&
         window.matchMedia("(prefers-reduced-motion: reduce)").matches;
 
-      // Clear Canvas (#FCFCFC)
       ctx.fillStyle = "#FCFCFC";
       ctx.fillRect(0, 0, STAGE_W, STAGE_H);
 
@@ -204,7 +198,6 @@ export function ShareModal({
     [qrParticles]
   );
 
-  // HiDPI Canvas Init & Animation Driver
   useEffect(() => {
     if (!isOpen) return;
 
@@ -265,9 +258,8 @@ export function ShareModal({
   return (
     <AnimatePresence>
       {isOpen && (
-        <div className="fixed inset-0 z-[999] flex items-center justify-center p-4">
+        <div key="share-modal" className="fixed inset-0 z-[999] flex items-center justify-center p-4">
           
-          {/* Subtle Backdrop */}
           <motion.div
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
@@ -276,7 +268,6 @@ export function ShareModal({
             className="fixed inset-0 bg-black/40 backdrop-blur-sm"
           />
 
-          {/* Bulge-Out Compact Share Box */}
           <motion.div
             initial={{ scale: 0.65, opacity: 0, y: 10 }}
             animate={{ scale: 1, opacity: 1, y: 0 }}
@@ -289,7 +280,6 @@ export function ShareModal({
             }}
             className="relative w-[268px] bg-[#FCFCFB] rounded-[24px] border border-white/80 p-3.5 shadow-[0_16px_40px_rgba(0,0,0,0.16),0_2px_6px_rgba(0,0,0,0.06),inset_0_1px_1px_rgba(255,255,255,0.95)] text-zinc-950 z-10 space-y-2.5 text-center"
           >
-            {/* Header */}
             <div className="flex items-center justify-between px-1">
               <div className="flex items-center gap-1.5">
                 <div className="w-6 h-6 rounded-lg bg-[#94EB41] text-[rgb(18,18,18)] flex items-center justify-center border border-[#80D42F] shadow-xs">
@@ -313,7 +303,6 @@ export function ShareModal({
               </button>
             </div>
 
-            {/* QR Canvas Container */}
             <div className="flex items-center justify-center p-1.5 rounded-xl bg-[#FCFCFC] border border-[#E2DFE2] shadow-[inset_0_1px_2px_rgba(0,0,0,0.04)]">
               <canvas
                 ref={canvasRef}
@@ -322,7 +311,6 @@ export function ShareModal({
               />
             </div>
 
-            {/* Direct Link + Copy Button */}
             <div className="flex items-center gap-1 p-1 bg-[#ECEAEB] rounded-xl border border-[#D5D2D4]">
               <div className="flex-1 px-2 py-1 text-[11px] font-mono text-zinc-700 truncate select-all text-left">
                 {shareUrl}

@@ -31,5 +31,5 @@ export interface PasswordValidation {
   hasUppercase: boolean;
   hasNumber: boolean;
   hasSpecialChar: boolean;
-  score: number; // 0 - 4
+  score: number;
 }

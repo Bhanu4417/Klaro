@@ -49,7 +49,6 @@ export const OfficerLoginForm: React.FC<OfficerLoginFormProps> = ({
   return (
     <form onSubmit={handleSubmit} className="w-full space-y-4 text-left">
       
-      {/* Officer Authority Header */}
       <div className="text-center space-y-2 pb-2">
         <div className="flex items-center justify-center mx-auto mb-3">
           <OfficerCustomBadgeIcon className="w-14 h-14 text-[#346415]" />
@@ -65,14 +64,12 @@ export const OfficerLoginForm: React.FC<OfficerLoginFormProps> = ({
         </p>
       </div>
 
-      {/* Error Alert */}
       {(error || serverError) && (
         <div className="p-3 rounded-xl bg-rose-50 border border-rose-200 text-rose-800 text-xs font-medium">
           {error || serverError?.message}
         </div>
       )}
 
-      {/* Email Input */}
       <div className="space-y-1">
         <label className="text-xs font-bold text-zinc-700 block">Officer Email Address</label>
         <Input
@@ -85,7 +82,6 @@ export const OfficerLoginForm: React.FC<OfficerLoginFormProps> = ({
         />
       </div>
 
-      {/* Password Input */}
       <div className="space-y-1">
         <label className="text-xs font-bold text-zinc-700 block">Security Key / Password</label>
         <Input
@@ -98,7 +94,6 @@ export const OfficerLoginForm: React.FC<OfficerLoginFormProps> = ({
         />
       </div>
 
-      {/* Submit Button */}
       <div className="pt-2 space-y-2">
         <Button
           type="submit"

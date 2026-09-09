@@ -68,7 +68,6 @@ export const DailyActivity: React.FC = () => {
     <section id="features" className="py-20 sm:py-28 bg-[#E6E4E5] relative overflow-hidden select-none">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         
-        {/* Section Header */}
         <div className="text-center max-w-2xl mx-auto space-y-3 mb-14">
           <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-[#ECEAEB] border border-[#D5D2D4] text-xs font-semibold text-zinc-800">
             <BookOpen className="w-3.5 h-3.5 text-[#417F14]" />
@@ -87,10 +86,8 @@ export const DailyActivity: React.FC = () => {
           </p>
         </div>
 
-        {/* The Food Journal Timeline Container */}
         <div className="max-w-3xl mx-auto bg-[#FCFCFB] rounded-[24px] border border-[#D5D2D4] shadow-[0_16px_40px_rgba(0,0,0,0.06)] overflow-hidden text-left">
           
-          {/* Summary Metric Header */}
           <div className="p-6 bg-[#ECEAEB] border-b border-[#D5D2D4] flex flex-wrap items-center justify-between gap-4">
             <div className="flex items-center gap-3">
               <div className="w-10 h-10 rounded-xl bg-white border border-[#D5D2D4] flex items-center justify-center text-lg shadow-sm">
@@ -106,7 +103,6 @@ export const DailyActivity: React.FC = () => {
               </div>
             </div>
 
-            {/* Quick Metrics */}
             <div className="flex items-center gap-4 text-xs font-mono">
               <div className="text-center px-3 py-1.5 rounded-xl bg-white border border-[#D5D2D4]">
                 <span className="text-zinc-500 block text-[10px]">SCANS</span>
@@ -123,7 +119,6 @@ export const DailyActivity: React.FC = () => {
             </div>
           </div>
 
-          {/* Timeline Feed Items */}
           <div className="divide-y divide-zinc-200/80 p-4 sm:p-6 space-y-2">
             {DAILY_ACTIVITIES.map((act) => (
               <div

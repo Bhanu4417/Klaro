@@ -11,7 +11,6 @@ export const CommunitySection: React.FC = () => {
     <section id="community" className="py-20 sm:py-28 bg-[#ECEAEB] border-y border-[#D5D2D4] relative overflow-hidden select-none">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         
-        {/* Section Header */}
         <div className="text-center max-w-2xl mx-auto space-y-3 mb-12 sm:mb-16">
           <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-[#E6E4E5] border border-[#D5D2D4] text-xs font-semibold text-zinc-800">
             <Users className="w-3.5 h-3.5 text-[#417F14]" />
@@ -30,14 +29,12 @@ export const CommunitySection: React.FC = () => {
           </p>
         </div>
 
-        {/* The Live Interactive India Map Experience */}
         <div className="w-full rounded-[28px] overflow-hidden bg-[#0B0B0D] border border-zinc-800 shadow-[0_24px_60px_rgba(0,0,0,0.35)] relative">
           <div className="w-full h-[520px] sm:h-[580px] lg:h-[640px] flex items-center justify-center relative">
             <IndiaMap />
           </div>
         </div>
 
-        {/* 3 Step Community Ripple Cards */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-5 mt-10 text-left">
           
           <div className="p-5 sm:p-6 rounded-2xl bg-white border border-[#D5D2D4] shadow-sm space-y-2">

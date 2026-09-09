@@ -24,7 +24,6 @@ export const WelcomeView: React.FC<WelcomeViewProps> = ({
 }) => {
   return (
     <div className="w-full space-y-4 text-center">
-      {/* Primary Social Authentication Methods */}
       <div className="space-y-2.5">
         <SocialAuthButton
           provider="google"
@@ -42,7 +41,6 @@ export const WelcomeView: React.FC<WelcomeViewProps> = ({
 
       <Divider text="or" />
 
-      {/* Continue with Email button with glossy green capsule styling */}
       <button
         type="button"
         onClick={onSelectEmail}
@@ -57,7 +55,6 @@ export const WelcomeView: React.FC<WelcomeViewProps> = ({
         <span>Continue with Email</span>
       </button>
 
-      {/* Sign In Switcher */}
       <div className="pt-1.5 space-y-3">
         <p className="text-xs sm:text-[13px] text-zinc-500 font-normal">
           Already have an account?{" "}
@@ -70,7 +67,6 @@ export const WelcomeView: React.FC<WelcomeViewProps> = ({
           </button>
         </p>
 
-        {/* Dedicated Officer & Admin Portal Entry Button */}
         <button
           type="button"
           onClick={onOfficerLogin}
@@ -101,7 +97,6 @@ export const WelcomeView: React.FC<WelcomeViewProps> = ({
         </button>
       </div>
 
-      {/* Terms & Privacy microcopy with green accents */}
       <div className="pt-3 border-t border-zinc-100">
         <p className="text-[11px] leading-relaxed text-zinc-400">
           By continuing, you agree to Klaro's{" "}

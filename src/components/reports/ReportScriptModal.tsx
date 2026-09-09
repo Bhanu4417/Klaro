@@ -30,7 +30,6 @@ export interface ScriptPost {
   };
 }
 
-/** Full persisted audit dossier loaded with the post from Supabase (all issues + evidence photo) */
 export interface ScriptRecord {
   report?: AuditReport;
   imageUrl?: string | null;
@@ -59,7 +58,6 @@ interface DisplayIssue {
   locationOnPackage: string;
 }
 
-/** Builds the dossier view — from the full saved audit when available, otherwise reconstructed from the post */
 function buildScriptData(post: ScriptPost, script?: ScriptRecord | null) {
   const full = script?.report;
   if (full) {
@@ -83,7 +81,6 @@ function buildScriptData(post: ScriptPost, script?: ScriptRecord | null) {
     };
   }
 
-  // Fallback: reconstruct a single-issue dossier from the persisted post
   const seed = hashString(post.id + post.title);
   const dossierNumber = `KLR-${(seed % 900000 + 100000).toString()}`;
   const evidenceHash = Array.from({ length: 8 }, (_, i) =>
@@ -134,7 +131,7 @@ export function ReportScriptModal({ post, report, onClose }: ReportScriptModalPr
   return (
     <AnimatePresence>
       {post && data && (
-        <div className="fixed inset-0 z-[85] flex items-center justify-center overflow-y-auto overscroll-contain p-3 sm:p-6">
+        <div key="report-script-modal" className="fixed inset-0 z-[100000] flex items-center justify-center overflow-y-auto overscroll-contain p-3 sm:p-6">
           <motion.div
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
@@ -143,8 +140,7 @@ export function ReportScriptModal({ post, report, onClose }: ReportScriptModalPr
             className="fixed inset-0 bg-[#0B0B0D]/65 backdrop-blur-md"
           />
 
-          <div className="relative z-[90] w-full max-w-[500px] flex flex-col items-center gap-3 my-auto">
-            {/* Modal chrome header */}
+          <div className="relative z-[100001] w-full max-w-[500px] flex flex-col items-center gap-3 my-auto">
             <motion.div
               initial={{ opacity: 0, y: -8 }}
               animate={{ opacity: 1, y: 0 }}
@@ -167,7 +163,6 @@ export function ReportScriptModal({ post, report, onClose }: ReportScriptModalPr
               </button>
             </motion.div>
 
-            {/* Paper unfolding open animation — same script style as the scanner printout */}
             <motion.div
               initial={{ opacity: 0, rotateX: -78, y: 64, scale: 0.96 }}
               animate={{ opacity: 1, rotateX: 0, y: 0, scale: 1 }}
@@ -182,7 +177,6 @@ export function ReportScriptModal({ post, report, onClose }: ReportScriptModalPr
               className="w-full bg-[#FCFCFB] border border-[#D5D2D4] shadow-[0_24px_60px_rgba(0,0,0,0.22)] relative overflow-hidden rounded-2xl max-h-[82vh] overflow-y-auto"
             >
               <div className="p-5 sm:p-6 font-mono text-left">
-                {/* Dossier Header */}
                 <div className="text-center space-y-1 pb-3 border-b border-dashed border-zinc-300">
                   <span className="text-sm font-bold tracking-tight text-zinc-950 block font-satoshi">
                     KLARO LEGAL METROLOGY DOSSIER
@@ -195,7 +189,6 @@ export function ReportScriptModal({ post, report, onClose }: ReportScriptModalPr
                   </span>
                 </div>
 
-                {/* Product Details + Evidence Photo Attachment */}
                 <div className="py-3 border-b border-dashed border-zinc-300 flex gap-3 items-center">
                   {evidenceImage ? (
                     <img src={evidenceImage} alt="proof" className="w-16 h-16 rounded-xl object-cover border border-zinc-200 shrink-0" />
@@ -221,7 +214,6 @@ export function ReportScriptModal({ post, report, onClose }: ReportScriptModalPr
                     </div>
                   </div>
 
-                  {/* Evidence Photo Attachment */}
                   {evidenceImage && (
                     <button
                       type="button"
@@ -238,7 +230,6 @@ export function ReportScriptModal({ post, report, onClose }: ReportScriptModalPr
                   )}
                 </div>
 
-                {/* Statutory Non-Compliances Section — every flagged issue */}
                 <div className="py-3 border-b border-dashed border-zinc-300 space-y-3">
                   <div className="flex items-center justify-between">
                     <span className="text-[10px] font-mono font-bold tracking-widest text-zinc-500 block">
@@ -286,7 +277,6 @@ export function ReportScriptModal({ post, report, onClose }: ReportScriptModalPr
                   ))}
                 </div>
 
-                {/* Officer Note (becomes the post description) */}
                 {post.description && (
                   <div className="py-3 border-b border-dashed border-zinc-300 space-y-1.5">
                     <span className="text-[10px] font-mono font-bold tracking-widest text-zinc-500 block">
@@ -298,7 +288,6 @@ export function ReportScriptModal({ post, report, onClose }: ReportScriptModalPr
                   </div>
                 )}
 
-                {/* Statutory Rule Citation Box */}
                 <div className="py-3 border-b border-dashed border-zinc-300 space-y-1.5">
                   <span className="text-[10px] font-mono font-bold tracking-widest text-zinc-500 block">
                     LEGAL METROLOGY ACT CITATIONS
@@ -314,7 +303,49 @@ export function ReportScriptModal({ post, report, onClose }: ReportScriptModalPr
                   </div>
                 </div>
 
-                {/* Barcode & Verification Seal */}
+                {((report as any)?.compoundingOrder || (post as any)?.auditReport?.compoundingOrder || post.status === "Compounded" || post.status === "Notice Drafted") && (
+                  <div className="py-3 border-b border-dashed border-zinc-300 space-y-1.5">
+                    <span className="text-[10px] font-mono font-bold tracking-widest text-zinc-500 block">
+                      OFFICIAL ENFORCEMENT & COMPOUNDING ACTION
+                    </span>
+                    <div className="p-3.5 rounded-2xl bg-[#EAFBD9] border border-[#80D42F] text-[rgb(18,18,18)] font-mono space-y-2 shadow-[0_4px_16px_rgba(148,235,65,0.15)]">
+                      <div className="flex items-center justify-between border-b border-[#B8F27D] pb-1.5">
+                        <div className="flex items-center gap-1.5">
+                          <span className="w-2 h-2 rounded-full bg-[#346415] animate-pulse" />
+                          <span className="text-xs font-extrabold text-[#346415] uppercase tracking-wider">
+                            {(report as any)?.compoundingOrder?.status || (post as any)?.auditReport?.compoundingOrder?.status || post.status}
+                          </span>
+                        </div>
+                        <span className="text-[9.5px] font-bold text-zinc-700 bg-white/80 px-2 py-0.5 rounded-md border border-[#B8F27D]">
+                          Ref: {(report as any)?.compoundingOrder?.noticeRef || (post as any)?.auditReport?.compoundingOrder?.noticeRef || `NOT-LM-${post.id.slice(-6)}`}
+                        </span>
+                      </div>
+
+                      <div className="grid grid-cols-2 gap-2 text-[10.5px]">
+                        <div>
+                          <span className="text-zinc-500 font-bold block text-[9px] uppercase">Executing Officer:</span>
+                          <span className="font-bold text-zinc-900">{(report as any)?.compoundingOrder?.officerName || (post as any)?.auditReport?.compoundingOrder?.officerName || "Controller of Legal Metrology"}</span>
+                        </div>
+                        <div>
+                          <span className="text-zinc-500 font-bold block text-[9px] uppercase">Penalty Assessment:</span>
+                          <span className="font-extrabold text-[#346415]">{(report as any)?.compoundingOrder?.penaltyAmount || (post as any)?.auditReport?.compoundingOrder?.penaltyAmount || "₹25,000"}</span>
+                        </div>
+                      </div>
+
+                      {((report as any)?.compoundingOrder?.remarks || (post as any)?.auditReport?.compoundingOrder?.remarks) && (
+                        <p className="text-[10px] text-zinc-700 font-sans italic bg-white/60 p-2 rounded-xl border border-[#B8F27D]/50 leading-relaxed">
+                          &ldquo;{(report as any)?.compoundingOrder?.remarks || (post as any)?.auditReport?.compoundingOrder?.remarks}&rdquo;
+                        </p>
+                      )}
+
+                      <div className="pt-1 flex items-center justify-between text-[9px] text-zinc-500 border-t border-[#B8F27D]">
+                        <span>SIG: {(report as any)?.compoundingOrder?.signatureHash || (post as any)?.auditReport?.compoundingOrder?.signatureHash || "SHA256:VERIFIED-LM"}</span>
+                        <span>{(report as any)?.compoundingOrder?.signedAt || (post as any)?.auditReport?.compoundingOrder?.signedAt ? new Date((report as any)?.compoundingOrder?.signedAt || (post as any)?.auditReport?.compoundingOrder?.signedAt).toLocaleDateString("en-IN") : "Recorded"}</span>
+                      </div>
+                    </div>
+                  </div>
+                )}
+
                 <div className="pt-3 space-y-2">
                   <BarcodeGraphic code={data.barcode} />
                   <div className="flex items-center justify-between text-[10px] font-mono pt-1">

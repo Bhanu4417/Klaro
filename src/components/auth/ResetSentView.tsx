@@ -35,7 +35,6 @@ export const ResetSentView: React.FC<ResetSentViewProps> = ({
 
   return (
     <div className="w-full space-y-5 text-center">
-      {/* Icon badge */}
       <div className="mx-auto w-12 h-12 rounded-2xl bg-[#EAFBD9] border border-[#B8F27D] flex items-center justify-center text-[#417F14] shadow-[0_1px_2px_rgba(0,0,0,0.02)]">
         <MailCheck className="w-6 h-6 text-[#478516]" />
       </div>

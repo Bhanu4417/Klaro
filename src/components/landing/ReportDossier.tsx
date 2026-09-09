@@ -10,7 +10,6 @@ export const ReportDossier: React.FC = () => {
         
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 lg:gap-16 items-center">
           
-          {/* LEFT: Explanatory Context */}
           <div className="lg:col-span-5 text-left space-y-6">
             <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-[#ECEAEB] border border-[#D5D2D4] text-xs font-semibold text-zinc-800">
               <FileText className="w-3.5 h-3.5 text-[#417F14]" />
@@ -52,11 +51,9 @@ export const ReportDossier: React.FC = () => {
             </div>
           </div>
 
-          {/* RIGHT: Visual Digital Inspection Dossier Document */}
           <div className="lg:col-span-7 flex justify-center">
             <div className="w-full max-w-xl bg-white rounded-[24px] border border-[#D5D2D4] p-6 sm:p-8 shadow-[0_20px_50px_rgba(0,0,0,0.08)] space-y-6 text-left font-mono">
               
-              {/* Document Header */}
               <div className="flex flex-col sm:flex-row sm:items-center justify-between pb-4 border-b-2 border-zinc-900 gap-3">
                 <div>
                   <span className="text-[10px] uppercase text-zinc-500 font-bold block">
@@ -71,7 +68,6 @@ export const ReportDossier: React.FC = () => {
                 </span>
               </div>
 
-              {/* Inspection Metadata Table */}
               <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 text-xs bg-[#F7F6F6] p-3.5 rounded-xl border border-zinc-200">
                 <div>
                   <span className="text-[9px] text-zinc-500 block uppercase">COMMODITY</span>
@@ -91,7 +87,6 @@ export const ReportDossier: React.FC = () => {
                 </div>
               </div>
 
-              {/* Findings Summary */}
               <div className="space-y-2 text-xs">
                 <span className="text-[10px] uppercase text-zinc-500 font-bold block">
                   STATUTORY VIOLATION SUMMARY (LMPC RULES 2011)
@@ -115,7 +110,6 @@ export const ReportDossier: React.FC = () => {
                 </div>
               </div>
 
-              {/* Digital Authentication & QR Code Seal */}
               <div className="pt-4 border-t border-dashed border-zinc-300 flex items-center justify-between">
                 <div className="space-y-1">
                   <span className="text-[10px] text-zinc-500 block uppercase">DIGITAL SIGNATURE HASH</span>
