@@ -272,4 +272,4 @@ Key routes:
 
 ---
 
-Built for **Smart India Hackathon 2025** — an AI-powered public-interest platform for Legal Metrology compliance.
+Built for **Smart India Hackathon 2026** — an AI-powered public-interest platform for Legal Metrology compliance.

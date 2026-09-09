@@ -14,22 +14,28 @@ const isPublicRoute = createRouteMatcher([
 
 const isAuthRoute = createRouteMatcher(["/", "/login"]);
 
-export default clerkMiddleware(async (auth, req) => {
-  const { userId } = await auth();
-  const loggedInCookie = req.cookies.get("klaro_logged_in")?.value;
+export default clerkMiddleware(
+  async (auth, req) => {
+    const { userId } = await auth();
+    const loggedInCookie = req.cookies.get("klaro_logged_in")?.value;
 
-  if ((userId || loggedInCookie === "true") && isAuthRoute(req)) {
-    return NextResponse.redirect(new URL("/dashboard", req.url));
-  }
-
-  if (!isPublicRoute(req)) {
-    if (userId || loggedInCookie === "true") {
-      return NextResponse.next();
+    if ((userId || loggedInCookie === "true") && isAuthRoute(req)) {
+      return NextResponse.redirect(new URL("/dashboard", req.url));
     }
 
-    return NextResponse.redirect(new URL("/login", req.url));
+    if (!isPublicRoute(req)) {
+      if (userId || loggedInCookie === "true") {
+        return NextResponse.next();
+      }
+
+      return NextResponse.redirect(new URL("/login", req.url));
+    }
+  },
+  {
+    signInUrl: "/login",
+    signUpUrl: "/login",
   }
-});
+);
 
 export const config = {
   matcher: [
