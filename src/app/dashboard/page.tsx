@@ -639,7 +639,10 @@ export default function DashboardPage() {
   useEffect(() => {
     if (!isLoaded) return;
 
-    if (!isSignedIn) {
+    const mockOfficer =
+      typeof window !== "undefined" && !!localStorage.getItem("klaro_admin_auth");
+
+    if (!isSignedIn && !mockOfficer) {
       if (typeof window !== "undefined") {
         localStorage.removeItem("klaro_logged_in");
         document.cookie = "klaro_logged_in=; path=/; max-age=0; SameSite=Lax";
@@ -667,6 +670,16 @@ export default function DashboardPage() {
             avatarUrl: user.imageUrl || "https://api.dicebear.com/9.x/lorelei/svg?seed=Officer&backgroundColor=27272a",
             dietaryPreferences: ["Field Inspector"],
             createdAt: user.createdAt ? new Date(user.createdAt).toISOString() : new Date().toISOString(),
+          });
+        } else if (mockOfficer) {
+          setProfile({
+            id: "admin",
+            email: "admin0529@gmail.com",
+            username: "@chief-administrator",
+            displayName: "Chief Administrator",
+            avatarUrl: "https://api.dicebear.com/9.x/lorelei/svg?seed=Officer&backgroundColor=27272a",
+            dietaryPreferences: ["Field Inspector"],
+            createdAt: new Date().toISOString(),
           });
         }
       } catch (err) {

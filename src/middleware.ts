@@ -23,11 +23,11 @@ export default clerkMiddleware(async (auth, req) => {
   }
 
   if (!isPublicRoute(req)) {
-    if (!userId && loggedInCookie !== "true") {
-      return NextResponse.redirect(new URL("/login", req.url));
+    if (userId || loggedInCookie === "true") {
+      return NextResponse.next();
     }
 
-    await auth.protect();
+    return NextResponse.redirect(new URL("/login", req.url));
   }
 });
 
