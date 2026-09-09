@@ -5,6 +5,7 @@ import { motion, AnimatePresence } from "framer-motion";
 import { Send, X, ShieldCheck, CornerDownRight } from "lucide-react";
 import { KlaroBot } from "../auth/KlaroBot";
 import { cn } from "../../lib/utils";
+import { safeGet, safeRemove, safeSet } from "../../lib/storage";
 
 export const BotUserIcon = ({ className = "w-4 h-4" }: { className?: string }) => (
   <svg
@@ -330,18 +331,18 @@ export const AdminBotPanel: React.FC<{
   const storageKey = `klaro_chat_history_${adminEmail}`;
   const [messages, setMessages] = useState<Msg[]>(() => {
     if (typeof window === "undefined") return [];
-    try {
-      const stored = localStorage.getItem(`klaro_chat_history_${adminEmail}`);
-      if (stored) {
+    const stored = safeGet(`klaro_chat_history_${adminEmail}`);
+    if (stored) {
+      try {
         const parsed = JSON.parse(stored);
         if (Array.isArray(parsed) && parsed.length > 0) {
           return parsed
             .filter((m: any) => m && m.text && !m.pending)
             .map((m: any, idx: number) => ({ ...m, id: idx + 1 }));
         }
+      } catch (e) {
+        console.warn("Could not parse chat history", e);
       }
-    } catch (e) {
-      console.warn("Could not load chat history from localStorage", e);
     }
     return [];
   });
@@ -357,13 +358,9 @@ export const AdminBotPanel: React.FC<{
 
   useEffect(() => {
     if (messages.length > 0) {
-      try {
-        const toSave = messages.filter((m) => !m.pending && m.text);
-        if (toSave.length > 0) {
-          localStorage.setItem(storageKey, JSON.stringify(toSave));
-        }
-      } catch (e) {
-        console.warn("Could not save chat history to localStorage", e);
+      const toSave = messages.filter((m) => !m.pending && m.text);
+      if (toSave.length > 0) {
+        safeSet(storageKey, JSON.stringify(toSave));
       }
     }
   }, [messages, storageKey]);
@@ -391,11 +388,7 @@ export const AdminBotPanel: React.FC<{
 
   const handleClearHistory = () => {
     setMessages([]);
-    try {
-      localStorage.removeItem(storageKey);
-    } catch (e) {
-      console.warn("Could not clear chat history", e);
-    }
+    safeRemove(storageKey);
   };
 
   const ask = async (question: string, context?: string) => {

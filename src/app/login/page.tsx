@@ -17,15 +17,16 @@ import { AuthenticatedAppPreview } from "../../components/preview/AuthenticatedA
 import { AuthErrorState } from "../../components/auth/AuthErrorState";
 import { AuthLoadingState } from "../../components/auth/AuthLoadingState";
 import { getUserProfile, saveUserProfile } from "../../actions/profile";
+import { safeGet, safeRemove, safeSet } from "../../lib/storage";
 
 function setLoginStorage(active: boolean) {
   if (typeof window === "undefined") return;
   if (active) {
-    localStorage.setItem("klaro_logged_in", "true");
+    safeSet("klaro_logged_in", "true");
     document.cookie = "klaro_logged_in=true; path=/; max-age=31536000; SameSite=Lax";
   } else {
-    localStorage.removeItem("klaro_logged_in");
-    localStorage.removeItem("klaro_admin_auth");
+    safeRemove("klaro_logged_in");
+    safeRemove("klaro_admin_auth");
     document.cookie = "klaro_logged_in=; path=/; max-age=0; SameSite=Lax";
   }
 }
@@ -57,8 +58,8 @@ export default function LoginPage() {
 
   useEffect(() => {
     if (typeof window !== "undefined") {
-      const isAlreadyLoggedIn = localStorage.getItem("klaro_logged_in") === "true";
-      const hasAdminAuth = !!localStorage.getItem("klaro_admin_auth");
+      const isAlreadyLoggedIn = safeGet("klaro_logged_in") === "true";
+      const hasAdminAuth = !!safeGet("klaro_admin_auth");
 
       if (hasAdminAuth) {
         setLoadingMessage("Directing to administrator portal...");
@@ -106,8 +107,8 @@ export default function LoginPage() {
         }
       } else if (isUserLoaded && !isSignedIn) {
         if (typeof window !== "undefined") {
-          const hasAdmin = !!localStorage.getItem("klaro_admin_auth");
-          const hasLocalLogin = localStorage.getItem("klaro_logged_in") === "true";
+          const hasAdmin = !!safeGet("klaro_admin_auth");
+          const hasLocalLogin = safeGet("klaro_logged_in") === "true";
           if (!hasAdmin && !hasLocalLogin) {
             setIsLoading(false);
           } else if (!hasAdmin && hasLocalLogin) {
@@ -157,7 +158,7 @@ export default function LoginPage() {
         credentials.pass === "131520@k"
       ) {
         if (typeof window !== "undefined") {
-          localStorage.setItem(
+          safeSet(
             "klaro_admin_auth",
             JSON.stringify({
               email: "admin0529@gmail.com",

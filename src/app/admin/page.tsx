@@ -46,6 +46,7 @@ import {
   Rows3
 } from "lucide-react";
 import { cn, timeAgo } from "../../lib/utils";
+import { safeGet, safeRemove, safeSet } from "../../lib/storage";
 import { Avatar } from "../../components/ui/Avatar";
 import { getLiveReports, seedDemoReports, voteReport, addReportComment, createInspectionReport, updateReportStatus, DBReport } from "../../actions/reports";
 import { CommentsDialog } from "../../components/community/CommentsDialog";
@@ -496,9 +497,9 @@ export default function AdminDashboardPage() {
 
   useEffect(() => {
     if (typeof window !== "undefined") {
-      const storedAuth = localStorage.getItem("klaro_admin_auth");
+      const storedAuth = safeGet("klaro_admin_auth");
       if (!storedAuth) {
-        localStorage.setItem(
+        safeSet(
           "klaro_admin_auth",
           JSON.stringify({
             email: "admin0529@gmail.com",
@@ -520,8 +521,8 @@ export default function AdminDashboardPage() {
 
   const handleAdminSignOut = () => {
     if (typeof window !== "undefined") {
-      localStorage.removeItem("klaro_admin_auth");
-      localStorage.removeItem("klaro_logged_in");
+      safeRemove("klaro_admin_auth");
+      safeRemove("klaro_logged_in");
       document.cookie = "klaro_logged_in=; path=/; max-age=0; SameSite=Lax";
     }
     router.replace("/login");

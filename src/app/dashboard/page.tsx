@@ -7,6 +7,7 @@ import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { getUserProfile } from "../../actions/profile";
 import { UserProfile } from "../../types/auth";
+import { hasLoginCookie, safeGet, safeRemove, safeSet } from "../../lib/storage";
 import { Logo } from "../../components/ui/Logo";
 import { AuthLoadingState } from "../../components/auth/AuthLoadingState";
 import { CommentsDialog } from "../../components/community/CommentsDialog";
@@ -640,11 +641,12 @@ export default function DashboardPage() {
     if (!isLoaded) return;
 
     const mockOfficer =
-      typeof window !== "undefined" && !!localStorage.getItem("klaro_admin_auth");
+      typeof window !== "undefined" &&
+      (!!safeGet("klaro_admin_auth") || hasLoginCookie());
 
     if (!isSignedIn && !mockOfficer) {
       if (typeof window !== "undefined") {
-        localStorage.removeItem("klaro_logged_in");
+        safeRemove("klaro_logged_in");
         document.cookie = "klaro_logged_in=; path=/; max-age=0; SameSite=Lax";
       }
       router.replace("/login");
@@ -652,7 +654,7 @@ export default function DashboardPage() {
     }
 
     if (typeof window !== "undefined") {
-      localStorage.setItem("klaro_logged_in", "true");
+      safeSet("klaro_logged_in", "true");
       document.cookie = "klaro_logged_in=true; path=/; max-age=31536000; SameSite=Lax";
     }
 
@@ -695,8 +697,8 @@ export default function DashboardPage() {
   const handleSignOut = async () => {
     setIsSigningOut(true);
     if (typeof window !== "undefined") {
-      localStorage.removeItem("klaro_logged_in");
-      localStorage.removeItem("klaro_admin_auth");
+      safeRemove("klaro_logged_in");
+      safeRemove("klaro_admin_auth");
       document.cookie = "klaro_logged_in=; path=/; max-age=0; SameSite=Lax";
     }
     try {
