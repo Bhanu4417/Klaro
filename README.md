@@ -10,8 +10,17 @@ Klaro lets any citizen photograph a packaged product and have it instantly audit
 
 ---
 
+## Demo
+
+<iframe src="https://drive.google.com/file/d/1vZv-Xmj9FKPh99DwzFOxVBJjBgMRvaVH/preview" width="720" height="405" allow="autoplay; fullscreen" allowfullscreen></iframe>
+
+[Open the Klaro demo video on Google Drive](https://drive.google.com/file/d/1vZv-Xmj9FKPh99DwzFOxVBJjBgMRvaVH/view?usp=drive_link)
+
+---
+
 ## Table of Contents
 
+- [Demo](#demo)
 - [Features](#features)
 - [How It Works](#how-it-works)
 - [Screenshots](#screenshots)

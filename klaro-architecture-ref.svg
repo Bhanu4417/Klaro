@@ -1,0 +1,202 @@
+<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" viewBox="0 0 1920 1080" width="1920" height="1080" font-family="'Noto Sans', 'Liberation Sans', sans-serif" shape-rendering="geometricPrecision">
+  <defs>
+    <filter id="cardShadow" x="-30%" y="-30%" width="160%" height="180%">
+      <feDropShadow dx="0" dy="3" stdDeviation="4.5" flood-color="#1A1A1A" flood-opacity="0.07"/>
+    </filter>
+    <marker id="arrowGreen" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6.5" markerHeight="6.5" orient="auto" markerUnits="strokeWidth">
+      <path d="M2 2 L9 5 L2 8 Z" fill="#1F4779" stroke="#1F4779" stroke-width="1.2" stroke-linejoin="round" stroke-linecap="round"/>
+    </marker>
+    <marker id="arrowGray" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6.5" markerHeight="6.5" orient="auto" markerUnits="strokeWidth">
+      <path d="M2 2 L9 5 L2 8 Z" fill="#A7ABB1" stroke="#A7ABB1" stroke-width="1.2" stroke-linejoin="round" stroke-linecap="round"/>
+    </marker>
+    <symbol id="i-user" viewBox="0 0 24 24" fill="none" stroke="#1F4779" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round">
+      <circle cx="12" cy="8.2" r="3.5"/>
+      <path d="M5.2 19.6c0-3.5 3-5.5 6.8-5.5s6.8 2 6.8 5.5"/>
+    </symbol>
+    <symbol id="i-cloud" viewBox="0 0 24 24" fill="none" stroke="#1F4779" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round">
+      <path d="M7.2 18.5h9.3a4.1 4.1 0 0 0 .6-8.16 5.6 5.6 0 0 0-10.7-1.2A3.7 3.7 0 0 0 7.2 18.5Z"/>
+      <path d="M12 15.2V8.9"/>
+      <path d="M9.4 11.2 12 8.6l2.6 2.6"/>
+    </symbol>
+    <symbol id="i-scan" viewBox="0 0 24 24" fill="none" stroke="#1F4779" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round">
+      <path d="M4 8.2V5.6A1.6 1.6 0 0 1 5.6 4h2.6"/>
+      <path d="M15.8 4h2.6A1.6 1.6 0 0 1 20 5.6v2.6"/>
+      <path d="M20 15.8v2.6a1.6 1.6 0 0 1-1.6 1.6h-2.6"/>
+      <path d="M8.2 20H5.6A1.6 1.6 0 0 1 4 18.4v-2.6"/>
+      <path d="M7.8 9.6h8.4"/>
+      <path d="M7.8 12.6h5.4"/>
+      <path d="M7.8 15.6h8.4"/>
+    </symbol>
+    <symbol id="i-shield" viewBox="0 0 24 24" fill="none" stroke="#1F4779" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round">
+      <path d="M12 3.2 18.6 6v5.4c0 4.6-2.9 7.1-6.6 8.4-3.7-1.3-6.6-3.8-6.6-8.4V6Z"/>
+      <path d="M9.2 11.9l1.9 1.9 3.7-3.8"/>
+    </symbol>
+    <symbol id="i-hash" viewBox="0 0 24 24" fill="none" stroke="#1F4779" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round">
+      <path d="M9.4 3.6 7.3 20.4"/>
+      <path d="M16.7 3.6l-2.1 16.8"/>
+      <path d="M4.3 9h15.4"/>
+      <path d="M3.9 15h15.4"/>
+    </symbol>
+    <symbol id="i-bars" viewBox="0 0 24 24" fill="none" stroke="#1F4779" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round">
+      <rect x="3.6" y="4.2" width="16.8" height="15.6" rx="2.4"/>
+      <path d="M8 15.4v-3"/>
+      <path d="M12 15.4V8.8"/>
+      <path d="M16 15.4v-4.8"/>
+    </symbol>
+    <symbol id="i-download" viewBox="0 0 24 24" fill="none" stroke="#1F4779" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round">
+      <path d="M4.2 16.6v2.2a1.6 1.6 0 0 0 1.6 1.6h12.4a1.6 1.6 0 0 0 1.6-1.6v-2.2"/>
+      <path d="M12 3.6v10.2"/>
+      <path d="M8.2 10.2 12 14l3.8-3.8"/>
+    </symbol>
+    <symbol id="i-grid" viewBox="0 0 24 24" fill="none" stroke="#1F4779" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round">
+      <rect x="3.8" y="3.8" width="7" height="7" rx="1.8"/>
+      <rect x="13.2" y="3.8" width="7" height="7" rx="1.8"/>
+      <rect x="3.8" y="13.2" width="7" height="7" rx="1.8"/>
+      <rect x="13.2" y="13.2" width="7" height="7" rx="1.8"/>
+    </symbol>
+    <symbol id="i-clipboard" viewBox="0 0 24 24" fill="none" stroke="#1F4779" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round">
+      <rect x="5" y="4.4" width="14" height="16.2" rx="2.2"/>
+      <path d="M9 4.4v-.8a1.4 1.4 0 0 1 1.4-1.4h3.2a1.4 1.4 0 0 1 1.4 1.4v.8"/>
+      <path d="M8.4 10.6h7.2"/>
+      <path d="M8.4 14.1h5"/>
+    </symbol>
+    <symbol id="i-magnifier" viewBox="0 0 24 24" fill="none" stroke="#1F4779" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round">
+      <circle cx="10.6" cy="10.6" r="6"/>
+      <path d="M15.2 15.2 20.4 20.4"/>
+    </symbol>
+    <symbol id="i-doc" viewBox="0 0 24 24" fill="none" stroke="#1F4779" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round">
+      <path d="M6.4 3.7h7.1l4 4v12a1.3 1.3 0 0 1-1.3 1.3H6.4a1.3 1.3 0 0 1-1.3-1.3V5a1.3 1.3 0 0 1 1.3-1.3Z"/>
+      <path d="M13.4 3.9v4.1h4.1"/>
+      <path d="M8.6 12.5h6.8"/>
+      <path d="M8.6 16h4.6"/>
+    </symbol>
+    <symbol id="i-db" viewBox="0 0 24 24" fill="none" stroke="#1F4779" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round">
+      <ellipse cx="12" cy="6" rx="7.2" ry="2.9"/>
+      <path d="M4.8 6v12c0 1.6 3.2 2.9 7.2 2.9s7.2-1.3 7.2-2.9V6"/>
+      <path d="M4.8 12c0 1.6 3.2 2.9 7.2 2.9s7.2-1.3 7.2-2.9"/>
+    </symbol>
+    <symbol id="i-lock" viewBox="0 0 24 24" fill="none" stroke="#52525B" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round">
+      <rect x="5" y="10.6" width="14" height="9.6" rx="2.2"/>
+      <path d="M8.2 10.6V7.8a3.8 3.8 0 0 1 7.6 0v2.8"/>
+    </symbol>
+  </defs>
+
+
+
+
+  <g stroke="#1F4779" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" fill="none">
+    <path d="M372 164H432" marker-end="url(#arrowGreen)"/>
+    <path d="M744 164H804" marker-end="url(#arrowGreen)"/>
+    <path d="M1116 164H1176" marker-end="url(#arrowGreen)"/>
+    <path d="M1488 164H1548" marker-end="url(#arrowGreen)"/>
+    <path d="M1704 218V310" marker-end="url(#arrowGreen)"/>
+    <path d="M432 414H372" marker-end="url(#arrowGreen)"/>
+    <path d="M216 468V720" marker-end="url(#arrowGreen)"/>
+    <path d="M372 774H432" marker-end="url(#arrowGreen)"/>
+    <path d="M744 774H804" marker-end="url(#arrowGreen)"/>
+    <path d="M1116 774H1176" marker-end="url(#arrowGreen)"/>
+    <path d="M1488 774H1688Q1704 774 1704 758V516" marker-end="url(#arrowGreen)"/>
+  </g>
+  <path d="M1548 414H744" stroke="#A7ABB1" stroke-width="2.2" stroke-linecap="round" fill="none" marker-end="url(#arrowGray)"/>
+
+  <g font-size="18" fill="#8A8F98">
+    <text x="1714" y="268">write report</text>
+    <text x="1140" y="404" text-anchor="middle">fetch verified reports</text>
+    <text x="228" y="600">priority queue</text>
+    <text x="1716" y="650">write order</text>
+  </g>
+
+  <g>
+    <rect x="60" y="110" width="312" height="108" rx="16" fill="#FFFFFF" stroke="#DBD8DA" stroke-width="1.6" filter="url(#cardShadow)"/>
+    <rect x="76" y="140" width="48" height="48" rx="13" fill="#F0CD7A" stroke="#D9A94E" stroke-width="1.4"/>
+    <use xlink:href="#i-user" x="87" y="151" width="26" height="26"/>
+    <text x="136" y="156" font-size="24" font-weight="700" fill="#18181B">Citizen App</text>
+    <text x="136" y="180" font-size="18" fill="#7A7F86">mobile label scanner</text>
+    <circle cx="344" cy="134" r="13" fill="#FFFFFF" stroke="#D5D2D4" stroke-width="1.3"/>
+    <use xlink:href="#i-lock" x="336" y="126" width="16" height="16"/>
+
+    <rect x="432" y="110" width="312" height="108" rx="16" fill="#FFFFFF" stroke="#DBD8DA" stroke-width="1.6" filter="url(#cardShadow)"/>
+    <rect x="448" y="140" width="48" height="48" rx="13" fill="#F0CEAB" stroke="#CFA373" stroke-width="1.4"/>
+    <use xlink:href="#i-cloud" x="459" y="151" width="26" height="26"/>
+    <text x="508" y="156" font-size="24" font-weight="700" fill="#18181B">Cloudinary Upload</text>
+    <text x="508" y="180" font-size="18" fill="#7A7F86">label evidence storage</text>
+
+    <rect x="804" y="110" width="312" height="108" rx="16" fill="#FFFFFF" stroke="#DBD8DA" stroke-width="1.6" filter="url(#cardShadow)"/>
+    <rect x="820" y="140" width="48" height="48" rx="13" fill="#B1E4BF" stroke="#8FC2A4" stroke-width="1.4"/>
+    <use xlink:href="#i-scan" x="831" y="151" width="26" height="26"/>
+    <text x="880" y="156" font-size="24" font-weight="700" fill="#18181B">OCR &amp; Label Parse</text>
+    <text x="880" y="180" font-size="18" fill="#7A7F86">text &amp; entity extraction</text>
+
+    <rect x="1176" y="110" width="312" height="108" rx="16" fill="#FFFFFF" stroke="#DBD8DA" stroke-width="1.6" filter="url(#cardShadow)"/>
+    <rect x="1192" y="140" width="48" height="48" rx="13" fill="#F0CD7A" stroke="#D9A94E" stroke-width="1.4"/>
+    <use xlink:href="#i-shield" x="1203" y="151" width="26" height="26"/>
+    <text x="1252" y="156" font-size="24" font-weight="700" fill="#18181B">Audit Engine</text>
+    <text x="1252" y="180" font-size="18" fill="#7A7F86">LMPC 2011 rule checks</text>
+
+    <rect x="1548" y="110" width="312" height="108" rx="16" fill="#FFFFFF" stroke="#DBD8DA" stroke-width="1.6" filter="url(#cardShadow)"/>
+    <rect x="1564" y="140" width="48" height="48" rx="13" fill="#F0CEAB" stroke="#CFA373" stroke-width="1.4"/>
+    <use xlink:href="#i-hash" x="1575" y="151" width="26" height="26"/>
+    <text x="1624" y="156" font-size="24" font-weight="700" fill="#18181B">Verdict &amp; Dossier</text>
+    <text x="1624" y="180" font-size="18" fill="#7A7F86">score &amp; SHA-256 hash</text>
+  </g>
+
+  <g>
+    <rect x="1548" y="310" width="312" height="200" rx="18" fill="#FFFFFF" stroke="#DBD8DA" stroke-width="1.6" filter="url(#cardShadow)"/>
+    <rect x="1676" y="332" width="56" height="56" rx="16" fill="#B1E4BF" stroke="#8FC2A4" stroke-width="1.4"/>
+    <use xlink:href="#i-db" x="1689" y="345" width="30" height="30"/>
+    <text x="1704" y="428" text-anchor="middle" font-size="28" font-weight="700" fill="#18181B">Supabase Postgres</text>
+    <text x="1704" y="453" text-anchor="middle" font-size="19" font-weight="700" fill="#1F4779">Central Data Store</text>
+    <text x="1704" y="478" text-anchor="middle" font-size="17" fill="#8A8F98">reports · votes · audit orders</text>
+  </g>
+
+  <g>
+    <rect x="60" y="360" width="312" height="108" rx="16" fill="#FFFFFF" stroke="#DBD8DA" stroke-width="1.6" filter="url(#cardShadow)"/>
+    <rect x="76" y="390" width="48" height="48" rx="13" fill="#F0CD7A" stroke="#D9A94E" stroke-width="1.4"/>
+    <use xlink:href="#i-bars" x="87" y="401" width="26" height="26"/>
+    <text x="136" y="406" font-size="24" font-weight="700" fill="#18181B">Community Feed</text>
+    <text x="136" y="430" font-size="18" fill="#7A7F86">votes, comments &amp; India map</text>
+
+    <rect x="432" y="360" width="312" height="108" rx="16" fill="#FFFFFF" stroke="#DBD8DA" stroke-width="1.6" filter="url(#cardShadow)"/>
+    <rect x="448" y="390" width="48" height="48" rx="13" fill="#F0CEAB" stroke="#CFA373" stroke-width="1.4"/>
+    <use xlink:href="#i-download" x="459" y="401" width="26" height="26"/>
+    <text x="508" y="406" font-size="24" font-weight="700" fill="#18181B">Case Export</text>
+    <text x="508" y="430" font-size="18" fill="#7A7F86">dossier &amp; legal trail</text>
+  </g>
+
+  <g>
+  </g>
+
+  <g>
+    <rect x="60" y="720" width="312" height="108" rx="16" fill="#FFFFFF" stroke="#DBD8DA" stroke-width="1.6" filter="url(#cardShadow)"/>
+    <rect x="76" y="750" width="48" height="48" rx="13" fill="#B1E4BF" stroke="#8FC2A4" stroke-width="1.4"/>
+    <use xlink:href="#i-grid" x="87" y="761" width="26" height="26"/>
+    <text x="136" y="766" font-size="24" font-weight="700" fill="#18181B">Officer Console</text>
+    <text x="136" y="790" font-size="18" fill="#7A7F86">enforcement dashboard</text>
+    <circle cx="344" cy="744" r="13" fill="#FFFFFF" stroke="#D5D2D4" stroke-width="1.3"/>
+    <use xlink:href="#i-lock" x="336" y="736" width="16" height="16"/>
+
+    <rect x="432" y="720" width="312" height="108" rx="16" fill="#FFFFFF" stroke="#DBD8DA" stroke-width="1.6" filter="url(#cardShadow)"/>
+    <rect x="448" y="750" width="48" height="48" rx="13" fill="#F0CD7A" stroke="#D9A94E" stroke-width="1.4"/>
+    <use xlink:href="#i-clipboard" x="459" y="761" width="26" height="26"/>
+    <text x="508" y="766" font-size="24" font-weight="700" fill="#18181B">Case Review</text>
+    <text x="508" y="790" font-size="18" fill="#7A7F86">clause, severity &amp; evidence</text>
+
+    <rect x="804" y="720" width="312" height="108" rx="16" fill="#FFFFFF" stroke="#DBD8DA" stroke-width="1.6" filter="url(#cardShadow)"/>
+    <rect x="820" y="750" width="48" height="48" rx="13" fill="#F0CEAB" stroke="#CFA373" stroke-width="1.4"/>
+    <use xlink:href="#i-magnifier" x="831" y="761" width="26" height="26"/>
+    <text x="880" y="766" font-size="24" font-weight="700" fill="#18181B">Officer Copilot</text>
+    <text x="880" y="790" font-size="18" fill="#7A7F86">LMPC rule Q&amp;A assistant</text>
+
+    <rect x="1176" y="720" width="312" height="108" rx="16" fill="#FFFFFF" stroke="#DBD8DA" stroke-width="1.6" filter="url(#cardShadow)"/>
+    <rect x="1192" y="750" width="48" height="48" rx="13" fill="#B1E4BF" stroke="#8FC2A4" stroke-width="1.4"/>
+    <use xlink:href="#i-doc" x="1203" y="761" width="26" height="26"/>
+    <text x="1252" y="766" font-size="24" font-weight="700" fill="#18181B">Notice &amp; Order</text>
+    <text x="1252" y="790" font-size="18" fill="#7A7F86">show-cause notice &amp; order</text>
+  </g>
+
+  <g>
+  </g>
+
+  <g>
+  </g>
+</svg>
